@@ -11,6 +11,7 @@ immutable ArrayFire
 	device
 	createHandle
 	createArray
+	releaseArray
 
 	function ArrayFire(backend)
 		lib = if backend == OpenCL
@@ -26,7 +27,8 @@ immutable ArrayFire
 			ptr,
 			AFDevice(ptr),
 			Libdl.dlsym(ptr, :af_create_handle),
-			Libdl.dlsym(ptr, :af_create_array))
+			Libdl.dlsym(ptr, :af_create_array),
+			Libdl.dlsym(ptr, :af_release_array))
 	end
 end
 

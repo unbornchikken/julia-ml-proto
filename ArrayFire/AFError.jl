@@ -5,4 +5,4 @@ end
 Base.showerror(io::IO, e::AFErrorException) =
 	print(io, "AF Error Code: ", e.code);
 
-assertErr(err) = (err != 0) && throw(AFErrorException(err))
+assertErr(err) = !((err != 0) && throw(AFErrorException(err)))

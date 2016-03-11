@@ -69,3 +69,18 @@ export Dim4, DimT
 
 typealias DimT Int64
 typealias Dim4 Vector{DimT}
+
+export dimsToDim4
+
+dimsToDim4(dims) =
+	if length(dims) == 1
+        [dims[1]]
+    elseif length(dims) == 2
+        [dims[1], dims[2]]
+    elseif length(dims) == 3
+        [dims[1], dims[2], dims[4]]
+    elseif length(dims) == 4
+        [dims[1], dims[2], dims[3], dims[4]]
+    else
+        throw(ArgumentError("Too many dimensions"))
+    end
