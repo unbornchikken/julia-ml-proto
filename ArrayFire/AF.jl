@@ -38,10 +38,16 @@ include("AFDevice.jl")
 include("AFArray.jl")
 include("FreeList.jl")
 
+immutable ScopeHandle
+	result::Function
+	register::Function
+end
+
 function scope!(pred, af::ArrayFire)
 	newScope!(af.freeList)
 	try
-		pred(arr -> markResult!(af.freeList, arr))
+		h = ScopeHandle(arr -> markResult!(af.freeList, arr), arr -> register!(af.freeList, arr))
+		pred(h)
 	finally
 		endScope!(af.freeList)
 	end
