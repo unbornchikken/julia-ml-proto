@@ -15,7 +15,9 @@ type EmptyAFArray <: AFArray
 		dims = [0, 0, 0, 0]
 		err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, 4, dims, f32)
 		assertErr(err)
-		new(AFArrayBase(af, ptr[]))
+		me = new(AFArrayBase(af, ptr[]))
+		register!(af, me)
+		me
 	end
 end
 
@@ -30,7 +32,9 @@ type AFArrayWithData{T, N} <: AFArray
 		assert(N == length(dims))
 		err = ccall(af.createArray, Cint, (Ptr{Ptr{Void}}, Ptr{T}, Cuint, Ptr{DimT}, DType), ptr, pointer(arr), N, pointer(dims), asDType(T))
 		assertErr(err)
-		new(AFArrayBase(af, ptr[]))
+		me = new(AFArrayBase(af, ptr[]))
+		register!(af, me)
+		me
 	end
 
 	function AFArrayWithData(af::ArrayFire, dims...)
@@ -39,7 +43,9 @@ type AFArrayWithData{T, N} <: AFArray
 		assert(N == length(dims))
 		err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, N, pointer(dims), asDType(T))
 		assertErr(err)
-		new(AFArrayBase(af, ptr[]))
+		me = new(AFArrayBase(af, ptr[]))
+		register!(af, me)
+		me
 	end
 end
 

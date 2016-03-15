@@ -9,7 +9,11 @@ immutable AFDevice
 
 	function AFDevice(ptr)
 		new(
-			Libdl.dlsym(ptr, :af_info_string),
+			try
+				Libdl.dlsym(ptr, :af_info_string)
+			catch
+				C_NULL
+			end,
 			Libdl.dlsym(ptr, :af_get_device_count),
 			Libdl.dlsym(ptr, :af_set_device),
 			Libdl.dlsym(ptr, :af_get_device),
@@ -21,9 +25,14 @@ end
 export infoString
 
 function infoString(af::ArrayFire)
-	result = Ref{Ptr{Cchar}}()
-	ccall(af.device.infoString, Cint, (Ptr{Ptr{Cchar}}, Cuchar), result, false)
-	bytestring(result[])
+	if (af.device.infoString != C_NULL)
+		result = Ref{Ptr{Cchar}}()
+		ccall(af.device.infoString, Cint, (Ptr{Ptr{Cchar}}, Cuchar), result, false)
+		bytestring(result[])
+	else
+		info = deviceInfo(af)
+		convert(AbstractString, info)
+	end
 end
 
 export getDeviceCount
