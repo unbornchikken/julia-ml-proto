@@ -2,7 +2,7 @@ export Backend
 
 @enum Backend Default CPU CUDA OpenCL
 
-export DeviceInfo, convert
+export DeviceInfo
 
 immutable DeviceInfo
 	id
@@ -12,9 +12,12 @@ immutable DeviceInfo
 	compute
 end
 
-function convert(::Type{AbstractString}, info::DeviceInfo)
+function toString(info::DeviceInfo)
 	"ID: $(info.id)\nName: $(info.name)\nPlatform: $(info.platform)\nToolkit: $(info.toolkit)\nCompute: $(info.compute)"
 end
+
+Base.print(io::IOBuffer, info::DeviceInfo) = Base.print(io, toString(info))
+Base.print(info::DeviceInfo) = Base.print(toString(info))
 
 export DType, f32, c32, f64, c64, b8, s32, u32, u8, s64, u64
 

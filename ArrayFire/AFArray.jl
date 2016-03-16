@@ -57,6 +57,8 @@ array{T, N}(af::ArrayFire, arr::Array{T, N}) = AFArrayWithData{T, N}(af, arr)
 
 array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArrayWithData{T, length(dims)}(af, dims...)
 
+array{T}(af::ArrayFire, arr::Array{T}, dims...) = array(af, reshape(arr, dims))
+
 getBase(arr::EmptyAFArray) = arr.base
 
 getBase{T, N}(arr::AFArrayWithData{T, N}) = arr.base

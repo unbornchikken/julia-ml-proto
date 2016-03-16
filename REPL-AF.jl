@@ -27,3 +27,5 @@ begin
 	print(release!(arr4))
 	print(release!(arr5))
 end
+
+arr6 = array(af, [1.1f0 2.2f0 3.3f0 4.4f0], 2, 2)

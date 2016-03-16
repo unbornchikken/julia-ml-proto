@@ -1,2 +1,7 @@
-idx = readIdx(Float32, joinpath(pwd(), "examples", "MNIST", "data", "images-subset"))
-print(idx)
+include("ArrayFire/AF.jl")
+include("GenEvo.jl")
+
+import AF: ArrayFire, Backend
+
+af = ArrayFire(0)
+r = loadSubset(af)
