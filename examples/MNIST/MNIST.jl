@@ -2,6 +2,8 @@ include("../../GenEvo.jl")
 
 module MNIST
 
+using GenEvo
+
 immutable Idx
 	numDims::Int
 	dims

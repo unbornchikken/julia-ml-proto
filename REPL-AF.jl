@@ -1,4 +1,4 @@
-af = ArrayFire(OpenCL)
+af = ArrayFire{OpenCL}()
 @show infoString(af)
 getDeviceCount(af)
 @show getDevice(af)

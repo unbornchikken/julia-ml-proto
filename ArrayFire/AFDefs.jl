@@ -1,6 +1,4 @@
-export Backend
-
-@enum Backend Default CPU CUDA OpenCL
+include("Backend.jl")
 
 export DeviceInfo
 

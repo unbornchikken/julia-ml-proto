@@ -1,5 +1,9 @@
+include("ArrayFire/AF.jl")
+
 module GenEvo
 
-include("Context.jl")
+using Reexport
+
+@reexport using AF
 
 end

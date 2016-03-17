@@ -1,7 +1,2 @@
-include("ArrayFire/AF.jl")
-include("GenEvo.jl")
-
-import AF: ArrayFire, Backend
-
-af = ArrayFire(0)
+af = ArrayFire{CPU}()
 r = loadSubset(af)

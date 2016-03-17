@@ -5,8 +5,7 @@ include("AFError.jl")
 
 export ArrayFire
 
-immutable ArrayFire
-	backend::Backend
+immutable ArrayFire{T<:Backend}
 	ptr
 	device
 	createHandle
@@ -14,17 +13,16 @@ immutable ArrayFire
 	releaseArray
 	freeList
 
-	function ArrayFire(backend)
-		lib = if backend == OpenCL
+	function ArrayFire()
+		lib = if is(T, OpenCL)
 			"afopencl"
-		elseif backend == CUDA
+		elseif is(T, CUDA)
 			"afcuda"
 		else
 			"afcpu"
 		end
 		ptr = Libdl.dlopen(lib)
 		new(
-			backend,
 			ptr,
 			AFDevice(ptr),
 			Libdl.dlsym(ptr, :af_create_handle),
