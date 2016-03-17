@@ -1,5 +1,3 @@
-export AFDevice
-
 immutable AFDevice
 	infoString
 	getDeviceCount

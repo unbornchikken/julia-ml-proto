@@ -8,9 +8,12 @@ export ArrayFire
 immutable ArrayFire{T<:Backend}
 	ptr
 	device
+	create
 	createHandle
 	createArray
 	releaseArray
+	getDims
+	getDataPtr
 	freeList
 
 	function ArrayFire()
@@ -25,14 +28,18 @@ immutable ArrayFire{T<:Backend}
 		new(
 			ptr,
 			AFDevice(ptr),
+			Create(ptr),
 			Libdl.dlsym(ptr, :af_create_handle),
 			Libdl.dlsym(ptr, :af_create_array),
 			Libdl.dlsym(ptr, :af_release_array),
+			Libdl.dlsym(ptr, :af_get_dims),
+			Libdl.dlsym(ptr, :af_get_data_ptr),
 			FreeList())
 	end
 end
 
 include("AFDevice.jl")
+include("Create.jl")
 include("AFArray.jl")
 include("FreeList.jl")
 

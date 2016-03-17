@@ -8,12 +8,17 @@ setDevice(af, 1)
 
 arr1 = array(af)
 @show arr1
+dims(arr1)
+size(arr1)
 
 arr2 = array(af, Float32, 4, 5)
-@show arr2
+print(dims(arr2))
+print(dims(arr2, 1))
+print(size(arr2))
 
 arr3 = array(af, [1.1f0 2.2f0 3.3f0 4.4f0])
-@show arr3
+size(arr3)
+print(host(arr3))
 release!(arr3)
 
 begin

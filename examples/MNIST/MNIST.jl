@@ -42,8 +42,8 @@ function readIdx{T}(::Type{T}, path)
 	end
 end
 
-function loadSubset(ctx, expandLabels = true, frac = 0.6)
-	frac = min(frac, 0.8)
+function loadSubset(ctx, expandLabels = true, frac = 0.6f0)
+	frac = min(frac, 0.8f0)
 
 	cd = dirname(@__FILE__)
 	dataRoot = joinpath(cd, "data")
@@ -51,22 +51,23 @@ function loadSubset(ctx, expandLabels = true, frac = 0.6)
 	labelData = readIdx(UInt32, joinpath(dataRoot, "labels-subset"))
 
 	rIDims = reverse(imageData.dims)
-	images = GenEvo.array(ctx, imageData.data, rIDims...)
+	images = array(ctx, imageData.data, rIDims...)
 
-	# let r = af.randu(10000, af.dType.f32);
-    # let cond = r.lt(frac);
-    # let trainIndices = af.where(cond);
-    # let testIndices = af.where(cond.not());
-	#
-    # let trainImages = af.lookup(images, trainIndices, 2).div(255);
-    # let testImages = af.lookup(images, testIndices, 2).div(255);
-	#
-    # let numClasses = 10;
-    # let numTrain = trainImages.dims(2);
-    # let numTest = testImages.dims(2);
-	#
-    # debug(`Training sample count: ${numTrain}`);
-    # debug(`Test sample count: ${numTest}`);
+	r = randu(Float32, 10000)
+	cond = r .< frac;
+	trainIndices = where(cond);
+	testIndices = where(!cond);
+
+	trainImages = lookup(images, trainIndices, 2) ./ 255;
+    testImages = lookup(images, testIndices, 2) ./ 255;
+
+    numClasses = 10;
+    numTrain = dims(trainImages, 2);
+    numTest = dims(testImages, 2);
+
+    print("Training sample count: $numTrain");
+    print("Test sample count: $numTest");
+
 	#
     # let trainLabels;
     # let testLabels;

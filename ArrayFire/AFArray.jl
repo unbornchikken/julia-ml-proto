@@ -74,4 +74,82 @@ function release!(arr)
 	end
 end
 
-assertAlive(arr) = !(getBase(arr).ptr == C_NULL && error("Cannot access to a released array."))
+function _base(arr)
+	b = getBase(arr)
+	b.ptr == C_NULL && error("Cannot access to a released array.")
+	b
+end
+
+export dims
+
+function dims{T, N}(arr::AFArrayWithData{T, N})
+	dim0 = Ref{DimT}()
+	dim1 = Ref{DimT}()
+	dim2 = Ref{DimT}()
+	dim3 = Ref{DimT}()
+	base = _base(arr)
+	err = ccall(
+		base.af.getDims,
+		Cint, (Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{Void}),
+		dim0, dim1, dim2, dim3, base.ptr)
+	assertErr(err)
+	[dim0[], dim1[], dim2[], dim3[]]
+end
+
+function dims{T, N}(arr::AFArrayWithData{T, N}, n)
+	dim0 = Ref{DimT}()
+	dim1 = Ref{DimT}()
+	dim2 = Ref{DimT}()
+	dim3 = Ref{DimT}()
+	base = _base(arr)
+	err = ccall(
+		base.af.getDims,
+		Cint, (Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{Void}),
+		dim0, dim1, dim2, dim3, base.ptr)
+	assertErr(err)
+	if n == 1
+		dim0[]
+	elseif n == 2
+		dim1[]
+	elseif n == 3
+		dim2[]
+	else
+		dim3[]
+	end
+end
+
+dims(arr::EmptyAFArray) = [0, 0, 0, 0]
+
+dims(arr::EmptyAFArray, n) = 0
+
+function Base.size(arr::AFArray)
+	d = dims(arr)
+	if d[4] > 1
+		(d[1], d[2], d[3], d[4])
+	elseif d[3] > 1
+		(d[1], d[2], d[3])
+	elseif d[2] > 1
+		(d[1], d[2])
+	elseif d[1] > 1
+		(d[1],)
+	else
+		()
+	end
+end
+
+export host
+
+function host{T, N}(arr::AFArrayWithData{T, N})
+	result = Array{T}(size(arr)...)
+	host(arr, result)
+end
+
+function host{T, N}(arr::AFArrayWithData{T, N}, to::Array{T, N})
+	base = _base(arr)
+	err = ccall(
+		base.af.getDataPtr,
+		Cint, (Ptr{T}, Ptr{Void}),
+		to, base.ptr)
+	assertErr(err)
+	to
+end
