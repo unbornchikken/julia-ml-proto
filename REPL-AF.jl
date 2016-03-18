@@ -1,9 +1,7 @@
 af = ArrayFire{OpenCL}()
 
-one = constant(af, 1.0f0, 4, 2)
-arr = host(one)
+arr1 = array(af, [1.0f0, 2.0f0, 3.0f0])
+arr2 = array(af, [2.0f0, 2.0f0, 2.0f0])
 
-rnd = randu(af, Bool, 1, 5)
-arr = host(rnd)
-
-gc()
+result = arr1 .< arr2
+host(result)

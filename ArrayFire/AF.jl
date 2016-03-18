@@ -3,7 +3,7 @@ module AF
 include("AFDefs.jl")
 include("AFError.jl")
 
-export ArrayFire 
+export ArrayFire
 export scope!
 export register!
 
@@ -11,12 +11,14 @@ immutable ArrayFire{T<:Backend}
 	ptr
 	device
 	create
+	binary
 	createHandle
 	createArray
 	releaseArray
 	getDims
 	getDataPtr
 	freeList
+	batch
 
 	function ArrayFire()
 		lib = if is(T, OpenCL)
@@ -31,18 +33,21 @@ immutable ArrayFire{T<:Backend}
 			ptr,
 			AFDevice(ptr),
 			Create(ptr),
+			Binary(ptr),
 			Libdl.dlsym(ptr, :af_create_handle),
 			Libdl.dlsym(ptr, :af_create_array),
 			Libdl.dlsym(ptr, :af_release_array),
 			Libdl.dlsym(ptr, :af_get_dims),
 			Libdl.dlsym(ptr, :af_get_data_ptr),
-			FreeList())
+			FreeList(),
+			false)
 	end
 end
 
+include("AFArray.jl")
 include("AFDevice.jl")
 include("Create.jl")
-include("AFArray.jl")
+include("Binary.jl")
 include("FreeList.jl")
 
 immutable ScopeHandle
