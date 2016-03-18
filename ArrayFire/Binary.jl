@@ -25,5 +25,5 @@ function .<{T, N, M}(lhs::AFArrayWithData{T, N}, rhs::AFArrayWithData{T, M})
 		Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 		result, lhsBase.ptr, rhsBase.ptr, af.batch)
 	assertErr(err)
-	AFArrayWithData{Bool, max(M, N)}(af, result[])
+	AFArrayWithData{asJType(Val{b8}), max(M, N)}(af, result[])
 end

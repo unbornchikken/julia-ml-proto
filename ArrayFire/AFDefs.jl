@@ -43,29 +43,16 @@ asDType(::Type{UInt8})            = u8
 asDType(::Type{Int64})            = s64
 asDType(::Type{UInt64})           = u64
 
-function asJType(dtype)
-    if dtype == f32
-        return Float32
-    elseif dtype == c32
-        return Complex{Float32}
-    elseif dtype == f64
-        return Float64
-    elseif dtype == c64
-        return Complex{Float64}
-    elseif dtype == b8
-        return Bool
-    elseif dtype == s32
-        return Int32
-    elseif dtype == u32
-        return UInt32
-    elseif dtype == u8
-        return UInt8
-    elseif dtype == s64
-        return Int64
-    elseif dtype == u64
-        return UInt64
-    end
-end
+asJType(::Type{Val{f32}}) = Float32
+asJType(::Type{Val{c32}}) = Complex{Float32}
+asJType(::Type{Val{f64}}) = Float64
+asJType(::Type{Val{c64}}) = Complex{Float64}
+asJType(::Type{Val{b8}}) = Bool
+asJType(::Type{Val{s32}}) = Int32
+asJType(::Type{Val{u32}}) = UInt32
+asJType(::Type{Val{u8}}) = UInt8
+asJType(::Type{Val{s64}}) = Int64
+asJType(::Type{Val{u64}}) = UInt64
 
 typealias DimT Int64
 typealias Dim4 Vector{DimT}

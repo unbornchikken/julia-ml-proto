@@ -6,9 +6,9 @@ export host
 
 abstract AFArray
 
-type AFArrayBase
-	af
-	ptr
+type AFArrayBase{T<:ArrayFire}
+	af::T
+	ptr::Ptr{Void}
 end
 
 type EmptyAFArray <: AFArray
@@ -44,9 +44,9 @@ type AFArrayWithData{T, N} <: AFArray
 
 	function AFArrayWithData(af::ArrayFire, dims...)
 		ptr = Ref{Ptr{Void}}()
-		dims = collect(dims)
-		assert(N == length(dims))
-		err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, N, pointer(dims), asDType(T))
+		dims2 = collect(dims)
+		assert(N == length(dims2))
+		err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, N, pointer(dims2), asDType(T))
 		assertErr(err)
 		me = new(AFArrayBase(af, ptr[]))
 		finalizer(me, release!)
