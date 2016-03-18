@@ -1,6 +1,9 @@
 include("Backend.jl")
 
 export DeviceInfo
+export DType
+export Dim4
+export DimT
 
 immutable DeviceInfo
 	id
@@ -17,8 +20,6 @@ end
 Base.print(io::IOBuffer, info::DeviceInfo) = Base.print(io, toString(info))
 Base.print(info::DeviceInfo) = Base.print(toString(info))
 
-export DType, f32, c32, f64, c64, b8, s32, u32, u8, s64, u64
-
 typealias DType UInt32
 const f32 = DType(0) # 32-bit floating point values
 const c32 = DType(1) # 32-bit complex floating point values
@@ -31,8 +32,6 @@ const u8  = DType(7) #  8-bit unsigned integral values
 const s64 = DType(8) # 64-bit signed integral values
 const u64 = DType(9) # 64-bit unsigned integral values
 
-export asDType
-
 asDType(::Type{Float32})          = f32
 asDType(::Type{Complex{Float32}}) = c32
 asDType(::Type{Float64})          = f64
@@ -43,8 +42,6 @@ asDType(::Type{UInt32})           = u32
 asDType(::Type{UInt8})            = u8
 asDType(::Type{Int64})            = s64
 asDType(::Type{UInt64})           = u64
-
-export asJType
 
 function asJType(dtype)
     if dtype == f32
@@ -70,12 +67,8 @@ function asJType(dtype)
     end
 end
 
-export Dim4, DimT
-
 typealias DimT Int64
 typealias Dim4 Vector{DimT}
-
-export dimsToDim4
 
 dimsToDim4(dims) =
 	if length(dims) == 1

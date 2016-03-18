@@ -1,3 +1,10 @@
+export infoString
+export getDeviceCount
+export setDevice
+export getDevice
+export deviceInfo
+export deviceInfos
+
 immutable AFDevice
 	infoString
 	getDeviceCount
@@ -20,8 +27,6 @@ immutable AFDevice
 	end
 end
 
-export infoString
-
 function infoString(af::ArrayFire)
 	if (af.device.infoString != C_NULL)
 		result = Ref{Ptr{Cchar}}()
@@ -33,8 +38,6 @@ function infoString(af::ArrayFire)
 	end
 end
 
-export getDeviceCount
-
 function getDeviceCount(af::ArrayFire)
 	count = Ref{Cint}(0)
 	err = ccall(af.device.getDeviceCount, Cint, (Ref{Cint},), count)
@@ -42,14 +45,10 @@ function getDeviceCount(af::ArrayFire)
 	count[]
 end
 
-export setDevice
-
 function setDevice(af::ArrayFire, device)
 	err = ccall(af.device.setDevice, Cint, (Cint,), device)
 	assertErr(err)
 end
-
-export getDevice
 
 function getDevice(af::ArrayFire)
 	device = Ref{Cint}(0)
@@ -57,8 +56,6 @@ function getDevice(af::ArrayFire)
 	assertErr(err)
 	device[]
 end
-
-export deviceInfo
 
 function deviceInfo(af::ArrayFire)
 	name = Array(Cchar, 256)
@@ -78,8 +75,6 @@ function deviceInfo(af::ArrayFire)
 		bytestring(pointer(toolkit)),
 		bytestring(pointer(compute)))
 end
-
-export deviceInfos
 
 function deviceInfos(af::ArrayFire)
 	curr = getDevice(af)

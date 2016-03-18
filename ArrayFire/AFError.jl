@@ -1,3 +1,5 @@
+export AFErrorException
+
 type AFErrorException <: Exception
 	code
 end

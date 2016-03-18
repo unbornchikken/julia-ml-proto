@@ -1,4 +1,8 @@
 export AFArray
+export array
+export release!
+export dims
+export host
 
 abstract AFArray
 
@@ -49,8 +53,6 @@ type AFArrayWithData{T, N} <: AFArray
 	end
 end
 
-export array
-
 array(af::ArrayFire) = EmptyAFArray(af)
 
 array{T, N}(af::ArrayFire, arr::Array{T, N}) = AFArrayWithData{T, N}(af, arr)
@@ -79,8 +81,6 @@ function _base(arr)
 	b.ptr == C_NULL && error("Cannot access to a released array.")
 	b
 end
-
-export dims
 
 function dims{T, N}(arr::AFArrayWithData{T, N})
 	dim0 = Ref{DimT}()
@@ -136,8 +136,6 @@ function Base.size(arr::AFArray)
 		()
 	end
 end
-
-export host
 
 function host{T, N}(arr::AFArrayWithData{T, N})
 	result = Array{T}(size(arr)...)
