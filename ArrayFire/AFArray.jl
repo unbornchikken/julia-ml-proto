@@ -37,6 +37,7 @@ type AFArrayWithData{T, N} <: AFArray
 		err = ccall(af.createArray, Cint, (Ptr{Ptr{Void}}, Ptr{T}, Cuint, Ptr{DimT}, DType), ptr, pointer(arr), N, pointer(dims), asDType(T))
 		assertErr(err)
 		me = new(AFArrayBase(af, ptr[]))
+		finalizer(me, release!)
 		register!(af, me)
 		me
 	end
@@ -48,6 +49,7 @@ type AFArrayWithData{T, N} <: AFArray
 		err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, N, pointer(dims), asDType(T))
 		assertErr(err)
 		me = new(AFArrayBase(af, ptr[]))
+		finalizer(me, release!)
 		register!(af, me)
 		me
 	end
