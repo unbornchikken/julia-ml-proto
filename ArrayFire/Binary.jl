@@ -1,4 +1,5 @@
-import Base: .<
+import Base: .<,.>,.<=,.>=
+export .<,.>,.<=,.>=
 
 immutable Binary
 	le
@@ -16,14 +17,57 @@ immutable Binary
 	end
 end
 
-function .<{T, N, M}(lhs::AFArrayWithData{T, N}, rhs::AFArrayWithData{T, M})
-	result = Ref{Ptr{Void}}()
-	lhsBase = getBase(lhs)
-	rhsBase = getBase(rhs)
-	af = lhsBase.af
-	err = ccall(af.binary.lt,
-		Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
-		result, lhsBase.ptr, rhsBase.ptr, af.batch)
-	assertErr(err)
-	AFArrayWithData{asJType(Val{b8}), max(M, N)}(af, result[])
+macro binOp(op, cFunc, resultT)
+	quote
+		function $(esc(op)){T1, N1, T2, N2}(lhs::AFArrayWithData{T1, N1}, rhs::AFArrayWithData{T2, N2})
+			result = Ref{Ptr{Void}}()
+			lhsBase = getBase(lhs)
+			rhsBase = getBase(rhs)
+			af = lhsBase.af
+			err = ccall(af.binary.$(cFunc),
+				Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
+				result, lhsBase.ptr, rhsBase.ptr, af.batch)
+			assertErr(err)
+			AFArrayWithData{$resultT, max(N1, N2)}(af, result[])
+		end
+
+		function $(esc(op)){T, N}(lhs::AFArrayWithData{T, N}, rhsConst::Number)
+			result = Ref{Ptr{Void}}()
+			lhsBase = getBase(lhs)
+			af = lhsBase.af
+			rhs = constant(af, rhsConst, size(lhs)...)
+			try
+				rhsBase = getBase(rhs)
+				err = ccall(af.binary.$(cFunc),
+					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
+					result, lhsBase.ptr, rhsBase.ptr, af.batch)
+				assertErr(err)
+				AFArrayWithData{$resultT, N}(af, result[])
+			finally
+				release!(rhs)
+			end
+		end
+
+		function $(esc(op)){T, N}(lhsConst::Number, rhs::AFArrayWithData{T, N})
+			result = Ref{Ptr{Void}}()
+			rhsBase = getBase(rhs)
+			af = rhsBase.af
+			lhs = constant(af, lhsConst, size(rhs)...)
+			try
+				lhsBase = getBase(lhs)
+				err = ccall(af.binary.$(cFunc),
+					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
+					result, lhsBase.ptr, rhsBase.ptr, af.batch)
+				assertErr(err)
+				AFArrayWithData{$resultT, N}(af, result[])
+			finally
+				release!(lhs)
+			end
+		end
+	end
 end
+
+@binOp(.<, lt, asJType(Val{b8}))
+@binOp(.<=, le, asJType(Val{b8}))
+@binOp(.>, gt, asJType(Val{b8}))
+@binOp(.>=, ge, asJType(Val{b8}))

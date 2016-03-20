@@ -27,7 +27,7 @@ function randn{T}(af::ArrayFire, ::Type{T}, dims...)
 		Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType),
 		ptr, length(dims), pointer(dims), asDType(T))
 	assertErr(err)
-	AFArrayWithData{T, length(dims)}(af, ptr[])
+	AFArrayWithData{T, dimsToSize(dims)}(af, ptr[])
 end
 
 function randu{T}(af::ArrayFire, ::Type{T}, dims...)
@@ -37,7 +37,7 @@ function randu{T}(af::ArrayFire, ::Type{T}, dims...)
 		Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType),
 		ptr, length(dims), pointer(dims), asDType(T))
 	assertErr(err)
-	AFArrayWithData{T, length(dims)}(af, ptr[])
+	AFArrayWithData{T, dimsToSize(dims)}(af, ptr[])
 end
 
 function constant{T<:Real}(af::ArrayFire, value::T, dims...)
@@ -47,7 +47,7 @@ function constant{T<:Real}(af::ArrayFire, value::T, dims...)
 		Cint, (Ptr{Ptr{Void}}, Float64, Cuint, Ptr{DimT}, DType),
 		ptr, Float64(value), length(dims), pointer(dims), asDType(T))
 	assertErr(err)
-	AFArrayWithData{T, length(dims)}(af, ptr[])
+	AFArrayWithData{T, dimsToSize(dims)}(af, ptr[])
 end
 
 function constant(af::ArrayFire, value::Int64, dims...)
@@ -55,9 +55,9 @@ function constant(af::ArrayFire, value::Int64, dims...)
 	dims = collect(dims)
 	err = ccall(af.create.constantLong,
 		Cint, (Ptr{Ptr{Void}}, Int64, Cuint, Ptr{DimT}, DType),
-		ptr, value, length(dims), pointer(dims), asDType(T))
+		ptr, value, length(dims), pointer(dims), asDType(Int64))
 	assertErr(err)
-	AFArrayWithData{Int64, length(dims)}(af, ptr[])
+	AFArrayWithData{Int64, dimsToSize(dims)}(af, ptr[])
 end
 
 function constant(af::ArrayFire, value::UInt64, dims...)
@@ -65,7 +65,7 @@ function constant(af::ArrayFire, value::UInt64, dims...)
 	dims = collect(dims)
 	err = ccall(af.create.constantLong,
 		Cint, (Ptr{Ptr{Void}}, UInt64, Cuint, Ptr{DimT}, DType),
-		ptr, value, length(dims), pointer(dims), asDType(T))
+		ptr, value, length(dims), pointer(dims), asDType(UInt64))
 	assertErr(err)
-	AFArrayWithData{UInt64, length(dims)}(af, ptr[])
+	AFArrayWithData{UInt64, dimsToSize(dims)}(af, ptr[])
 end

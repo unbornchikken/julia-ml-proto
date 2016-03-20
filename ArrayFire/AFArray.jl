@@ -25,7 +25,7 @@ type EmptyAFArray <: AFArray
 	end
 end
 
-type AFArrayWithData{T, N} <: AFArray
+type AFArrayWithData{T<:Number, N} <: AFArray
 	base
 
 	AFArrayWithData(af::ArrayFire, ptr) = new(AFArrayBase(af, ptr))
@@ -59,15 +59,15 @@ array(af::ArrayFire) = EmptyAFArray(af)
 
 array{T, N}(af::ArrayFire, arr::Array{T, N}) = AFArrayWithData{T, N}(af, arr)
 
-array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArrayWithData{T, length(dims)}(af, dims...)
+array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArrayWithData{T, dimsToSize(dims)}(af, dims...)
 
-array{T}(af::ArrayFire, arr::Array{T}, dims...) = array(af, reshape(arr, dims))
+array{T}(af::ArrayFire, arr::Array{T}, dims...) = array(af, reshape(arr, dimsToSize(dims)))
 
 getBase(arr::EmptyAFArray) = arr.base
 
 getBase{T, N}(arr::AFArrayWithData{T, N}) = arr.base
 
-function release!(arr)
+function release!(arr::AFArray)
 	base = getBase(arr)
 	if (base.ptr != C_NULL)
 		err = ccall(base.af.releaseArray, Cint, (Ptr{Void}, ), base.ptr)
@@ -78,7 +78,7 @@ function release!(arr)
 	end
 end
 
-function _base(arr)
+function _base(arr::AFArray)
 	b = getBase(arr)
 	b.ptr == C_NULL && error("Cannot access to a released array.")
 	b
@@ -125,18 +125,7 @@ dims(arr::EmptyAFArray) = [0, 0, 0, 0]
 dims(arr::EmptyAFArray, n) = 0
 
 function Base.size(arr::AFArray)
-	d = dims(arr)
-	if d[4] > 1
-		(d[1], d[2], d[3], d[4])
-	elseif d[3] > 1
-		(d[1], d[2], d[3])
-	elseif d[2] > 1
-		(d[1], d[2])
-	elseif d[1] > 1
-		(d[1],)
-	else
-		()
-	end
+	dimsToSize(dims(arr))
 end
 
 function host{T, N}(arr::AFArrayWithData{T, N})

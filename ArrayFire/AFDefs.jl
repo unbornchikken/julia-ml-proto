@@ -69,3 +69,33 @@ dimsToDim4(dims) =
     else
         throw(ArgumentError("Too many dimensions"))
     end
+
+function dimsToSize(d::DimT...)
+	len = size(d)
+	if len > 3 && d[4] > 1
+		(d[1], d[2], d[3], d[4])
+	elseif len > 2 && d[3] > 1
+		(d[1], d[2], d[3])
+	elseif len > 1 && d[2] > 1
+		(d[1], d[2])
+	elseif len > 0 && d[1] > 1
+		(d[1],)
+	else
+		()
+	end
+end
+
+function dimsToSize(d::Dim4)
+	len = length(d)
+	if len > 3 && d[4] > 1
+		(d[1], d[2], d[3], d[4])
+	elseif len > 2 && d[3] > 1
+		(d[1], d[2], d[3])
+	elseif len > 1 && d[2] > 1
+		(d[1], d[2])
+	elseif len > 0 && d[1] > 1
+		(d[1],)
+	else
+		()
+	end
+end
