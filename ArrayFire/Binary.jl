@@ -1,18 +1,26 @@
-import Base: .<,.>,.<=,.>=
-export .<,.>,.<=,.>=
+import Base: .<,.>,.<=,.>=,==,!=
+export .<,.>,.<=,.>=,==,!=,and,or
 
 immutable Binary
 	le
 	lt
 	ge
 	gt
+	eq
+	neq
+	and
+	or
 
 	function Binary(ptr)
 		new(
 			Libdl.dlsym(ptr, :af_le),
 			Libdl.dlsym(ptr, :af_lt),
 			Libdl.dlsym(ptr, :af_ge),
-			Libdl.dlsym(ptr, :af_gt)
+			Libdl.dlsym(ptr, :af_gt),
+			Libdl.dlsym(ptr, :af_eq),
+			Libdl.dlsym(ptr, :af_neq),
+			Libdl.dlsym(ptr, :af_and),
+			Libdl.dlsym(ptr, :af_or)
 		)
 	end
 end
@@ -24,7 +32,7 @@ macro binOp(op, cFunc, resultT)
 			lhsBase = getBase(lhs)
 			rhsBase = getBase(rhs)
 			af = lhsBase.af
-			err = ccall(af.binary.$(cFunc),
+			err = ccall(af.binary.$cFunc,
 				Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 				result, lhsBase.ptr, rhsBase.ptr, af.batch)
 			assertErr(err)
@@ -38,7 +46,7 @@ macro binOp(op, cFunc, resultT)
 			rhs = constant(af, rhsConst, size(lhs)...)
 			try
 				rhsBase = getBase(rhs)
-				err = ccall(af.binary.$(cFunc),
+				err = ccall(af.binary.$cFunc,
 					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 					result, lhsBase.ptr, rhsBase.ptr, af.batch)
 				assertErr(err)
@@ -55,7 +63,7 @@ macro binOp(op, cFunc, resultT)
 			lhs = constant(af, lhsConst, size(rhs)...)
 			try
 				lhsBase = getBase(lhs)
-				err = ccall(af.binary.$(cFunc),
+				err = ccall(af.binary.$cFunc,
 					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 					result, lhsBase.ptr, rhsBase.ptr, af.batch)
 				assertErr(err)
@@ -67,7 +75,15 @@ macro binOp(op, cFunc, resultT)
 	end
 end
 
-@binOp(.<, lt, asJType(Val{b8}))
-@binOp(.<=, le, asJType(Val{b8}))
-@binOp(.>, gt, asJType(Val{b8}))
-@binOp(.>=, ge, asJType(Val{b8}))
+macro logicBinOp(op, cFunc)
+	:( @binOp($(esc(op)), $cFunc, asJType(Val{b8})) )
+end
+
+@logicBinOp(.<, lt)
+@logicBinOp(.<=, le)
+@logicBinOp(.>, gt)
+@logicBinOp(.>=, ge)
+@logicBinOp(==, eq)
+@logicBinOp(!=, neq)
+@logicBinOp(and, and)
+@logicBinOp(or, or)
