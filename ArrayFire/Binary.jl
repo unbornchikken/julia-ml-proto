@@ -1,5 +1,7 @@
 import Base: .<,.>,.<=,.>=,==,!=
 export .<,.>,.<=,.>=,==,!=,and,or
+import Base: .+,.-,.*,./,.\
+export .+,.-,.*,./,.\
 
 immutable Binary
 	le
@@ -10,6 +12,10 @@ immutable Binary
 	neq
 	and
 	or
+	add
+	sub
+	mul
+	div
 
 	function Binary(ptr)
 		new(
@@ -20,7 +26,11 @@ immutable Binary
 			Libdl.dlsym(ptr, :af_eq),
 			Libdl.dlsym(ptr, :af_neq),
 			Libdl.dlsym(ptr, :af_and),
-			Libdl.dlsym(ptr, :af_or)
+			Libdl.dlsym(ptr, :af_or),
+			Libdl.dlsym(ptr, :af_add),
+			Libdl.dlsym(ptr, :af_mul),
+			Libdl.dlsym(ptr, :af_sub),
+			Libdl.dlsym(ptr, :af_mul)
 		)
 	end
 end
@@ -36,7 +46,7 @@ macro binOp(op, cFunc, resultT)
 				Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 				result, lhsBase.ptr, rhsBase.ptr, af.batch)
 			assertErr(err)
-			AFArrayWithData{$resultT, max(N1, N2)}(af, result[])
+			AFArrayWithData{$resultT(T1, T2), max(N1, N2)}(af, result[])
 		end
 
 		function $(esc(op)){T, N}(lhs::AFArrayWithData{T, N}, rhsConst::Number)
@@ -50,7 +60,7 @@ macro binOp(op, cFunc, resultT)
 					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 					result, lhsBase.ptr, rhsBase.ptr, af.batch)
 				assertErr(err)
-				AFArrayWithData{$resultT, N}(af, result[])
+				AFArrayWithData{$resultT(T, typeof(rhsConst)), N}(af, result[])
 			finally
 				release!(rhs)
 			end
@@ -67,7 +77,7 @@ macro binOp(op, cFunc, resultT)
 					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 					result, lhsBase.ptr, rhsBase.ptr, af.batch)
 				assertErr(err)
-				AFArrayWithData{$resultT, N}(af, result[])
+				AFArrayWithData{$resultT(typeof(lhsConst), T), N}(af, result[])
 			finally
 				release!(lhs)
 			end
@@ -76,7 +86,11 @@ macro binOp(op, cFunc, resultT)
 end
 
 macro logicBinOp(op, cFunc)
-	:( @binOp($(esc(op)), $cFunc, asJType(Val{b8})) )
+	:( @binOp($(esc(op)), $cFunc, (lhsT, rhsT) -> asJType(Val{b8})) )
+end
+
+macro arBinOp(op, cFunc)
+	:( @binOp($(esc(op)), $cFunc, (lhsT, rhsT) -> afPromote(lhsT, rhsT)) )
 end
 
 @logicBinOp(.<, lt)
@@ -87,3 +101,20 @@ end
 @logicBinOp(!=, neq)
 @logicBinOp(and, and)
 @logicBinOp(or, or)
+
+@arBinOp(.+, add)
+@arBinOp(.-, sub)
+@arBinOp(.*, mul)
+@arBinOp(./, div)
+
+function .\{T1, N1, T2, N2}(lhs::AFArrayWithData{T1, N1}, rhs::AFArrayWithData{T2, N2})
+	rhs ./ lhs
+end
+
+function .\{T, N}(lhs::AFArrayWithData{T, N}, rhsConst::Number)
+	rhs ./ lhs
+end
+
+function .\{T, N}(lhsConst::Number, rhs::AFArrayWithData{T, N})
+	rhs ./ lhs
+end

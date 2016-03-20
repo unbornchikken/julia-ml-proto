@@ -70,32 +70,57 @@ dimsToDim4(dims) =
         throw(ArgumentError("Too many dimensions"))
     end
 
+macro sizeRules(len, d)
+	quote
+		if $len > 3 && $d[4] > 1
+			($d[1], $d[2], $d[3], $d[4])
+		elseif $len > 2 && $d[3] > 1
+			($d[1], $d[2], $d[3])
+		elseif $len > 1 && $d[2] > 1
+			($d[1], $d[2])
+		elseif $len > 0 && $d[1] > 1
+			($d[1],)
+		else
+			()
+		end
+	end
+end
+
 function dimsToSize(d::DimT...)
 	len = size(d)
-	if len > 3 && d[4] > 1
-		(d[1], d[2], d[3], d[4])
-	elseif len > 2 && d[3] > 1
-		(d[1], d[2], d[3])
-	elseif len > 1 && d[2] > 1
-		(d[1], d[2])
-	elseif len > 0 && d[1] > 1
-		(d[1],)
-	else
-		()
-	end
+	@sizeRules(len, d)
 end
 
 function dimsToSize(d::Dim4)
 	len = length(d)
-	if len > 3 && d[4] > 1
-		(d[1], d[2], d[3], d[4])
-	elseif len > 2 && d[3] > 1
-		(d[1], d[2], d[3])
-	elseif len > 1 && d[2] > 1
-		(d[1], d[2])
-	elseif len > 0 && d[1] > 1
-		(d[1],)
-	else
-		()
-	end
+	@sizeRules(len, d)
+end
+
+function afPromote{T,S}(::Type{T},::Type{S})
+    if T == S
+        return T
+    elseif T == Complex{Float64} || S == Complex{Float64}
+        return Complex{Float64}
+    elseif T == Complex{Float32} || S == Complex{Float32}
+        (T == Float64 || S == Float64) && return Complex{Float64}
+        return Complex{Float32}
+    elseif T == Float64 || S == Float64
+        return Float64
+    elseif T == Float32 || S == Float32
+        return Float32
+    elseif T == UInt64 || S == UInt64
+        return UInt64
+    elseif T == Int64 || S == Int64
+        return Int64
+    elseif T == UInt32 || S == UInt32
+        return UInt32
+    elseif T == Int32 || S == Int32
+        return Int32
+    elseif T == UInt8 || S == UInt8
+        return UInt8
+    elseif T == Bool || S == Bool
+        return Bool
+    else
+        return Float32
+    end
 end
