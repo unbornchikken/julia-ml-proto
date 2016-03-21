@@ -3,9 +3,10 @@ module AF
 include("AFDefs.jl")
 include("AFError.jl")
 
-export ArrayFire
-export scope!
-export register!
+export
+	ArrayFire,
+	scope!,
+	register!
 
 immutable ArrayFire{T<:Backend}
 	ptr

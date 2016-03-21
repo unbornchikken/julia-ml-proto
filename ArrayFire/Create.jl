@@ -1,6 +1,7 @@
-export randn
-export randu
-export constant
+export
+	randn,
+	randu,
+	constant
 
 immutable Create
 	randn

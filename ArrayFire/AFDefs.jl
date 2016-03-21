@@ -1,9 +1,10 @@
 include("Backend.jl")
 
-export DeviceInfo
-export DType
-export Dim4
-export DimT
+export
+	DeviceInfo,
+	DType,
+	Dim4,
+	DimT
 
 immutable DeviceInfo
 	id
@@ -78,7 +79,7 @@ macro sizeRules(len, d)
 			($d[1], $d[2], $d[3])
 		elseif $len > 1 && $d[2] > 1
 			($d[1], $d[2])
-		elseif $len > 0 && $d[1] > 1
+		elseif $len > 0 && $d[1] > 0
 			($d[1],)
 		else
 			()
@@ -87,7 +88,7 @@ macro sizeRules(len, d)
 end
 
 function dimsToSize(d::DimT...)
-	len = size(d)
+	len = length(d)
 	@sizeRules(len, d)
 end
 

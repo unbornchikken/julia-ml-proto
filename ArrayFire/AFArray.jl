@@ -1,8 +1,9 @@
-export AFArray
-export array
-export release!
-export dims
-export host
+export
+	AFArray,
+	array,
+	release!,
+	dims,
+	host
 
 abstract AFArray
 
@@ -28,7 +29,7 @@ end
 type AFArrayWithData{T<:Number, N} <: AFArray
 	base
 
-	AFArrayWithData(af::ArrayFire, ptr) = new(AFArrayBase(af, ptr))
+	AFArrayWithData(af::ArrayFire, ptr::Ptr{Void}) = new(AFArrayBase(af, ptr))
 
 	function AFArrayWithData(af::ArrayFire, arr::Array{T, N})
 		ptr = Ref{Ptr{Void}}()
@@ -42,7 +43,7 @@ type AFArrayWithData{T<:Number, N} <: AFArray
 		me
 	end
 
-	function AFArrayWithData(af::ArrayFire, dims...)
+	function AFArrayWithData(af::ArrayFire, dims::Int...)
 		ptr = Ref{Ptr{Void}}()
 		dims2 = collect(dims)
 		assert(N == length(dims2))
@@ -59,9 +60,9 @@ array(af::ArrayFire) = EmptyAFArray(af)
 
 array{T, N}(af::ArrayFire, arr::Array{T, N}) = AFArrayWithData{T, N}(af, arr)
 
-array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArrayWithData{T, dimsToSize(dims)}(af, dims...)
+array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArrayWithData{T, length(dimsToSize(dims...))}(af, dims...)
 
-array{T}(af::ArrayFire, arr::Array{T}, dims...) = array(af, reshape(arr, dimsToSize(dims)))
+array{T}(af::ArrayFire, arr::Array{T}, dims...) = array(af, reshape(arr, dimsToSize(dims...)...))
 
 getBase(arr::EmptyAFArray) = arr.base
 

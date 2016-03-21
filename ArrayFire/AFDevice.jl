@@ -1,9 +1,10 @@
-export infoString
-export getDeviceCount
-export setDevice
-export getDevice
-export deviceInfo
-export deviceInfos
+export
+	infoString,
+	getDeviceCount,
+	setDevice,
+	getDevice,
+	deviceInfo,
+	deviceInfos
 
 immutable AFDevice
 	infoString

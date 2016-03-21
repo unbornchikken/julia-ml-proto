@@ -1,7 +1,8 @@
-export Backend
-export CPU
-export OpenCL
-export CUDA
+export
+	Backend,
+	CPU,
+	OpenCL,
+	CUDA
 
 abstract Backend
 
