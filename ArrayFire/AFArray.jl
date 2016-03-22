@@ -3,7 +3,9 @@ export
 	array,
 	release!,
 	dims,
-	host
+	host,
+	aftype,
+	numdims
 
 abstract AFArray
 
@@ -127,6 +129,28 @@ dims(arr::EmptyAFArray, n) = 0
 
 function Base.size(arr::AFArray)
 	dimsToSize(dims(arr))
+end
+
+function aftype(arr::AFArray)
+	base = _base(arr)
+	result = Ref{DimT}()
+	err = ccall(
+		base.af.getType,
+		Cint, (Ptr{DimT}, Ptr{Void}),
+		result, base.ptr)
+	assertErr(err)
+	result[]
+end
+
+function numdims(arr::AFArray)
+	base = _base(arr)
+	result = Ref{UInt32}()
+	err = ccall(
+		base.af.getNumDims,
+		Cint, (Ptr{UInt32}, Ptr{Void}),
+		result, base.ptr)
+	assertErr(err)
+	result[]
 end
 
 function host{T, N}(arr::AFArrayWithData{T, N})

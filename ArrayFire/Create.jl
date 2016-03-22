@@ -1,3 +1,5 @@
+import Base.randn
+
 export
 	randn,
 	randu,

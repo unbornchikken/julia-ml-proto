@@ -4,7 +4,17 @@ export
 	DeviceInfo,
 	DType,
 	Dim4,
-	DimT
+	DimT,
+	f32,
+	c32,
+	f64,
+	c64,
+	b8,
+	s32,
+	u32,
+	u8,
+	s64,
+	u64
 
 immutable DeviceInfo
 	id
@@ -22,16 +32,16 @@ Base.print(io::IOBuffer, info::DeviceInfo) = Base.print(io, toString(info))
 Base.print(info::DeviceInfo) = Base.print(toString(info))
 
 typealias DType UInt32
-const f32 = DType(0) # 32-bit floating point values
-const c32 = DType(1) # 32-bit complex floating point values
-const f64 = DType(2) # 64-bit complex floating point values
-const c64 = DType(3) # 64-bit complex floating point values
-const b8  = DType(4) #  8-bit boolean values
-const s32 = DType(5) # 32-bit signed integral values
-const u32 = DType(6) # 32-bit unsigned integral values
-const u8  = DType(7) #  8-bit unsigned integral values
-const s64 = DType(8) # 64-bit signed integral values
-const u64 = DType(9) # 64-bit unsigned integral values
+f32 = DType(0) # 32-bit floating point values
+c32 = DType(1) # 32-bit complex floating point values
+f64 = DType(2) # 64-bit complex floating point values
+c64 = DType(3) # 64-bit complex floating point values
+b8  = DType(4) #  8-bit boolean values
+s32 = DType(5) # 32-bit signed integral values
+u32 = DType(6) # 32-bit unsigned integral values
+u8  = DType(7) #  8-bit unsigned integral values
+s64 = DType(8) # 64-bit signed integral values
+u64 = DType(9) # 64-bit unsigned integral values
 
 asDType(::Type{Float32})          = f32
 asDType(::Type{Complex{Float32}}) = c32

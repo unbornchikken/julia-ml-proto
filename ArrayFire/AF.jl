@@ -5,6 +5,7 @@ include("AFError.jl")
 
 export
 	ArrayFire,
+	getSupportedBackends,
 	scope!,
 	register!
 
@@ -13,11 +14,14 @@ immutable ArrayFire{T<:Backend}
 	device
 	create
 	binary
+	index
 	createHandle
 	createArray
 	releaseArray
 	getDims
 	getDataPtr
+	getType
+	getNumDims
 	freeList
 	batch
 
@@ -35,20 +39,36 @@ immutable ArrayFire{T<:Backend}
 			AFDevice(ptr),
 			Create(ptr),
 			Binary(ptr),
+			Index(ptr),
 			Libdl.dlsym(ptr, :af_create_handle),
 			Libdl.dlsym(ptr, :af_create_array),
 			Libdl.dlsym(ptr, :af_release_array),
 			Libdl.dlsym(ptr, :af_get_dims),
 			Libdl.dlsym(ptr, :af_get_data_ptr),
+			Libdl.dlsym(ptr, :af_get_type),
+			Libdl.dlsym(ptr, :af_get_numdims),
 			FreeList(),
 			false)
 	end
+end
+
+function getSupportedBackends()
+	backends = Vector{Any}()
+	for b in [CPU, CUDA, OpenCL]
+		try
+			ArrayFire{b}()
+			push!(backends, b)
+		catch
+		end
+	end
+	backends
 end
 
 include("AFArray.jl")
 include("AFDevice.jl")
 include("Create.jl")
 include("Binary.jl")
+include("Index.jl")
 include("FreeList.jl")
 
 immutable ScopeHandle
