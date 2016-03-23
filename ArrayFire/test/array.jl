@@ -59,4 +59,23 @@ begin
 	@test host(afArr) == [one(Int32), zero(Int32)]
 	@test aftype(afArr) == s32
 	@test numdims(afArr) == length(size(afArr))
+
+	#index
+	idx = AF.ArrayIndex(afArr)
+	aPtr = AF.ptr(idx)
+	@test aPtr == AF._base(afArr).ptr
+	afArr = AF.AFArrayWithData{Int32, 1}(af, aPtr)
+	@test [2, 1, 1, 1] == dims(afArr)
+	@test (2, ) == size(afArr)
+	@test host(afArr) == [one(Int32), zero(Int32)]
+	@test aftype(afArr) == s32
+	@test numdims(afArr) == length(size(afArr))
+
+	afArr = array(af, [1, 2, 3, 4, 5])
+	indexed = AF.index(afArr, AF.SeqIndex(1))
+	@test host(indexed) == [2]
+	indexed = AF.index(afArr, AF.SeqIndex(1, 3))
+	@test host(indexed) == [2, 3, 4]
+
+	afArr = array(af, [[1,2,3,4] [5,6,7,8] [9,10,11,12] [13, 14, 15, 16]])
 end)

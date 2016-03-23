@@ -25,50 +25,50 @@ end
 
 function randn{T}(af::ArrayFire, ::Type{T}, dims...)
 	ptr = Ref{Ptr{Void}}()
-	dims = collect(dims)
+	dims2 = collect(dims)
 	err = ccall(af.create.randn,
 		Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType),
-		ptr, length(dims), pointer(dims), asDType(T))
+		ptr, length(dims2), pointer(dims2), asDType(T))
 	assertErr(err)
 	AFArrayWithData{T, dimsToSize(dims)}(af, ptr[])
 end
 
 function randu{T}(af::ArrayFire, ::Type{T}, dims...)
 	ptr = Ref{Ptr{Void}}()
-	dims = collect(dims)
+	dims2 = collect(dims)
 	err = ccall(af.create.randu,
 		Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType),
-		ptr, length(dims), pointer(dims), asDType(T))
+		ptr, length(dims2), pointer(dims2), asDType(T))
 	assertErr(err)
 	AFArrayWithData{T, dimsToSize(dims)}(af, ptr[])
 end
 
 function constant{T<:Real}(af::ArrayFire, value::T, dims...)
 	ptr = Ref{Ptr{Void}}()
-	dims = collect(dims)
+	dims2 = collect(dims)
 	err = ccall(af.create.constant,
 		Cint, (Ptr{Ptr{Void}}, Float64, Cuint, Ptr{DimT}, DType),
-		ptr, Float64(value), length(dims), pointer(dims), asDType(T))
+		ptr, Float64(value), length(dims2), pointer(dims2), asDType(T))
 	assertErr(err)
 	AFArrayWithData{T, dimsToSize(dims)}(af, ptr[])
 end
 
 function constant(af::ArrayFire, value::Int64, dims...)
 	ptr = Ref{Ptr{Void}}()
-	dims = collect(dims)
+	dims2 = collect(dims)
 	err = ccall(af.create.constantLong,
 		Cint, (Ptr{Ptr{Void}}, Int64, Cuint, Ptr{DimT}, DType),
-		ptr, value, length(dims), pointer(dims), asDType(Int64))
+		ptr, value, length(dims2), pointer(dims2), asDType(Int64))
 	assertErr(err)
 	AFArrayWithData{Int64, dimsToSize(dims)}(af, ptr[])
 end
 
 function constant(af::ArrayFire, value::UInt64, dims...)
 	ptr = Ref{Ptr{Void}}()
-	dims = collect(dims)
+	dims2 = collect(dims)
 	err = ccall(af.create.constantLong,
 		Cint, (Ptr{Ptr{Void}}, UInt64, Cuint, Ptr{DimT}, DType),
-		ptr, value, length(dims), pointer(dims), asDType(UInt64))
+		ptr, value, length(dims2), pointer(dims2), asDType(UInt64))
 	assertErr(err)
 	AFArrayWithData{UInt64, dimsToSize(dims)}(af, ptr[])
 end

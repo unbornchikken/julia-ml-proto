@@ -48,17 +48,30 @@ end
 
 @generated function ptr(arrayIndex::ArrayIndex)
 	if UInt == UInt32
-		:(Ptr{Void}(arrayIndex.i1))
+		:(reinterpret(Ptr{Void}, arrayIndex.data.i1))
 	else
-		:(Ptr{Void}(arrayIndex.i1 << 32 + arrayIndex.i2))
+		:(reinterpret(Ptr{Void}, UInt64(arrayIndex.data.i1) << 32 + UInt64(arrayIndex.data.i2)))
 	end
 end
 
 @generated function toArrayIndexData(arr::AFArray)
-	base = _base(arr)
 	if UInt == UInt32
-		:(DummySeqPart(UInt32(base.ptr), 0, 0, 0))
+		:(DummySeqPart(reinterpret(UInt32, _base(arr).ptr), 0, 0, 0, 0, 0))
 	else
-		:(DummySeqPart(UInt32(UInt64(base.ptr) >> 32), UInt32(UInt64(base.ptr) & 0xFFFFFFFF), 0, 0))
+		:(
+			base = _base(arr);
+			DummySeqPart(UInt32(reinterpret(UInt64, base.ptr) >> 32), UInt32(reinterpret(UInt64, base.ptr) & 0xFFFFFFFF), 0, 0, 0, 0)
+		)
 	end
+end
+
+function index{T, N, I<:AFIndex}(arr::AFArrayWithData{T, N}, indices::I...)
+	ptr = Ref{Ptr{Void}}()
+	indices2 = collect(indices)
+	base = _base(arr)
+	err = ccall(base.af.index.indexGen,
+		Cint, (Ptr{Ptr{Void}}, Ptr{Void}, DimT, Ptr{I}),
+		ptr, base.ptr, length(indices2), pointer(indices2))
+	assertErr(err)
+	array(base.af, T, ptr[])
 end

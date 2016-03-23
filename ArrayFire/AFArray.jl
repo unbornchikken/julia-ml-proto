@@ -66,6 +66,8 @@ array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArrayWithData{T, length(dimsToSi
 
 array{T}(af::ArrayFire, arr::Array{T}, dims...) = array(af, reshape(arr, dimsToSize(dims...)...))
 
+array{T}(af::ArrayFire, ::Type{T}, ptr::Ptr{Void}) = AFArrayWithData{T, Int(numdims(af, ptr))}(af, ptr)
+
 getBase(arr::EmptyAFArray) = arr.base
 
 getBase{T, N}(arr::AFArrayWithData{T, N}) = arr.base
@@ -87,16 +89,19 @@ function _base(arr::AFArray)
 	b
 end
 
-function dims{T, N}(arr::AFArrayWithData{T, N})
+dims{T, N}(arr::AFArrayWithData{T, N}) = dims(_base(arr))
+
+dims{T<:ArrayFire}(base::AFArrayBase{T}) = dims(base.af, base.ptr)
+
+function dims(af::ArrayFire, ptr::Ptr{Void})
 	dim0 = Ref{DimT}()
 	dim1 = Ref{DimT}()
 	dim2 = Ref{DimT}()
 	dim3 = Ref{DimT}()
-	base = _base(arr)
 	err = ccall(
-		base.af.getDims,
+		af.getDims,
 		Cint, (Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{Void}),
-		dim0, dim1, dim2, dim3, base.ptr)
+		dim0, dim1, dim2, dim3, ptr)
 	assertErr(err)
 	[dim0[], dim1[], dim2[], dim3[]]
 end
@@ -142,13 +147,16 @@ function aftype(arr::AFArray)
 	result[]
 end
 
-function numdims(arr::AFArray)
-	base = _base(arr)
+numdims(arr::AFArray) = numdims(_base(arr))
+
+numdims{T<:ArrayFire}(base::AFArrayBase{T}) = numdims(base.af, base.ptr)
+
+function numdims(af::ArrayFire, ptr::Ptr{Void})
 	result = Ref{UInt32}()
 	err = ccall(
-		base.af.getNumDims,
+		af.getNumDims,
 		Cint, (Ptr{UInt32}, Ptr{Void}),
-		result, base.ptr)
+		result, ptr)
 	assertErr(err)
 	result[]
 end
