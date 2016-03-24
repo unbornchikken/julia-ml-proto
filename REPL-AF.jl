@@ -1,10 +1,14 @@
 af = ArrayFire{OpenCL}()
 
-arr1 = array(af, [1.1, 2.2, 3.2])
-arr2 = array(af, [1, 0.1, 4])
+afArr = array(af, [[1,2,3,4] [5,6,7,8] [9,10,11,12] [13, 14, 15, 16]])
+print(code_typed(getindex, (AFArrayWithData{Float32, 1}, Int, AFArrayWithData{Float32, 1}, Colon)))
 
-result = arr1 ./ arr2
-host(result)
-
-result = arr2 .\ arr1
-host(result)
+# afArr = array(af, [[1,2,3,4] [5,6,7,8] [9,10,11,12] [13, 14, 15, 16]])
+# indexed = AF.index(afArr, AF.SeqIndex(2, 4))
+# print(host(indexed))
+#
+# indexed = AF.index(afArr, AF.SeqIndex(0, 2), AF.SeqIndex(1, 2))
+# print(host(indexed))
+#
+# indexed = AF.index(afArr, AF.SeqIndex(-1), AF.SeqIndex(2, 3))
+# print(host(indexed))
