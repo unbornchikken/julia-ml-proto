@@ -136,16 +136,7 @@ function Base.size(arr::AFArray)
 	dimsToSize(dims(arr))
 end
 
-function aftype(arr::AFArray)
-	base = _base(arr)
-	result = Ref{DimT}()
-	err = ccall(
-		base.af.getType,
-		Cint, (Ptr{DimT}, Ptr{Void}),
-		result, base.ptr)
-	assertErr(err)
-	result[]
-end
+aftype{T, N}(arr::AFArrayWithData{T, N}) = asDType(T)
 
 numdims(arr::AFArray) = numdims(_base(arr))
 

@@ -7,8 +7,13 @@ using Base.Test
 
 function testOnAllBackends(title, f)
 	for b in getSupportedBackends()
-		print("$title - $b")
-		f(b)
+		print("$title - $b\n")
+		af = ArrayFire{b}()
+		try
+			f(af)
+		finally
+			release!(af)
+		end
 	end
 end
 

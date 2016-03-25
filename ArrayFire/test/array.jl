@@ -1,7 +1,5 @@
-testOnAllBackends("AFArray", d ->
+testOnAllBackends("AFArray", af ->
 begin
-	af = ArrayFire{d}()
-
 	# construct
 	empty = array(af)
 	@test [0, 0, 0, 0] == dims(empty)
