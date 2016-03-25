@@ -1,6 +1,6 @@
 testOnAllBackends("AFArray", af ->
 begin
-	# construct
+	println("construct")
 	empty = array(af)
 	@test [0, 0, 0, 0] == dims(empty)
 	@test () == size(empty)
@@ -57,7 +57,7 @@ begin
 	@test aftype(afArr) == s32
 	@test numdims(afArr) == length(size(afArr))
 
-	#index
+	println("index get")
 	idx = AF.ArrayIndex(afArr)
 	aPtr = AF.ptr(idx)
 	@test aPtr == AF._base(afArr).ptr
@@ -98,4 +98,9 @@ begin
 	afIdx = array(af, [[1.0f0, 0.0f0, 2.0f0] [5.0f0, 10.0f0, 2.0f0]])
 	indexed = afArr[afIdx]
 	@test host(indexed) == [2,1,3,6,11,3]
+
+	println("index assign")
+	afArr = array(af, [1,2,3,4])
+	afArr[:] = 5
+	@test host(afArr) == [5,5,5,5]
 end)

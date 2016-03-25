@@ -66,6 +66,8 @@ array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArrayWithData{T, length(dimsToSi
 
 array{T}(af::ArrayFire, arr::Array{T}, dims...) = array(af, reshape(arr, dimsToSize(dims...)...))
 
+array{T}(af::ArrayFire, ::Type{T}, N::Int, ptr::Ptr{Void}) = AFArrayWithData{T, N}(af, ptr)
+
 array{T}(af::ArrayFire, ::Type{T}, ptr::Ptr{Void}) = AFArrayWithData{T, Int(numdims(af, ptr))}(af, ptr)
 
 getBase(arr::EmptyAFArray) = arr.base
@@ -136,7 +138,16 @@ function Base.size(arr::AFArray)
 	dimsToSize(dims(arr))
 end
 
-aftype{T, N}(arr::AFArrayWithData{T, N}) = asDType(T)
+function aftype(arr::AFArray)
+	base = _base(arr)
+	result = Ref{DType}()
+	err = ccall(
+		base.af.getType,
+		Cint, (Ptr{DType}, Ptr{Void}),
+		result, base.ptr)
+	assertErr(err)
+	result[]
+end
 
 numdims(arr::AFArray) = numdims(_base(arr))
 

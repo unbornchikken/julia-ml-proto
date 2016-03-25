@@ -4,10 +4,12 @@ export Seq, Span
 
 immutable Index
 	indexGen
+	assignGen
 
 	function Index(ptr)
 		new(
-			Libdl.dlsym(ptr, :af_index_gen)
+			Libdl.dlsym(ptr, :af_index_gen),
+			Libdl.dlsym(ptr, :af_assign_gen)
 		)
 	end
 end
@@ -70,7 +72,7 @@ end
 	end
 end
 
-function index{T, N, I<:AFIndex}(arr::AFArrayWithData{T, N}, indices::I...)
+function indexGen{T, N, I<:AFIndex}(arr::AFArrayWithData{T, N}, indices::I...)
 	ptr = Ref{Ptr{Void}}()
 	indices2 = collect(indices)
 	base = _base(arr)
@@ -81,9 +83,50 @@ function index{T, N, I<:AFIndex}(arr::AFArrayWithData{T, N}, indices::I...)
 	array(base.af, T, ptr[])
 end
 
+function assignGen{T, N, I<:AFIndex}(arr::AFArrayWithData{T, N}, rhs::AFArrayWithData, indices::I...)
+	ptr = Ref{Ptr{Void}}()
+	indices2 = collect(indices)
+	base = _base(rhs)
+	baseRhs = _base(arr)
+	err = ccall(base.af.index.indexGen,
+		Cint, (Ptr{Ptr{Void}}, Ptr{Void}, DimT, Ptr{I}, Ptr{Void}),
+		ptr, base.ptr, length(indices2), pointer(indices2), baseRhs.ptr)
+	assertErr(err)
+	ptr[]
+end
+
 immutable Span end
 
 @generated function getindex{T, N}(arr::AFArrayWithData{T, N}, args...)
+	exp = genIndices(arr, args...)
+	:( $exp; indexGen(arr, indices...) )
+end
+
+@generated function setindex!{T, N, V}(arr::AFArrayWithData{T, N}, rhs::V, args...)
+	exp = genIndices(arr, args...)
+	if rhs <: Real
+		quote
+			$exp
+			val = constant(base.af, rhs, size(arr)...)
+			try
+				outPtr = assignGen(arr, val, indices...)
+				release!(arr)
+				base.ptr = outPtr
+			finally
+				release!(val)
+			end
+		end
+	else
+		:(
+			$exp;
+			outPtr = assignGen(arr, rhs, indices...);
+			release!(arr);
+			arr.ptr = outPtr
+		)
+	end
+end
+
+function genIndices{T, N}(arr::Type{AFArrayWithData{T, N}}, args::Type...)
 	exp = :(base = _base(arr); indices = Array{AFIndex}(length(args)))
 	i = 1
 	for arg in args
@@ -107,5 +150,5 @@ immutable Span end
 		end
 		i = i + 1
 	end
-	:( $exp; index(arr, indices...) )
+	exp
 end

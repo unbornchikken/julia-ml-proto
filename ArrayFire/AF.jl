@@ -49,18 +49,7 @@ type ArrayFire{T<:Backend}
 			Libdl.dlsym(ptr, :af_get_numdims),
 			FreeList(),
 			false)
-		finalizer(af, release!)
 		af
-	end
-end
-
-function release!(af::ArrayFire)
-	if af.ptr !== C_NULL
-		Libdl.dlclose(af.ptr)
-		af.ptr = C_NULL
-		true
-	else
-		false
 	end
 end
 
