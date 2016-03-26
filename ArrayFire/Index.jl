@@ -86,9 +86,9 @@ end
 function assignGen{T, N, I<:AFIndex}(arr::AFArrayWithData{T, N}, rhs::AFArrayWithData, indices::I...)
 	ptr = Ref{Ptr{Void}}()
 	indices2 = collect(indices)
-	base = _base(rhs)
-	baseRhs = _base(arr)
-	err = ccall(base.af.index.indexGen,
+	base = _base(arr)
+	baseRhs = _base(rhs)
+	err = ccall(base.af.index.assignGen,
 		Cint, (Ptr{Ptr{Void}}, Ptr{Void}, DimT, Ptr{I}, Ptr{Void}),
 		ptr, base.ptr, length(indices2), pointer(indices2), baseRhs.ptr)
 	assertErr(err)
@@ -107,7 +107,7 @@ end
 	if rhs <: Real
 		quote
 			$exp
-			val = constant(base.af, rhs, size(arr)...)
+			val = constant(base.af, rhs, genDims(arr, indices...)...)
 			try
 				outPtr = assignGen(arr, val, indices...)
 				release!(arr)
@@ -121,9 +121,30 @@ end
 			$exp;
 			outPtr = assignGen(arr, rhs, indices...);
 			release!(arr);
-			arr.ptr = outPtr
+			base.ptr = outPtr
 		)
 	end
+end
+
+function genDims(arr::AFArray, i::ArrayIndex)
+	base = _base(arr)
+	dims(base.af, ptr(i))
+end
+
+function genDims(arr::AFArray, indices::SeqIndex...)
+	arrDims = dims(arr)
+	result = Dim4([1, 1, 1, 1])
+	idx = 1
+	for i in indices
+		if i.seq.afStep == 0
+			# span
+			result[idx] = arrDims[idx]
+		else
+			result[idx] = i.seq.afEnd - i.seq.afBegin + 1
+		end
+		idx += 1
+	end
+	result
 end
 
 function genIndices{T, N}(arr::Type{AFArrayWithData{T, N}}, args::Type...)

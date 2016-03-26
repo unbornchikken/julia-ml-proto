@@ -103,4 +103,21 @@ begin
 	afArr = array(af, [1,2,3,4])
 	afArr[:] = 5
 	@test host(afArr) == [5,5,5,5]
+
+	afArr = array(af, [1,2,3,4])
+	afArr[2:3] = 5.5f0
+	@test host(afArr) == [1,5,5,4]
+
+	afArr = array(af, [1,2,3,4])
+	afArr[1:2] = array(af, [10.1f0, 11.1f0])
+	@test host(afArr) == [10,11,3,4]
+
+	@test_throws AFErrorException afArr[1:2] = array(af, [10.1f0, 11.1f0, 12.2f0])
+
+	afArr = array(af, [[1,2,3,4] [5,6,7,8] [9,10,11,12] [13, 14, 15, 16]])
+	afArr[:, 3:4] = array(af, [[1,2,3,4] [5,6,7,8]])
+	@test host(afArr) == [[1,2,3,4] [5,6,7,8] [1,2,3,4] [5,6,7,8]]
+
+	afArr[3:4, :] = 1.1f0
+	@test host(afArr) == [[1,2,1,1] [5,6,1,1] [1,2,1,1] [5,6,1,1]]
 end)

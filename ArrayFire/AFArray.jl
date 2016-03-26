@@ -91,7 +91,7 @@ function _base(arr::AFArray)
 	b
 end
 
-dims{T, N}(arr::AFArrayWithData{T, N}) = dims(_base(arr))
+dims(arr::AFArray) = dims(_base(arr))
 
 dims{T<:ArrayFire}(base::AFArrayBase{T}) = dims(base.af, base.ptr)
 
