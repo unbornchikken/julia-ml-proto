@@ -22,6 +22,7 @@ type ArrayFire{T<:Backend}
 	getDataPtr
 	getType
 	getNumDims
+	getElements
 	freeList
 	batch
 
@@ -47,6 +48,7 @@ type ArrayFire{T<:Backend}
 			Libdl.dlsym(ptr, :af_get_data_ptr),
 			Libdl.dlsym(ptr, :af_get_type),
 			Libdl.dlsym(ptr, :af_get_numdims),
+			Libdl.dlsym(ptr, :af_get_elements),
 			FreeList(),
 			false)
 		af

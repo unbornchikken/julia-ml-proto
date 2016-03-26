@@ -163,6 +163,20 @@ function numdims(af::ArrayFire, ptr::Ptr{Void})
 	result[]
 end
 
+elements(arr::AFArray) = elements(_base(arr))
+
+elements{T<:ArrayFire}(base::AFArrayBase{T}) = elements(base.af, base.ptr)
+
+function elements(af::ArrayFire, ptr::Ptr{Void})
+	result = Ref{DimT}()
+	err = ccall(
+		af.getElements,
+		Cint, (Ptr{DimT}, Ptr{Void}),
+		result, ptr)
+	assertErr(err)
+	result[]
+end
+
 function host{T, N}(arr::AFArrayWithData{T, N})
 	result = Array{T}(size(arr)...)
 	host(arr, result)
