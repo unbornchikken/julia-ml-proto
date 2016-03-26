@@ -128,7 +128,7 @@ end
 
 function genDims(arr::AFArray, i::ArrayIndex)
 	base = _base(arr)
-	dims(base.af, ptr(i))
+	Dim4([elements(base.af, ptr(i)), 1, 1, 1])
 end
 
 function genDims(arr::AFArray, indices::SeqIndex...)
