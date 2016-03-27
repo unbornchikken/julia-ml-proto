@@ -1,5 +1,4 @@
-testOnAllBackends("AFArray", af ->
-begin
+testOnAllBackends("AFArray") do af
 	println("construct")
 	empty = array(af)
 	@test [0, 0, 0, 0] == dims(empty)
@@ -132,4 +131,4 @@ begin
 	afArr = array(af, [[1,2,3,4] [5,6,7,8] [9,10,11,12] [13, 14, 15, 16]])
 	afArr[array(af, [[1, 2, 3] [4, 5, 6]])] = -1
 	@test host(afArr) == [[1,-1,-1,-1] [-1,-1,-1,8] [9,10,11,12] [13, 14, 15, 16]]
-end)
+end

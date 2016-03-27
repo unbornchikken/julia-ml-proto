@@ -5,7 +5,7 @@ module AFTest
 using AF
 using Base.Test
 
-function testOnAllBackends(title, f)
+function testOnAllBackends(f, title)
 	for b in getSupportedBackends()
 		print("DEGIN: $title - $b\n")
 		f(ArrayFire{b}())
@@ -15,5 +15,6 @@ end
 
 include("device.jl")
 include("array.jl")
+include("binary.jl")
 
 end

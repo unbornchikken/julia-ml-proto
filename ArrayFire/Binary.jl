@@ -29,9 +29,9 @@ immutable Binary
 			Libdl.dlsym(ptr, :af_and),
 			Libdl.dlsym(ptr, :af_or),
 			Libdl.dlsym(ptr, :af_add),
-			Libdl.dlsym(ptr, :af_mul),
 			Libdl.dlsym(ptr, :af_sub),
-			Libdl.dlsym(ptr, :af_mul)
+			Libdl.dlsym(ptr, :af_mul),
+			Libdl.dlsym(ptr, :af_div)
 		)
 	end
 end
@@ -112,10 +112,10 @@ function .\{T1, N1, T2, N2}(lhs::AFArrayWithData{T1, N1}, rhs::AFArrayWithData{T
 	rhs ./ lhs
 end
 
-function .\{T, N}(lhs::AFArrayWithData{T, N}, rhsConst::Number)
+function .\{T, N}(lhs::AFArrayWithData{T, N}, rhs::Number)
 	rhs ./ lhs
 end
 
-function .\{T, N}(lhsConst::Number, rhs::AFArrayWithData{T, N})
+function .\{T, N}(lhs::Number, rhs::AFArrayWithData{T, N})
 	rhs ./ lhs
 end

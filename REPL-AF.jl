@@ -1,15 +1,21 @@
 af = ArrayFire{OpenCL}()
 
-afArr = array(af, [[1,2,3,4] [5,6,7,8] [9,10,11,12] [13, 14, 15, 16]])
-afArr[array(af, [[1, 2, 3] [4, 5, 6]])] = -1
-print(host(afArr))
+afArr = array(af, [[1, 2] [3, 4]])
+result = afArr .< array(af, [[2, 2] [2, 2]])
+println(host(result))
+result = afArr .<= array(af, [[2, 2] [2, 2]])
+println(host(result))
+result = afArr == array(af, [[2, 2] [2, 2]])
+println(host(result))
+result = afArr != array(af, [[2, 2] [2, 2]])
+println(host(result))
+result = afArr .> array(af, [[2, 2] [2, 2]])
+println(host(result))
+result = afArr .>= 2
+println(host(result))
 
-# afArr = array(af, [[1,2,3,4] [5,6,7,8] [9,10,11,12] [13, 14, 15, 16]])
-# indexed = AF.index(afArr, AF.SeqIndex(2, 4))
-# print(host(indexed))
-#
-# indexed = AF.index(afArr, AF.SeqIndex(0, 2), AF.SeqIndex(1, 2))
-# print(host(indexed))
-#
-# indexed = AF.index(afArr, AF.SeqIndex(-1), AF.SeqIndex(2, 3))
-# print(host(indexed))
+afArr = array(af, [[0, 1] [2, 0]])
+result = and(afArr, array(af, [[true, false] [true, false]]))
+println(host(result))
+result = or(afArr, array(af, [[true, false] [true, false]]))
+println(host(result))
