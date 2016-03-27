@@ -9,6 +9,10 @@ export
 	scope!,
 	register!
 
+libPrefix() = @linux? "lib" : @osx? "lib" : ""
+
+libPostfix() = @linux? ".so" : @osx? ".dylib" : ""
+
 type ArrayFire{T<:Backend}
 	ptr
 	device
@@ -28,11 +32,11 @@ type ArrayFire{T<:Backend}
 
 	function ArrayFire()
 		lib = if is(T, OpenCL)
-			"afopencl"
+			string(libPrefix(), "afopencl", libPostfix())
 		elseif is(T, CUDA)
-			"afcuda"
+			string(libPrefix(), "afcuda", libPostfix())
 		else
-			"afcpu"
+			string(libPrefix(), "afcpu", libPostfix())
 		end
 		ptr = Libdl.dlopen(lib)
 		af = new(
