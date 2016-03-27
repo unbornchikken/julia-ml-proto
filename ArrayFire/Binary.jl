@@ -1,5 +1,5 @@
-import Base: .<,.>,.<=,.>=,==,!=
-export .<,.>,.<=,.>=,==,!=,and,or
+import Base: .<,.>,.<=,.>=,.==,.!=
+export .<,.>,.<=,.>=,.==,.!=,and,or
 
 import Base: .+,.-,.*,./,.\
 export .+,.-,.*,./,.\
@@ -98,8 +98,8 @@ end
 @logicBinOp(.<=, le)
 @logicBinOp(.>, gt)
 @logicBinOp(.>=, ge)
-@logicBinOp(==, eq)
-@logicBinOp(!=, neq)
+@logicBinOp(.==, eq)
+@logicBinOp(.!=, neq)
 @logicBinOp(and, and)
 @logicBinOp(or, or)
 

@@ -16,5 +16,6 @@ end
 include("device.jl")
 include("array.jl")
 include("binary.jl")
+include("create.jl")
 
 end
