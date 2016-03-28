@@ -5,6 +5,7 @@ export
 	dims,
 	host,
 	dType,
+	jType,
 	numdims
 
 abstract AFArray
@@ -121,11 +122,11 @@ function dims{T, N}(arr::AFArrayWithData{T, N}, n)
 		Cint, (Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{Void}),
 		dim0, dim1, dim2, dim3, base.ptr)
 	assertErr(err)
-	if n == 1
+	if n == 0
 		dim0[]
-	elseif n == 2
+	elseif n == 1
 		dim1[]
-	elseif n == 3
+	elseif n == 2
 		dim2[]
 	else
 		dim3[]
@@ -155,6 +156,10 @@ function dType(af::ArrayFire, ptr::Ptr{Void})
 	assertErr(err)
 	result[]
 end
+
+jType(arr::AFArray) = asJType(Val{dType(arr)})
+
+jType{T, N}(arr::AFArrayWithData{T, N}) = T
 
 numdims(arr::AFArray) = numdims(_base(arr))
 

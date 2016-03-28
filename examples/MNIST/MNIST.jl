@@ -53,7 +53,7 @@ function loadSubset(ctx, expandLabels = true, frac = 0.6f0)
 	rIDims = reverse(imageData.dims)
 	images = array(ctx, imageData.data, rIDims...)
 
-	r = randu(Float32, 10000)
+	r = randu(ctx, Float32, 10000)
 	cond = r .< frac;
 	trainIndices = where(cond);
 	testIndices = where(!cond);
@@ -65,52 +65,41 @@ function loadSubset(ctx, expandLabels = true, frac = 0.6f0)
     numTrain = dims(trainImages, 2);
     numTest = dims(testImages, 2);
 
-    print("Training sample count: $numTrain");
-    print("Test sample count: $numTest");
+    println("Training sample count: $numTrain");
+    println("Test sample count: $numTest");
 
-	#
-    # let trainLabels;
-    # let testLabels;
-	#
-    # if (expandLabels) {
-    #     trainLabels = af.constant(0, numClasses, numTrain, af.dType.f32);
-    #     testLabels = af.constant(0, numClasses, numTest, af.dType.f32);
-	#
-    #     assert(trainIndices.type() === af.dType.u32);
-    #     assert(testIndices.type() === af.dType.u32);
-	#
-    #     let hTrainIdx = yield trainIndices.hostAsync();
-    #     let hTestIdx = yield testIndices.hostAsync();
-	#
-    #     for (let i = 0; i < numTrain; i++) {
-    #         let idx = uint.get(hTrainIdx, i * uint.size);
-    #         let label = uint.get(labelData.data, idx * uint.size);
-    #         assert(label >= 0 && label <= 9);
-    #         trainLabels.set(label, i, 1);
-    #     }
-	#
-    #     for (let i = 0; i < numTest; i++) {
-    #         let idx = uint.get(hTestIdx, i * uint.size);
-    #         let label = uint.get(labelData.data, idx * uint.size);
-    #         assert(label >= 0 && label <= 9);
-    #         testLabels.set(label, i, 1);
-    #     }
-    # }
-    # else {
-    #     let labels = yield AFArray.createAsync(labelData.dims[0], af.dType.u32, labelData.data);
-    #     trainLabels = labels.at(trainIndices);
-    #     testLabels = labels.at(testIndices);
-    # }
-	#
-    # return {
-    #     numClasses,
-    #     numTrain,
-    #     numTest,
-    #     trainImages: trainImages,
-    #     testImages: testImages,
-    #     trainLabels: trainLabels,
-    #     testLabels: testLabels
-    # };
+	local trainLabelsArr, testLabelsArr;
+
+	if expandLabels
+	    trainLabels = [0.0f0 for x = 1:numClasses, y = 1:numTrain]
+        testLabels = [0.0f0 for x = 1:numClasses, y = 1:numTest]
+
+        assert(jType(trainIndices) == UInt32);
+        assert(jType(testIndices) === UInt32);
+
+        hTrainIdx = host(trainIndices);
+        hTestIdx = host(testIndices);
+
+		process = (num, indices, labels) ->
+			for i in 1:num
+				idx = indices[i] + 1
+				label = labelData.data[idx]
+				assert(label >= 0 && label <= 9)
+				labels[label + 1, i] = 1;
+			end
+
+		process(numTrain, hTrainIdx, trainLabels)
+		process(numTest, hTestIdx, testLabels)
+
+		trainLabelsArr = array(af, trainLabels)
+		testLabelsArr = array(af, testLabels)
+	else
+		labels = array(af, labelData.data)
+		trainLabelsArr = labels[trainIndices]
+		testLabelsArr = labels[testIndices]
+	end
+
+	numClasses,	numTrain, numTest, trainImages, testImages, trainLabelsArr, testLabelsArr
 end
 
 end
