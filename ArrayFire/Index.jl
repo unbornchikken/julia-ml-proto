@@ -72,7 +72,7 @@ end
 	end
 end
 
-function indexGen{T, N, I<:AFIndex}(arr::AFArrayWithData{T, N}, indices::I...)
+function indexGen{T, N, I<:AFIndex}(arr::AFArray{T, N}, indices::I...)
 	ptr = Ref{Ptr{Void}}()
 	indices2 = collect(indices)
 	base = _base(arr)
@@ -83,7 +83,7 @@ function indexGen{T, N, I<:AFIndex}(arr::AFArrayWithData{T, N}, indices::I...)
 	array(base.af, T, ptr[])
 end
 
-function assignGen{T, N, I<:AFIndex}(arr::AFArrayWithData{T, N}, rhs::AFArrayWithData, indices::I...)
+function assignGen{T, N, I<:AFIndex}(arr::AFArray{T, N}, rhs::AFArray, indices::I...)
 	ptr = Ref{Ptr{Void}}()
 	indices2 = collect(indices)
 	base = _base(arr)
@@ -97,12 +97,12 @@ end
 
 immutable Span end
 
-@generated function getindex{T, N}(arr::AFArrayWithData{T, N}, args...)
+@generated function getindex{T, N}(arr::AFArray{T, N}, args...)
 	exp = genIndices(arr, args...)
 	:( $exp; indexGen(arr, indices...) )
 end
 
-@generated function setindex!{T, N, V}(arr::AFArrayWithData{T, N}, rhs::V, args...)
+@generated function setindex!{T, N, V}(arr::AFArray{T, N}, rhs::V, args...)
 	exp = genIndices(arr, args...)
 	if rhs <: Real
 		quote
@@ -147,7 +147,7 @@ function genDims(arr::AFArray, indices::SeqIndex...)
 	result
 end
 
-function genIndices{T, N}(arr::Type{AFArrayWithData{T, N}}, args::Type...)
+function genIndices{T, N}(arr::Type{AFArray{T, N}}, args::Type...)
 	exp = :(base = _base(arr); indices = Array{AFIndex}(length(args)))
 	i = 1
 	for arg in args

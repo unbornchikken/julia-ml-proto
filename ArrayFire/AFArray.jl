@@ -8,38 +8,22 @@ export
 	jType,
 	numdims
 
-abstract AFArray
-
 type AFArrayBase{T<:ArrayFire}
 	af::T
 	ptr::Ptr{Void}
 end
 
-type EmptyAFArray <: AFArray
+type AFArray{T<:Number, N}
 	base::AFArrayBase
 
-	function EmptyAFArray(af::ArrayFire)
-		ptr = Ref{Ptr{Void}}()
-		dims = [0, 0, 0, 0]
-		err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, 4, dims, f32)
-		assertErr(err)
-		me = new(AFArrayBase(af, ptr[]))
-		register!(af, me)
-		me
-	end
-end
-
-type AFArrayWithData{T<:Number, N} <: AFArray
-	base::AFArrayBase
-
-	function AFArrayWithData(af::ArrayFire, ptr::Ptr{Void})
+	function AFArray(af::ArrayFire, ptr::Ptr{Void})
 		me = new(AFArrayBase(af, ptr))
 		finalizer(me, release!)
 		register!(af, me)
 		me
 	end
 
-	function AFArrayWithData(af::ArrayFire, arr::Array{T, N})
+	function AFArray(af::ArrayFire, arr::Array{T, N})
 		ptr = Ref{Ptr{Void}}()
 		dims = collect(size(arr))
 		assert(N == length(dims))
@@ -51,7 +35,7 @@ type AFArrayWithData{T<:Number, N} <: AFArray
 		me
 	end
 
-	function AFArrayWithData(af::ArrayFire, dims::Int...)
+	function AFArray(af::ArrayFire, dims::Int...)
 		ptr = Ref{Ptr{Void}}()
 		dims2 = collect(dims)
 		assert(N == length(dims2))
@@ -64,23 +48,19 @@ type AFArrayWithData{T<:Number, N} <: AFArray
 	end
 end
 
-array(af::ArrayFire) = EmptyAFArray(af)
+array{T, N}(af::ArrayFire, arr::Array{T, N}) = AFArray{T, N}(af, arr)
 
-array{T, N}(af::ArrayFire, arr::Array{T, N}) = AFArrayWithData{T, N}(af, arr)
-
-array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArrayWithData{T, length(dimsToSize(dims...))}(af, dims...)
+array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArray{T, length(dimsToSize(dims...))}(af, dims...)
 
 array{T}(af::ArrayFire, arr::Array{T}, dims...) = array(af, reshape(arr, dimsToSize(dims...)...))
 
-array{T}(af::ArrayFire, ::Type{T}, N::Int, ptr::Ptr{Void}) = AFArrayWithData{T, N}(af, ptr)
+array{T}(af::ArrayFire, ::Type{T}, N::Int, ptr::Ptr{Void}) = AFArray{T, N}(af, ptr)
 
-array{T}(af::ArrayFire, ::Type{T}, ptr::Ptr{Void}) = AFArrayWithData{T, Int(numdims(af, ptr))}(af, ptr)
+array{T}(af::ArrayFire, ::Type{T}, ptr::Ptr{Void}) = AFArray{T, Int(numdims(af, ptr))}(af, ptr)
 
-array(af::ArrayFire, ptr::Ptr{Void}) = AFArrayWithData{asJType(Val{dType(af, ptr)}), Int(numdims(af, ptr))}(af, ptr)
+array(af::ArrayFire, ptr::Ptr{Void}) = AFArray{asJType(Val{dType(af, ptr)}), Int(numdims(af, ptr))}(af, ptr)
 
-getBase(arr::EmptyAFArray) = arr.base
-
-getBase{T, N}(arr::AFArrayWithData{T, N}) = arr.base
+getBase{T, N}(arr::AFArray{T, N}) = arr.base
 
 function release!(arr::AFArray)
 	base = getBase(arr)
@@ -116,7 +96,7 @@ function dims(af::ArrayFire, ptr::Ptr{Void})
 	[dim0[], dim1[], dim2[], dim3[]]
 end
 
-function dims{T, N}(arr::AFArrayWithData{T, N}, n)
+function dims{T, N}(arr::AFArray{T, N}, n)
 	dim0 = Ref{DimT}()
 	dim1 = Ref{DimT}()
 	dim2 = Ref{DimT}()
@@ -137,10 +117,6 @@ function dims{T, N}(arr::AFArrayWithData{T, N}, n)
 		dim3[]
 	end
 end
-
-dims(arr::EmptyAFArray) = [0, 0, 0, 0]
-
-dims(arr::EmptyAFArray, n) = 0
 
 function Base.size(arr::AFArray)
 	dimsToSize(dims(arr))
@@ -164,7 +140,7 @@ end
 
 jType(arr::AFArray) = asJType(Val{dType(arr)})
 
-jType{T, N}(arr::AFArrayWithData{T, N}) = T
+jType{T, N}(arr::AFArray{T, N}) = T
 
 numdims(arr::AFArray) = numdims(_base(arr))
 
@@ -194,12 +170,12 @@ function elements(af::ArrayFire, ptr::Ptr{Void})
 	result[]
 end
 
-function host{T, N}(arr::AFArrayWithData{T, N})
+function host{T, N}(arr::AFArray{T, N})
 	result = Array{T}(size(arr)...)
 	host(arr, result)
 end
 
-function host{T, N}(arr::AFArrayWithData{T, N}, to::Array{T, N})
+function host{T, N}(arr::AFArray{T, N}, to::Array{T, N})
 	base = _base(arr)
 	err = ccall(
 		base.af.getDataPtr,

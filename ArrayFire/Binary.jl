@@ -38,7 +38,7 @@ end
 
 macro binOp(op, cFunc, resultT)
 	quote
-		function $(esc(op)){T1, N1, T2, N2}(lhs::AFArrayWithData{T1, N1}, rhs::AFArrayWithData{T2, N2})
+		function $(esc(op)){T1, N1, T2, N2}(lhs::AFArray{T1, N1}, rhs::AFArray{T2, N2})
 			result = Ref{Ptr{Void}}()
 			lhsBase = getBase(lhs)
 			rhsBase = getBase(rhs)
@@ -47,10 +47,10 @@ macro binOp(op, cFunc, resultT)
 				Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 				result, lhsBase.ptr, rhsBase.ptr, af.batch)
 			assertErr(err)
-			AFArrayWithData{$resultT(T1, T2), max(N1, N2)}(af, result[])
+			AFArray{$resultT(T1, T2), max(N1, N2)}(af, result[])
 		end
 
-		function $(esc(op)){T, N}(lhs::AFArrayWithData{T, N}, rhsConst::Number)
+		function $(esc(op)){T, N}(lhs::AFArray{T, N}, rhsConst::Number)
 			result = Ref{Ptr{Void}}()
 			lhsBase = getBase(lhs)
 			af = lhsBase.af
@@ -61,13 +61,13 @@ macro binOp(op, cFunc, resultT)
 					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 					result, lhsBase.ptr, rhsBase.ptr, af.batch)
 				assertErr(err)
-				AFArrayWithData{$resultT(T, typeof(rhsConst)), N}(af, result[])
+				AFArray{$resultT(T, typeof(rhsConst)), N}(af, result[])
 			finally
 				release!(rhs)
 			end
 		end
 
-		function $(esc(op)){T, N}(lhsConst::Number, rhs::AFArrayWithData{T, N})
+		function $(esc(op)){T, N}(lhsConst::Number, rhs::AFArray{T, N})
 			result = Ref{Ptr{Void}}()
 			rhsBase = getBase(rhs)
 			af = rhsBase.af
@@ -78,7 +78,7 @@ macro binOp(op, cFunc, resultT)
 					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 					result, lhsBase.ptr, rhsBase.ptr, af.batch)
 				assertErr(err)
-				AFArrayWithData{$resultT(typeof(lhsConst), T), N}(af, result[])
+				AFArray{$resultT(typeof(lhsConst), T), N}(af, result[])
 			finally
 				release!(lhs)
 			end
@@ -108,14 +108,14 @@ end
 @arBinOp(.*, mul)
 @arBinOp(./, div)
 
-function .\{T1, N1, T2, N2}(lhs::AFArrayWithData{T1, N1}, rhs::AFArrayWithData{T2, N2})
+function .\{T1, N1, T2, N2}(lhs::AFArray{T1, N1}, rhs::AFArray{T2, N2})
 	rhs ./ lhs
 end
 
-function .\{T, N}(lhs::AFArrayWithData{T, N}, rhs::Number)
+function .\{T, N}(lhs::AFArray{T, N}, rhs::Number)
 	rhs ./ lhs
 end
 
-function .\{T, N}(lhs::Number, rhs::AFArrayWithData{T, N})
+function .\{T, N}(lhs::Number, rhs::AFArray{T, N})
 	rhs ./ lhs
 end

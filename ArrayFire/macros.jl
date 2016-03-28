@@ -1,6 +1,6 @@
 macro afCall_Arr_Arr(method, holder, func)
 	quote
-		function $(esc(method)){T, N}(arr::AFArrayWithData{T, N})
+		function $(esc(method)){T, N}(arr::AFArray{T, N})
 			result = Ref{Ptr{Void}}()
 			base = getBase(arr)
 			af = base.af
@@ -15,7 +15,7 @@ end
 
 macro afCall_Arr_Arr_Arr_Unsigned(method, holder, func)
 	quote
-		function $(esc(method)){T1, N1, T2, N2}(arr1::AFArrayWithData{T1, N1}, arr2::AFArrayWithData{T2, N2}, value)
+		function $(esc(method)){T1, N1, T2, N2}(arr1::AFArray{T1, N1}, arr2::AFArray{T2, N2}, value)
 			result = Ref{Ptr{Void}}()
 			base1 = getBase(arr1)
 			af = base1.af

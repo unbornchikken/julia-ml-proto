@@ -1,10 +1,5 @@
 testOnAllBackends("AFArray") do af
 	println("\tconstruct")
-	empty = array(af)
-	@test [0, 0, 0, 0] == dims(empty)
-	@test () == size(empty)
-	@test_throws MethodError host(empty)
-	@test numdims(empty) == length(size(empty))
 
 	arr = [1.0f0, 2.0f0]
 	afArr = array(af, arr)
@@ -60,7 +55,7 @@ testOnAllBackends("AFArray") do af
 	idx = AF.ArrayIndex(afArr)
 	aPtr = AF.ptr(idx)
 	@test aPtr == AF._base(afArr).ptr
-	afArr = AF.AFArrayWithData{Int32, 1}(af, aPtr)
+	afArr = AF.AFArray{Int32, 1}(af, aPtr)
 	@test [2, 1, 1, 1] == dims(afArr)
 	@test (2, ) == size(afArr)
 	@test host(afArr) == [one(Int32), zero(Int32)]
