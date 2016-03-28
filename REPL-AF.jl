@@ -1,5 +1,7 @@
 af = ArrayFire{OpenCL}()
 
-afArr = array(af, [0.0, 0.1, 0.0, 0.3, 0.0, 0.5, 0.0, 0.7, 0.8, 0.0])
-result = host(where(!afArr))
-println(result)
+afArr = array(af, [[1, 2] [3, 4]])
+result = lookup(afArr, array(af, [1]), 0)
+println(host(result))
+result = lookup(afArr, array(af, [0]), 1)
+println(host(result))

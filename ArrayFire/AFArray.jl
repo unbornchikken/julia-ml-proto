@@ -70,6 +70,8 @@ array{T}(af::ArrayFire, ::Type{T}, N::Int, ptr::Ptr{Void}) = AFArrayWithData{T, 
 
 array{T}(af::ArrayFire, ::Type{T}, ptr::Ptr{Void}) = AFArrayWithData{T, Int(numdims(af, ptr))}(af, ptr)
 
+array(af::ArrayFire, ptr::Ptr{Void}) = AFArrayWithData{asJType(Val{aftype(af, ptr)}), Int(numdims(af, ptr))}(af, ptr)
+
 getBase(arr::EmptyAFArray) = arr.base
 
 getBase{T, N}(arr::AFArrayWithData{T, N}) = arr.base
@@ -139,12 +141,17 @@ function Base.size(arr::AFArray)
 end
 
 function aftype(arr::AFArray)
-	base = _base(arr)
+	aftype(_base(arr))
+end
+
+aftype{T<:ArrayFire}(base::AFArrayBase{T}) = aftype(base.af, base.ptr)
+
+function aftype(af::ArrayFire, ptr::Ptr{Void})
 	result = Ref{DType}()
 	err = ccall(
-		base.af.getType,
+		af.getType,
 		Cint, (Ptr{DType}, Ptr{Void}),
-		result, base.ptr)
+		result, ptr)
 	assertErr(err)
 	result[]
 end

@@ -16,4 +16,11 @@ testOnAllBackends("Create Array") do af
 	afArr = randn(af, Float32, 1, 2)
 	@test host(afArr .>= -4.0f0) == [true true]
 	@test host(afArr .<= 4.0f0) == [true true]
+
+	println("\tlookup")
+	afArr = array(af, [[1, 2] [3, 4]])
+	result = lookup(afArr, array(af, [1]), 0)
+	@test host(result) == [2 4]
+	result = lookup(afArr, array(af, [0]), 1)
+	@test host(result) == [1, 2]
 end

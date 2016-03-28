@@ -11,16 +11,16 @@ immutable Unary
 	end
 end
 
-macro unOp(op, cFunc, resultT)
-	:( @afCall_Arr_Arr($(esc(op)), unary, $cFunc, $resultT, N -> N) )
+macro unOp(op, cFunc)
+	:( @afCall_Arr_Arr($(esc(op)), unary, $cFunc) )
 end
 
 macro logicUnOp(op, cFunc)
-	:( @unOp($(esc(op)), $cFunc, T -> asJType(Val{b8})) )
+	:( @unOp($(esc(op)), $cFunc) )
 end
 
 macro arUnOp(op, cFunc)
-	:( @unOp($(esc(op)), $cFunc, T -> T) )
+	:( @unOp($(esc(op)), $cFunc) )
 end
 
 @logicUnOp(!, not)

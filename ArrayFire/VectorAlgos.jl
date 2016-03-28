@@ -10,4 +10,4 @@ immutable VectorAlgos
 	end
 end
 
-@afCall_Arr_Arr(where, vectorAlgos, where, T -> UInt32, N -> 1)
+@afCall_Arr_Arr(where, vectorAlgos, where)

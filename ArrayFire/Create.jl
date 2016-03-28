@@ -3,7 +3,8 @@ import Base.randn
 export
 	randn,
 	randu,
-	constant
+	constant,
+	lookup
 
 immutable Create
 	randn
@@ -11,6 +12,7 @@ immutable Create
 	constant
 	constantLong
 	constantULong
+	lookup
 
 	function Create(ptr)
 		new(
@@ -18,7 +20,8 @@ immutable Create
 			Libdl.dlsym(ptr, :af_randu),
 			Libdl.dlsym(ptr, :af_constant),
 			Libdl.dlsym(ptr, :af_constant_long),
-			Libdl.dlsym(ptr, :af_constant_ulong)
+			Libdl.dlsym(ptr, :af_constant_ulong),
+			Libdl.dlsym(ptr, :af_lookup)
 		)
 	end
 end
@@ -72,3 +75,5 @@ function constant(af::ArrayFire, value::UInt64, dims...)
 	assertErr(err)
 	AFArrayWithData{UInt64, jlLength(dims)}(af, ptr[])
 end
+
+@afCall_Arr_Arr_Arr_Unsigned(lookup, create, lookup)
