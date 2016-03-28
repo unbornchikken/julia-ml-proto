@@ -16,7 +16,9 @@ type ArrayFire{T<:Backend}
 	device
 	create
 	binary
+	unary
 	index
+	vectorAlgos
 	createHandle
 	createArray
 	releaseArray
@@ -35,7 +37,9 @@ type ArrayFire{T<:Backend}
 			AFDevice(ptr),
 			Create(ptr),
 			Binary(ptr),
+			Unary(ptr),
 			Index(ptr),
+			VectorAlgos(ptr),
 			Libdl.dlsym(ptr, :af_create_handle),
 			Libdl.dlsym(ptr, :af_create_array),
 			Libdl.dlsym(ptr, :af_release_array),
@@ -62,11 +66,14 @@ function getSupportedBackends()
 	backends
 end
 
-include("AFArray.jl")
 include("AFDevice.jl")
+include("AFArray.jl")
+include("macros.jl")
 include("Create.jl")
 include("Binary.jl")
+include("Unary.jl")
 include("Index.jl")
+include("VectorAlgos.jl")
 include("FreeList.jl")
 
 immutable ScopeHandle

@@ -107,6 +107,17 @@ function dimsToSize(d::Dim4)
 	@sizeRules(len, d)
 end
 
+function dimsToSize(d::Tuple)
+	len = length(d)
+	@sizeRules(len, d)
+end
+
+jlLength(dims::Tuple) = length(dimsToSize(dims))
+
+jlLength(dims::DimT...) = length(dimsToSize(dims...))
+
+jlLength(dims::Dim4) = length(dimsToSize(dims))
+
 function afPromote{T,S}(::Type{T},::Type{S})
     if T == S
         return T

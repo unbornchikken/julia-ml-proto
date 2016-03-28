@@ -16,6 +16,8 @@ end
 include("device.jl")
 include("array.jl")
 include("binary.jl")
+include("unary.jl")
 include("create.jl")
+include("vectorAlgos.jl")
 
 end

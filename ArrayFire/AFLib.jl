@@ -18,16 +18,12 @@ type AFLib{T<:Backend}
 		try
 			ptr = Libdl.dlopen(string(libPrefix(), libName(T), libPostfix()))
 			me = new(ptr, Nullable{Exception}())
-			finalizer(me, release!)
 			me
 		catch err
 			me = new(C_NULL, Nullable(err))
-			finalizer(me, release!)
 			me
 		end
 end
-
-release!{T<:Backend}(lib::AFLib{T}) = Libdl.dlclose(lib.ptr)
 
 function getLibPtr{T<:Backend}(lib::AFLib{T})
 	if isnull(lib.err)
