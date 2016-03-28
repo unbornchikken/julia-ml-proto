@@ -16,7 +16,7 @@ type AFArrayBase{T<:ArrayFire}
 end
 
 type EmptyAFArray <: AFArray
-	base
+	base::AFArrayBase
 
 	function EmptyAFArray(af::ArrayFire)
 		ptr = Ref{Ptr{Void}}()
@@ -30,9 +30,14 @@ type EmptyAFArray <: AFArray
 end
 
 type AFArrayWithData{T<:Number, N} <: AFArray
-	base
+	base::AFArrayBase
 
-	AFArrayWithData(af::ArrayFire, ptr::Ptr{Void}) = new(AFArrayBase(af, ptr))
+	function AFArrayWithData(af::ArrayFire, ptr::Ptr{Void})
+		me = new(AFArrayBase(af, ptr))
+		finalizer(me, release!)
+		register!(af, me)
+		me
+	end
 
 	function AFArrayWithData(af::ArrayFire, arr::Array{T, N})
 		ptr = Ref{Ptr{Void}}()

@@ -10,39 +10,35 @@ immutable Idx
 	data
 end
 
-function toString(idx::Idx)
-	"numDims: $(idx.numDims)\ndims: $(idx.dims)"
-end
+toString(idx::Idx) = "numDims: $(idx.numDims)\ndims: $(idx.dims)"
 
 Base.print(io::IOBuffer, idx::Idx) = Base.print(io, toString(idx))
 Base.print(idx::Idx) = Base.print(toString(idx))
 
-function readIdx{T}(::Type{T}, path)
-	open(path) do f
-		bytes = readbytes(f, 4)
+readIdx{T}(::Type{T}, path) = open(path) do f
+	bytes = readbytes(f, 4)
 
-		bytes[3] != 8 && error("Unsupported data type")
+	bytes[3] != 8 && error("Unsupported data type")
 
-		numDims = bytes[4]
-		dims = Array{Int}(numDims)
-		size = 1;
-		for i in 1:numDims
-			dim = ntoh(read(f, Int32))
-			size *= dim
-			dims[i] = dim
-		end
-
-		bytes = readbytes(f, size)
-		data = Array{T}(size)
-		for i in 1:size
-			data[i] = convert(T, bytes[i])
-		end
-
-        return Idx(numDims, dims, data)
+	numDims = bytes[4]
+	dims = Array{Int}(numDims)
+	size = 1;
+	for i in 1:numDims
+		dim = ntoh(read(f, Int32))
+		size *= dim
+		dims[i] = dim
 	end
+
+	bytes = readbytes(f, size)
+	data = Array{T}(size)
+	for i in 1:size
+		data[i] = convert(T, bytes[i])
+	end
+
+	return Idx(numDims, dims, data)
 end
 
-function loadSubset(ctx, expandLabels = true, frac = 0.6f0)
+loadSubset(ctx, expandLabels = true, frac = 0.6f0) = scope!(ctx) do this
 	frac = min(frac, 0.8f0)
 
 	cd = dirname(@__FILE__)
@@ -98,6 +94,9 @@ function loadSubset(ctx, expandLabels = true, frac = 0.6f0)
 		trainLabelsArr = labels[trainIndices]
 		testLabelsArr = labels[testIndices]
 	end
+
+	this.result(trainLabelsArr)
+	this.result(testLabelsArr)
 
 	numClasses,	numTrain, numTest, trainImages, testImages, trainLabelsArr, testLabelsArr
 end

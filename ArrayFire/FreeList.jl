@@ -5,7 +5,7 @@ end
 
 FreeListEntry(arr) = FreeListEntry(arr, false)
 
-type FreeList
+type FreeList <: AFImpl
   list::Vector{Vector{FreeListEntry}}
 end
 

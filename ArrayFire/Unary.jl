@@ -1,8 +1,8 @@
 import Base: !
 export !
 
-immutable Unary
-	not
+immutable Unary <: AFImpl
+	not::Ptr{Void}
 
 	function Unary(ptr)
 		new(

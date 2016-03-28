@@ -6,13 +6,13 @@ export
 	constant,
 	lookup
 
-immutable Create
-	randn
-	randu
-	constant
-	constantLong
-	constantULong
-	lookup
+immutable Create <: AFImpl
+	randn::Ptr{Void}
+	randu::Ptr{Void}
+	constant::Ptr{Void}
+	constantLong::Ptr{Void}
+	constantULong::Ptr{Void}
+	lookup::Ptr{Void}
 
 	function Create(ptr)
 		new(

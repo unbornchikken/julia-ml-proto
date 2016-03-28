@@ -6,12 +6,12 @@ export
 	deviceInfo,
 	deviceInfos
 
-immutable AFDevice
-	infoString
-	getDeviceCount
-	setDevice
-	getDevice
-	deviceInfo
+immutable AFDevice <: AFImpl
+	infoString::Ptr{Void}
+	getDeviceCount::Ptr{Void}
+	setDevice::Ptr{Void}
+	getDevice::Ptr{Void}
+	deviceInfo::Ptr{Void}
 
 	function AFDevice(ptr)
 		new(

@@ -9,26 +9,28 @@ export
 	scope!,
 	register!
 
+abstract AFImpl
+
 include("AFLib.jl")
 
 type ArrayFire{T<:Backend}
-	ptr
-	device
-	create
-	binary
-	unary
-	index
-	vectorAlgos
-	createHandle
-	createArray
-	releaseArray
-	getDims
-	getDataPtr
-	getType
-	getNumDims
-	getElements
-	freeList
-	batch
+	ptr::Ptr{Void}
+	device::AFImpl
+	create::AFImpl
+	binary::AFImpl
+	unary::AFImpl
+	index::AFImpl
+	vectorAlgos::AFImpl
+	createHandle::Ptr{Void}
+	createArray::Ptr{Void}
+	releaseArray::Ptr{Void}
+	getDims::Ptr{Void}
+	getDataPtr::Ptr{Void}
+	getType::Ptr{Void}
+	getNumDims::Ptr{Void}
+	getElements::Ptr{Void}
+	freeList::AFImpl
+	batch::Bool
 
 	function ArrayFire()
 		ptr = getLibPtr(T)

@@ -1,7 +1,7 @@
 export where
 
-immutable VectorAlgos
-	where
+immutable VectorAlgos <: AFImpl
+	where::Ptr{Void}
 
 	function VectorAlgos(ptr)
 		new(

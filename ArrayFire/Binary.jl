@@ -4,19 +4,19 @@ export .<,.>,.<=,.>=,.==,.!=,and,or
 import Base: .+,.-,.*,./,.\
 export .+,.-,.*,./,.\
 
-immutable Binary
-	le
-	lt
-	ge
-	gt
-	eq
-	neq
-	and
-	or
-	add
-	sub
-	mul
-	div
+immutable Binary <: AFImpl
+	le::Ptr{Void}
+	lt::Ptr{Void}
+	ge::Ptr{Void}
+	gt::Ptr{Void}
+	eq::Ptr{Void}
+	neq::Ptr{Void}
+	and::Ptr{Void}
+	or::Ptr{Void}
+	add::Ptr{Void}
+	sub::Ptr{Void}
+	mul::Ptr{Void}
+	div::Ptr{Void}
 
 	function Binary(ptr)
 		new(

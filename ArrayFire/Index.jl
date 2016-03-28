@@ -2,9 +2,9 @@ import Base: getindex, setindex!
 export getindex, setindex!
 export Seq, Span
 
-immutable Index
-	indexGen
-	assignGen
+immutable Index <: AFImpl
+	indexGen::Ptr{Void}
+	assignGen::Ptr{Void}
 
 	function Index(ptr)
 		new(
