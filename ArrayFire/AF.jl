@@ -9,9 +9,7 @@ export
 	scope!,
 	register!
 
-libPrefix() = @linux? "lib" : @osx? "lib" : ""
-
-libPostfix() = @linux? ".so" : @osx? ".dylib" : ""
+include("AFLib.jl")
 
 type ArrayFire{T<:Backend}
 	ptr
@@ -31,14 +29,7 @@ type ArrayFire{T<:Backend}
 	batch
 
 	function ArrayFire()
-		lib = if is(T, OpenCL)
-			string(libPrefix(), "afopencl", libPostfix())
-		elseif is(T, CUDA)
-			string(libPrefix(), "afcuda", libPostfix())
-		else
-			string(libPrefix(), "afcpu", libPostfix())
-		end
-		ptr = Libdl.dlopen(lib)
+		ptr = getLibPtr(T)
 		af = new(
 			ptr,
 			AFDevice(ptr),
