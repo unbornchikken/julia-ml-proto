@@ -11,7 +11,7 @@ testOnAllBackends("AFArray") do af
 	@test [2, 1, 1, 1] == dims(afArr)
 	@test (2,) == size(afArr)
 	@test host(afArr) == arr
-	@test aftype(afArr) == f32
+	@test dType(afArr) == f32
 	@test numdims(afArr) == length(size(afArr))
 
 	arr = [1.0f0 2.0f0]
@@ -19,7 +19,7 @@ testOnAllBackends("AFArray") do af
 	@test [1, 2, 1, 1] == dims(afArr)
 	@test (1,2) == size(afArr)
 	@test host(afArr) == arr
-	@test aftype(afArr) == f32
+	@test dType(afArr) == f32
 	@test numdims(afArr) == length(size(afArr))
 
 	afArr = array(af, Float32, 3)
@@ -28,7 +28,7 @@ testOnAllBackends("AFArray") do af
 	arr = host(afArr)
 	@test typeof(arr) == Array{Float32, 1}
 	@test (3,) == size(arr)
-	@test aftype(afArr) == f32
+	@test dType(afArr) == f32
 	@test numdims(afArr) == length(size(afArr))
 
 	afArr = array(af, Float32, 1, 3)
@@ -37,7 +37,7 @@ testOnAllBackends("AFArray") do af
 	arr = host(afArr)
 	@test typeof(arr) == Array{Float32, 2}
 	@test (1, 3) == size(arr)
-	@test aftype(afArr) == f32
+	@test dType(afArr) == f32
 	@test numdims(afArr) == length(size(afArr))
 
 	arr = [1.0f0, 2.0f0]
@@ -45,7 +45,7 @@ testOnAllBackends("AFArray") do af
 	@test [1, 2, 1, 1] == dims(afArr)
 	@test (1, 2) == size(afArr)
 	@test host(afArr) == [1.0f0 2.0f0]
-	@test aftype(afArr) == f32
+	@test dType(afArr) == f32
 	@test numdims(afArr) == length(size(afArr))
 
 	arr = [one(Int32) zero(Int32)]
@@ -53,7 +53,7 @@ testOnAllBackends("AFArray") do af
 	@test [2, 1, 1, 1] == dims(afArr)
 	@test (2, ) == size(afArr)
 	@test host(afArr) == [one(Int32), zero(Int32)]
-	@test aftype(afArr) == s32
+	@test dType(afArr) == s32
 	@test numdims(afArr) == length(size(afArr))
 
 	println("\tindex get")
@@ -64,7 +64,7 @@ testOnAllBackends("AFArray") do af
 	@test [2, 1, 1, 1] == dims(afArr)
 	@test (2, ) == size(afArr)
 	@test host(afArr) == [one(Int32), zero(Int32)]
-	@test aftype(afArr) == s32
+	@test dType(afArr) == s32
 	@test numdims(afArr) == length(size(afArr))
 
 	afArr = array(af, [1, 2, 3, 4, 5])

@@ -4,7 +4,7 @@ export
 	release!,
 	dims,
 	host,
-	aftype,
+	dType,
 	numdims
 
 abstract AFArray
@@ -70,7 +70,7 @@ array{T}(af::ArrayFire, ::Type{T}, N::Int, ptr::Ptr{Void}) = AFArrayWithData{T, 
 
 array{T}(af::ArrayFire, ::Type{T}, ptr::Ptr{Void}) = AFArrayWithData{T, Int(numdims(af, ptr))}(af, ptr)
 
-array(af::ArrayFire, ptr::Ptr{Void}) = AFArrayWithData{asJType(Val{aftype(af, ptr)}), Int(numdims(af, ptr))}(af, ptr)
+array(af::ArrayFire, ptr::Ptr{Void}) = AFArrayWithData{asJType(Val{dType(af, ptr)}), Int(numdims(af, ptr))}(af, ptr)
 
 getBase(arr::EmptyAFArray) = arr.base
 
@@ -140,13 +140,13 @@ function Base.size(arr::AFArray)
 	dimsToSize(dims(arr))
 end
 
-function aftype(arr::AFArray)
-	aftype(_base(arr))
+function dType(arr::AFArray)
+	dType(_base(arr))
 end
 
-aftype{T<:ArrayFire}(base::AFArrayBase{T}) = aftype(base.af, base.ptr)
+dType{T<:ArrayFire}(base::AFArrayBase{T}) = dType(base.af, base.ptr)
 
-function aftype(af::ArrayFire, ptr::Ptr{Void})
+function dType(af::ArrayFire, ptr::Ptr{Void})
 	result = Ref{DType}()
 	err = ccall(
 		af.getType,
