@@ -7,6 +7,7 @@ export
 	ArrayFire,
 	getSupportedBackends,
 	scope!,
+	@scope,
 	register!
 
 abstract AFImpl
@@ -114,6 +115,10 @@ end
 
 function register!(af::ArrayFire, arr::AFArray)
 	register!(af.freeList, arr)
+end
+
+macro scope(af, expr)
+	:( scope!(this -> $expr, $af) )
 end
 
 end # module

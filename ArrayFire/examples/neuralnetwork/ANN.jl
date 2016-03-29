@@ -1,37 +1,28 @@
 type ANN
 	af::ArrayFire
 	numLayers::Int
-	signal::Vector{AFArray}
-	weights::Vector{AFArray}
+	signal::Vector{Nullable{AFArray}}
+	weights::Vector{Nullable{AFArray}}
 
 	function ANN(af, layers, range = 0.05f0)
 		numLayers = length(layers)
-		signal = Vector{AFArray}()
-		weights = Vector{AFArray}()
+		signal = Vector{Nullable{AFArray}}()
+		weights = Vector{Nullable{AFArray}}()
 
 		for i in 1:numLayers
-			
+			push!(signal, Nullable{AFArray}())
+			if i != numLayers
+				w = randu(fa, Float32, layers[i] + 1, layers[i + 1])
+				push!(weights, w)
+			end
 		end
 
 		new(af, numLayers, signal, weights)
 	end
 end
 
-# function ANN(af, layers, range) {
-#     range = range || 0.05;
-#     this.af = af;
-#     this.numLayers = layers.length;
-#     this.signal = [];
-#     this.weights = [];
-#     for (let i = 0; i < this.numLayers; i++) {
-#         this.signal.push(new af.AFArray());
-#         if (i < this.numLayers - 1) {
-#             let w = af.randu(layers[i] + 1, layers[i + 1], af.dType.f32).mul(range).sub(range / 2);
-#             this.weights.push(w);
-#         }
-#     }
-# }
-#
+deriv(out) = out .* (1.0f0 - out)
+
 # let proto = ANN.prototype;
 #
 # proto.deriv = function (out) {

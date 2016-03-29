@@ -7,4 +7,5 @@ af = ArrayFire{OpenCL}()
 	result = lookup(afArr, array(af, [0]), 1)
 	println(host(result))
 	this.result(afArr)
+	println("OK")
 end
