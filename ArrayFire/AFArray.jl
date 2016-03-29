@@ -16,10 +16,12 @@ end
 type AFArray{T<:Number, N}
 	base::AFArrayBase
 
-	function AFArray(af::ArrayFire, ptr::Ptr{Void})
+	function AFArray(af::ArrayFire, ptr::Ptr{Void}, wrap = true)
 		me = new(AFArrayBase(af, ptr))
-		finalizer(me, release!)
-		register!(af, me)
+		if wrap
+			finalizer(me, release!)
+			register!(af, me)
+		end
 		me
 	end
 

@@ -110,19 +110,23 @@ end
 			val = constant(base.af, rhs, genDims(arr, indices...)...)
 			try
 				outPtr = assignGen(arr, val, indices...)
-				release!(arr)
-				base.ptr = outPtr
+				if base.ptr != outPtr
+					release!(arr)
+					base.ptr = outPtr
+				end
 			finally
 				release!(val)
 			end
 		end
 	else
-		:(
-			$exp;
-			outPtr = assignGen(arr, rhs, indices...);
-			release!(arr);
-			base.ptr = outPtr
-		)
+		quote
+			$exp
+			outPtr = assignGen(arr, rhs, indices...)
+			if base.ptr != outPtr
+				release!(arr)
+				base.ptr = outPtr
+			end
+		end
 	end
 end
 
