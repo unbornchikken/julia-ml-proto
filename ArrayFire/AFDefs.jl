@@ -32,6 +32,7 @@ Base.print(io::IOBuffer, info::DeviceInfo) = Base.print(io, toString(info))
 Base.print(info::DeviceInfo) = Base.print(toString(info))
 
 typealias DType UInt32
+
 f32 = DType(0) # 32-bit floating point values
 c32 = DType(1) # 32-bit complex floating point values
 f64 = DType(2) # 64-bit complex floating point values

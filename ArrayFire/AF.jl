@@ -13,6 +13,23 @@ abstract AFImpl
 
 include("AFLib.jl")
 
+type Results
+	ptr::Ref{Ptr{Void}}
+	dim0::Ref{DimT}
+	dim1::Ref{DimT}
+	dim2::Ref{DimT}
+	dim3::Ref{DimT}
+	dType::Ref{DType}
+end
+
+Results() = Results(
+	Ref{Ptr{Void}}(C_NULL),
+	Ref{DimT}(0),
+	Ref{DimT}(0),
+	Ref{DimT}(0),
+	Ref{DimT}(0),
+	Ref{DType}(0))
+
 type ArrayFire{T<:Backend}
 	ptr::Ptr{Void}
 	device::AFImpl
@@ -31,6 +48,7 @@ type ArrayFire{T<:Backend}
 	getElements::Ptr{Void}
 	freeList::AFImpl
 	batch::Bool
+	results::Results
 
 	function ArrayFire()
 		ptr = getLibPtr(T)
@@ -51,7 +69,8 @@ type ArrayFire{T<:Backend}
 			Libdl.dlsym(ptr, :af_get_numdims),
 			Libdl.dlsym(ptr, :af_get_elements),
 			FreeList(),
-			false)
+			false,
+			Results())
 		af
 	end
 end

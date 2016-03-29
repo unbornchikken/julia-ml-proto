@@ -73,22 +73,24 @@ end
 end
 
 function indexGen{T, N, I<:AFIndex}(arr::AFArray{T, N}, indices::I...)
-	ptr = Ref{Ptr{Void}}()
 	indices2 = collect(indices)
 	base = _base(arr)
-	err = ccall(base.af.index.indexGen,
+	af = base.af
+	ptr = af.results.ptr
+	err = ccall(af.index.indexGen,
 		Cint, (Ptr{Ptr{Void}}, Ptr{Void}, DimT, Ptr{I}),
 		ptr, base.ptr, length(indices2), pointer(indices2))
 	assertErr(err)
-	array(base.af, T, ptr[])
+	array(af, T, ptr[])
 end
 
 function assignGen{T, N, I<:AFIndex}(arr::AFArray{T, N}, rhs::AFArray, indices::I...)
-	ptr = Ref{Ptr{Void}}()
 	indices2 = collect(indices)
 	base = _base(arr)
 	baseRhs = _base(rhs)
-	err = ccall(base.af.index.assignGen,
+	af = base.af
+	ptr = af.results.ptr
+	err = ccall(af.index.assignGen,
 		Cint, (Ptr{Ptr{Void}}, Ptr{Void}, DimT, Ptr{I}, Ptr{Void}),
 		ptr, base.ptr, length(indices2), pointer(indices2), baseRhs.ptr)
 	assertErr(err)

@@ -26,7 +26,7 @@ type AFArray{T<:Number, N}
 	end
 
 	function AFArray(af::ArrayFire, arr::Array{T, N})
-		ptr = Ref{Ptr{Void}}()
+		ptr = af.results.ptr
 		dims = collect(size(arr))
 		assert(N == length(dims))
 		err = ccall(af.createArray, Cint, (Ptr{Ptr{Void}}, Ptr{T}, Cuint, Ptr{DimT}, DType), ptr, pointer(arr), N, pointer(dims), asDType(T))
@@ -38,7 +38,7 @@ type AFArray{T<:Number, N}
 	end
 
 	function AFArray(af::ArrayFire, dims::Int...)
-		ptr = Ref{Ptr{Void}}()
+		ptr = af.results.ptr
 		dims2 = collect(dims)
 		assert(N == length(dims2))
 		err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, N, pointer(dims2), asDType(T))
@@ -86,10 +86,10 @@ dims(arr::AFArray) = dims(_base(arr))
 dims{T<:ArrayFire}(base::AFArrayBase{T}) = dims(base.af, base.ptr)
 
 function dims(af::ArrayFire, ptr::Ptr{Void})
-	dim0 = Ref{DimT}()
-	dim1 = Ref{DimT}()
-	dim2 = Ref{DimT}()
-	dim3 = Ref{DimT}()
+	dim0 = af.results.dim0
+	dim1 = af.results.dim1
+	dim2 = af.results.dim2
+	dim3 = af.results.dim3
 	err = ccall(
 		af.getDims,
 		Cint, (Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{Void}),
@@ -99,13 +99,14 @@ function dims(af::ArrayFire, ptr::Ptr{Void})
 end
 
 function dims{T, N}(arr::AFArray{T, N}, n)
-	dim0 = Ref{DimT}()
-	dim1 = Ref{DimT}()
-	dim2 = Ref{DimT}()
-	dim3 = Ref{DimT}()
 	base = _base(arr)
+	af = base.af
+	dim0 = af.results.dim0
+	dim1 = af.results.dim1
+	dim2 = af.results.dim2
+	dim3 = af.results.dim3
 	err = ccall(
-		base.af.getDims,
+		af.getDims,
 		Cint, (Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{Void}),
 		dim0, dim1, dim2, dim3, base.ptr)
 	assertErr(err)
@@ -131,7 +132,7 @@ end
 dType{T<:ArrayFire}(base::AFArrayBase{T}) = dType(base.af, base.ptr)
 
 function dType(af::ArrayFire, ptr::Ptr{Void})
-	result = Ref{DType}()
+	result = af.results.dType
 	err = ccall(
 		af.getType,
 		Cint, (Ptr{DType}, Ptr{Void}),
@@ -149,7 +150,7 @@ numdims(arr::AFArray) = numdims(_base(arr))
 numdims{T<:ArrayFire}(base::AFArrayBase{T}) = numdims(base.af, base.ptr)
 
 function numdims(af::ArrayFire, ptr::Ptr{Void})
-	result = Ref{UInt32}()
+	result = af.results.dType
 	err = ccall(
 		af.getNumDims,
 		Cint, (Ptr{UInt32}, Ptr{Void}),
@@ -163,7 +164,7 @@ elements(arr::AFArray) = elements(_base(arr))
 elements{T<:ArrayFire}(base::AFArrayBase{T}) = elements(base.af, base.ptr)
 
 function elements(af::ArrayFire, ptr::Ptr{Void})
-	result = Ref{DimT}()
+	result = af.results.dim0
 	err = ccall(
 		af.getElements,
 		Cint, (Ptr{DimT}, Ptr{Void}),

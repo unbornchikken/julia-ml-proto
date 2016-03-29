@@ -27,7 +27,7 @@ immutable Create <: AFImpl
 end
 
 function randn{T}(af::ArrayFire, ::Type{T}, dims...)
-	ptr = Ref{Ptr{Void}}()
+	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.randn,
 		Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType),
@@ -37,7 +37,7 @@ function randn{T}(af::ArrayFire, ::Type{T}, dims...)
 end
 
 function randu{T}(af::ArrayFire, ::Type{T}, dims...)
-	ptr = Ref{Ptr{Void}}()
+	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.randu,
 		Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType),
@@ -47,7 +47,7 @@ function randu{T}(af::ArrayFire, ::Type{T}, dims...)
 end
 
 function constant{T<:Real}(af::ArrayFire, value::T, dims...)
-	ptr = Ref{Ptr{Void}}()
+	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.constant,
 		Cint, (Ptr{Ptr{Void}}, Float64, Cuint, Ptr{DimT}, DType),
@@ -57,7 +57,7 @@ function constant{T<:Real}(af::ArrayFire, value::T, dims...)
 end
 
 function constant(af::ArrayFire, value::Int64, dims...)
-	ptr = Ref{Ptr{Void}}()
+	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.constantLong,
 		Cint, (Ptr{Ptr{Void}}, Int64, Cuint, Ptr{DimT}, DType),
@@ -67,7 +67,7 @@ function constant(af::ArrayFire, value::Int64, dims...)
 end
 
 function constant(af::ArrayFire, value::UInt64, dims...)
-	ptr = Ref{Ptr{Void}}()
+	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.constantLong,
 		Cint, (Ptr{Ptr{Void}}, UInt64, Cuint, Ptr{DimT}, DType),

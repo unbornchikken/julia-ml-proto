@@ -1,9 +1,9 @@
 macro afCall_Arr_Arr(method, holder, func)
 	quote
 		function $(esc(method)){T, N}(arr::AFArray{T, N})
-			result = Ref{Ptr{Void}}()
 			base = getBase(arr)
 			af = base.af
+			result = af.results.ptr
 			err = ccall(af.$holder.$func,
 				Cint, (Ptr{Ptr{Void}}, Ptr{Void}),
 				result, base.ptr)
@@ -16,9 +16,9 @@ end
 macro afCall_Arr_Arr_Arr_Unsigned(method, holder, func)
 	quote
 		function $(esc(method)){T1, N1, T2, N2}(arr1::AFArray{T1, N1}, arr2::AFArray{T2, N2}, value)
-			result = Ref{Ptr{Void}}()
 			base1 = getBase(arr1)
 			af = base1.af
+			result = af.results.ptr
 			base2 = getBase(arr2)
 			err = ccall(af.$holder.$func,
 				Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, UInt32),

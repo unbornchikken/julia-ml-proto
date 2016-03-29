@@ -39,10 +39,10 @@ end
 macro binOp(op, cFunc, resultT)
 	quote
 		function $(esc(op)){T1, N1, T2, N2}(lhs::AFArray{T1, N1}, rhs::AFArray{T2, N2})
-			result = Ref{Ptr{Void}}()
 			lhsBase = getBase(lhs)
 			rhsBase = getBase(rhs)
 			af = lhsBase.af
+			result = af.results.ptr
 			err = ccall(af.binary.$cFunc,
 				Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 				result, lhsBase.ptr, rhsBase.ptr, af.batch)
@@ -51,9 +51,9 @@ macro binOp(op, cFunc, resultT)
 		end
 
 		function $(esc(op)){T, N}(lhs::AFArray{T, N}, rhsConst::Number)
-			result = Ref{Ptr{Void}}()
 			lhsBase = getBase(lhs)
 			af = lhsBase.af
+			result = af.results.ptr
 			rhs = constant(af, rhsConst, size(lhs)...)
 			try
 				rhsBase = getBase(rhs)
@@ -68,9 +68,9 @@ macro binOp(op, cFunc, resultT)
 		end
 
 		function $(esc(op)){T, N}(lhsConst::Number, rhs::AFArray{T, N})
-			result = Ref{Ptr{Void}}()
 			rhsBase = getBase(rhs)
 			af = rhsBase.af
+			result = af.results.ptr
 			lhs = constant(af, lhsConst, size(rhs)...)
 			try
 				lhsBase = getBase(lhs)
