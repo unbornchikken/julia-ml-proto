@@ -53,7 +53,7 @@ type ArrayFire{T<:Backend}
 
 	function ArrayFire()
 		ptr = getLibPtr(T)
-		af = new(
+		new(
 			ptr,
 			AFDevice(ptr),
 			Create(ptr),
@@ -72,7 +72,6 @@ type ArrayFire{T<:Backend}
 			FreeList(),
 			false,
 			Results())
-		af
 	end
 end
 
