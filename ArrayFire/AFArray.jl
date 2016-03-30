@@ -1,5 +1,6 @@
 export
 	AFArray,
+	NAFArray,
 	array,
 	release!,
 	dims,
@@ -50,6 +51,10 @@ type AFArray{T<:Number, N}
 	end
 end
 
+typealias NAFArray Nullable{AFArray}
+
+typealias NAFArray{T, N} Nullable{AFArray{T, N}}
+
 array{T, N}(af::ArrayFire, arr::Array{T, N}) = AFArray{T, N}(af, arr)
 
 array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArray{T, length(dimsToSize(dims...))}(af, dims...)
@@ -62,7 +67,9 @@ array{T}(af::ArrayFire, ::Type{T}, ptr::Ptr{Void}) = AFArray{T, Int(numdims(af, 
 
 array(af::ArrayFire, ptr::Ptr{Void}) = AFArray{asJType(Val{dType(af, ptr)}), Int(numdims(af, ptr))}(af, ptr)
 
-getBase{T, N}(arr::AFArray{T, N}) = arr.base
+getBase(arr::AFArray) = arr.base
+
+af(arr::AFArray) = getBase(arr).af
 
 function release!(arr::AFArray)
 	base = getBase(arr)

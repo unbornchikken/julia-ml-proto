@@ -1,16 +1,16 @@
 type ANN
 	af::ArrayFire
 	numLayers::Int
-	signal::Vector{Nullable{AFArray}}
-	weights::Vector{Nullable{AFArray}}
+	signal::Vector{NAFArray}
+	weights::Vector{NAFArray}
 
 	function ANN(af, layers, range = 0.05f0)
 		numLayers = length(layers)
-		signal = Vector{Nullable{AFArray}}()
-		weights = Vector{Nullable{AFArray}}()
+		signal = Vector{NAFArray}()
+		weights = Vector{NAFArray}()
 
 		for i in 1:numLayers
-			push!(signal, Nullable{AFArray}())
+			push!(signal, NAFArray())
 			if i != numLayers
 				w = randu(fa, Float32, layers[i] + 1, layers[i + 1])
 				push!(weights, w)
@@ -23,22 +23,23 @@ end
 
 deriv(out) = out .* (1.0f0 - out)
 
-# let proto = ANN.prototype;
-#
-# proto.deriv = function (out) {
-#     return out.rhsSub(1).mul(out);
-# };
-#
-# proto.addBias = function (input) {
-#     return this.af.join(1, this.af.constant(1, input.dims(0), this.af.dType.f32), input);
-# };
-#
-# proto._calculateError = function(out, pred) {
-#     let dif = out.sub(pred);
-#     let sq = dif.mul(dif);
-#     return Math.sqrt(this.af.sum(sq)) / sq.elements();
-# };
-#
+addBias(input) = join(1, constant(af(input), 1.0f0, dims(input, 0)), input)
+
+function calculateError(out, pred)
+	diff = out - pred;
+	sq = diff * diff;
+	sqrt(sum(qs)) / elements(sq)
+end
+
+function forwardPropagate(ann::ANN, input)
+	ann.signal[1] = input
+	for 1:(ann.numLayers - 1)
+		@scope ann.af begin
+			
+		end
+	end
+end
+
 # proto.forwardPropagate = function (input) {
 #     this.signal[0].set(input);
 #     for (let i = 0; i < this.numLayers - 1; i++) {
