@@ -1,13 +1,13 @@
 type ANN
 	af::ArrayFire
 	numLayers::Int
-	signal::Vector{NAFArray}
-	weights::Vector{NAFArray}
+	signal::Vector{AFArray}
+	weights::Vector{AFArray}
 
 	function ANN(af, layers, range = 0.05f0)
 		numLayers = length(layers)
-		signal = Vector{NAFArray}()
-		weights = Vector{NAFArray}()
+		signal = Vector{AFArray}()
+		weights = Vector{AFArray}()
 
 		for i in 1:numLayers
 			push!(signal, NAFArray())
@@ -35,7 +35,7 @@ function forwardPropagate(ann::ANN, input)
 	ann.signal[1] = input
 	for 1:(ann.numLayers - 1)
 		@scope ann.af begin
-			
+
 		end
 	end
 end

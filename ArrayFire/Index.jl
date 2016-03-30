@@ -99,6 +99,20 @@ end
 
 immutable Span end
 
+function getindex{T, N}(arr::AFArray{T, N})
+	base = _base(arr)
+	array(base.af, T, N, retain!(base.af, base.ptr))
+end
+
+function setindex!{T, N}(arr::AFArray{T, N}, rhs::AFArray{T, N})
+	base =_base(arr)
+	rhsBase = _base(rhs)
+	if base.ptr != rhsBase.ptr
+		release!(arr)
+		base.ptr = retain!(base.af, rhsBase.ptr)
+	end
+end
+
 @generated function getindex{T, N}(arr::AFArray{T, N}, args...)
 	exp = genIndices(arr, args...)
 	:( $exp; indexGen(arr, indices...) )

@@ -126,4 +126,26 @@ testOnAllBackends("AFArray") do af
 	afArr = array(af, [[1,2,3,4] [5,6,7,8] [9,10,11,12] [13, 14, 15, 16]])
 	afArr[array(af, [[1, 2, 3] [4, 5, 6]])] = -1
 	@test host(afArr) == [[1,-1,-1,-1] [-1,-1,-1,8] [9,10,11,12] [13, 14, 15, 16]]
+
+	println("\tCOW")
+	arr1 = array(af, [1, 2, 3])
+	arr2 = arr1[]
+
+	@test host(arr1) == [1, 2, 3]
+	@test host(arr2) == [1, 2, 3]
+
+	arr1[1] = 5
+
+	@test host(arr1) == [5, 2, 3]
+	@test host(arr2) == [1, 2, 3]
+
+	println("\tempty")
+	arr1[] = empty(af, Int, 1)
+
+	@test dType(arr1) == 0
+	@test dims(arr1) == [0, 0, 0, 0]
+	@test size(arr1) == ()
+	@test isEmpty(arr1)
+	@test host(arr2) == [1, 2, 3]
+	@test_throws ErrorException host(arr1)
 end

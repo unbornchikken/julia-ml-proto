@@ -21,6 +21,7 @@ type Results
 	dim2::Ref{DimT}
 	dim3::Ref{DimT}
 	dType::Ref{DType}
+	bool::Ref{Bool}
 end
 
 Results() = Results(
@@ -29,7 +30,8 @@ Results() = Results(
 	Ref{DimT}(0),
 	Ref{DimT}(0),
 	Ref{DimT}(0),
-	Ref{DType}(0))
+	Ref{DType}(0),
+	Ref{Bool}(false))
 
 type ArrayFire{T<:Backend}
 	ptr::Ptr{Void}
@@ -41,12 +43,14 @@ type ArrayFire{T<:Backend}
 	vectorAlgos::AFImpl
 	createHandle::Ptr{Void}
 	createArray::Ptr{Void}
+	retainArray::Ptr{Void}
 	releaseArray::Ptr{Void}
 	getDims::Ptr{Void}
 	getDataPtr::Ptr{Void}
 	getType::Ptr{Void}
 	getNumDims::Ptr{Void}
 	getElements::Ptr{Void}
+	isEmpty::Ptr{Void}
 	freeList::AFImpl
 	batch::Bool
 	results::Results
@@ -63,12 +67,14 @@ type ArrayFire{T<:Backend}
 			VectorAlgos(ptr),
 			Libdl.dlsym(ptr, :af_create_handle),
 			Libdl.dlsym(ptr, :af_create_array),
+			Libdl.dlsym(ptr, :af_retain_array),
 			Libdl.dlsym(ptr, :af_release_array),
 			Libdl.dlsym(ptr, :af_get_dims),
 			Libdl.dlsym(ptr, :af_get_data_ptr),
 			Libdl.dlsym(ptr, :af_get_type),
 			Libdl.dlsym(ptr, :af_get_numdims),
 			Libdl.dlsym(ptr, :af_get_elements),
+			Libdl.dlsym(ptr, :af_is_empty),
 			FreeList(),
 			false,
 			Results())
