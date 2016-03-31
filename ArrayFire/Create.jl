@@ -26,54 +26,54 @@ immutable Create <: AFImpl
 	end
 end
 
-function randn{T}(af::ArrayFire, ::Type{T}, dims...)
+function randn{B, T}(af::ArrayFire{B}, ::Type{T}, dims...)
 	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.randn,
 		Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType),
 		ptr, length(dims2), pointer(dims2), asDType(T))
 	assertErr(err)
-	AFArray{T, jlLength(dims)}(af, ptr[])
+	AFArray{B, T, jlLength(dims)}(af, ptr[])
 end
 
-function randu{T}(af::ArrayFire, ::Type{T}, dims...)
+function randu{B, T}(af::ArrayFire{B}, ::Type{T}, dims...)
 	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.randu,
 		Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType),
 		ptr, length(dims2), pointer(dims2), asDType(T))
 	assertErr(err)
-	AFArray{T, jlLength(dims)}(af, ptr[])
+	AFArray{B, T, jlLength(dims)}(af, ptr[])
 end
 
-function constant{T<:Real}(af::ArrayFire, value::T, dims...)
+function constant{B, T<:Real}(af::ArrayFire{B}, value::T, dims...)
 	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.constant,
 		Cint, (Ptr{Ptr{Void}}, Float64, Cuint, Ptr{DimT}, DType),
 		ptr, Float64(value), length(dims2), pointer(dims2), asDType(T))
 	assertErr(err)
-	AFArray{T, jlLength(dims)}(af, ptr[])
+	AFArray{B, T, jlLength(dims)}(af, ptr[])
 end
 
-function constant(af::ArrayFire, value::Int64, dims...)
+function constant{B}(af::ArrayFire{B}, value::Int64, dims...)
 	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.constantLong,
 		Cint, (Ptr{Ptr{Void}}, Int64, Cuint, Ptr{DimT}, DType),
 		ptr, value, length(dims2), pointer(dims2), asDType(Int64))
 	assertErr(err)
-	AFArray{Int64, jlLength(dims)}(af, ptr[])
+	AFArray{B, Int64, jlLength(dims)}(af, ptr[])
 end
 
-function constant(af::ArrayFire, value::UInt64, dims...)
+function constant{B}(af::ArrayFire{B}, value::UInt64, dims...)
 	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.constantLong,
 		Cint, (Ptr{Ptr{Void}}, UInt64, Cuint, Ptr{DimT}, DType),
 		ptr, value, length(dims2), pointer(dims2), asDType(UInt64))
 	assertErr(err)
-	AFArray{UInt64, jlLength(dims)}(af, ptr[])
+	AFArray{B, UInt64, jlLength(dims)}(af, ptr[])
 end
 
 @afCall_Arr_Arr_Arr_Unsigned(lookup, create, lookup)

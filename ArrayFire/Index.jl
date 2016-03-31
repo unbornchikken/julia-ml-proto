@@ -1,4 +1,4 @@
-import arr: getindex, setindex!
+import Base: getindex, setindex!
 export getindex, setindex!
 export Seq, Span
 
@@ -83,12 +83,11 @@ end
 
 function assignGen{D, T, N, I<:AFIndex}(arr::AFArray{D, T, N}, rhs::AFArray{D}, indices::I...)
 	indices2 = collect(indices)
-	arrRhs = _arr(rhs)
 	af = arr.af
 	ptr = af.results.ptr
 	err = ccall(af.index.assignGen,
 		Cint, (Ptr{Ptr{Void}}, Ptr{Void}, DimT, Ptr{I}, Ptr{Void}),
-		ptr, arr.ptr, length(indices2), pointer(indices2), arrRhs.ptr)
+		ptr, arr.ptr, length(indices2), pointer(indices2), rhs.ptr)
 	assertErr(err)
 	ptr[]
 end

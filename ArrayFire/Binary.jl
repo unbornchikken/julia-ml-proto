@@ -47,7 +47,7 @@ macro binOp(op, cFunc, resultT)
 				Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 				result, lhs.ptr, rhs.ptr, af.batch)
 			assertErr(err)
-			AFArray{$resultT(T1, T2), max(N1, N2)}(af, result[])
+			AFArray{D, $resultT(T1, T2), max(N1, N2)}(af, result[])
 		end
 
 		function $(esc(op)){D, T, N}(lhs::AFArray{D, T, N}, rhsConst::Number)
@@ -56,12 +56,11 @@ macro binOp(op, cFunc, resultT)
 			result = af.results.ptr
 			rhs = constant(af, rhsConst, size(lhs)...)
 			try
-				rhs = get(rhs)
 				err = ccall(af.binary.$cFunc,
 					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 					result, lhs.ptr, rhs.ptr, af.batch)
 				assertErr(err)
-				AFArray{$resultT(T, typeof(rhsConst)), N}(af, result[])
+				AFArray{D, $resultT(T, typeof(rhsConst)), N}(af, result[])
 			finally
 				release!(rhs)
 			end
@@ -73,12 +72,11 @@ macro binOp(op, cFunc, resultT)
 			result = af.results.ptr
 			lhs = constant(af, lhsConst, size(rhs)...)
 			try
-				lhs = get(lhs)
 				err = ccall(af.binary.$cFunc,
 					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
 					result, lhs.ptr, rhs.ptr, af.batch)
 				assertErr(err)
-				AFArray{$resultT(typeof(lhsConst), T), N}(af, result[])
+				AFArray{D, $resultT(typeof(lhsConst), T), N}(af, result[])
 			finally
 				release!(lhs)
 			end

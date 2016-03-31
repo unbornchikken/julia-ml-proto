@@ -1,7 +1,7 @@
 export
 	AFArray,
-	NAFArray,
 	array,
+	getBackend,
 	empty,
 	release!,
 	dims,
@@ -73,6 +73,8 @@ array{D, T}(af::ArrayFire{D}, ::Type{T}, ptr::Ptr{Void}) = AFArray{D, T, Int(num
 
 array{D}(af::ArrayFire{D}, ptr::Ptr{Void}) = AFArray{D, asJType(Val{dType(af, ptr)}), Int(numdims(af, ptr))}(af, ptr)
 
+getBackend{D}(arr::AFArray{D}) = (verifyAccess(arr); D)
+
 function release!(arr::AFArray)
 	if (arr.ptr != C_NULL)
 		release!(arr.af, arr.ptr)
@@ -96,7 +98,7 @@ end
 
 verifyAccess(arr::AFArray) = arr.ptr == C_NULL && error("Cannot access to a released array.")
 
-isEmpty(arr::AFArray) = verifyAccess(arr); isEmpty(arr.af, arr.ptr)
+isEmpty(arr::AFArray) = (verifyAccess(arr); isEmpty(arr.af, arr.ptr))
 
 function isEmpty(af::ArrayFire, ptr::Ptr{Void})
 	result = af.results.bool
@@ -108,7 +110,7 @@ function isEmpty(af::ArrayFire, ptr::Ptr{Void})
 	result[]
 end
 
-dims(arr::AFArray) = verifyAccess(arr); dims(arr.af, arr.ptr)
+dims(arr::AFArray) = (verifyAccess(arr); dims(arr.af, arr.ptr))
 
 function dims(af::ArrayFire, ptr::Ptr{Void})
 	dim0 = af.results.dim0
@@ -164,9 +166,9 @@ function dType(af::ArrayFire, ptr::Ptr{Void})
 	result[]
 end
 
-jType{D, T, N}(arr::AFArray{D, T, N}) = verifyAccess(arr); T
+jType{D, T, N}(arr::AFArray{D, T, N}) = (verifyAccess(arr); T)
 
-numdims(arr::AFArray) = verifyAccess(arr); numdims(arr.af, arr.ptr)
+numdims(arr::AFArray) = (verifyAccess(arr); numdims(arr.af, arr.ptr))
 
 function numdims(af::ArrayFire, ptr::Ptr{Void})
 	result = af.results.dType
@@ -178,7 +180,7 @@ function numdims(af::ArrayFire, ptr::Ptr{Void})
 	result[]
 end
 
-elements(arr::AFArray) = verifyAccess(arr); elements(arr.af, arr.ptr)
+elements(arr::AFArray) = (verifyAccess(arr); elements(arr.af, arr.ptr))
 
 function elements(af::ArrayFire, ptr::Ptr{Void})
 	result = af.results.dim0

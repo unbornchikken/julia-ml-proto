@@ -5,6 +5,7 @@ include("AFError.jl")
 
 export
 	ArrayFire,
+	getBackend,
 	getSupportedBackends,
 	scope!,
 	@scope,
@@ -80,6 +81,8 @@ type ArrayFire{T<:Backend}
 			Results())
 	end
 end
+
+getBackend{T<:Backend}(af::ArrayFire{T}) = T
 
 function getSupportedBackends()
 	backends = Vector{Any}()
