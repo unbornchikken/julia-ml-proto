@@ -38,28 +38,28 @@ end
 
 macro binOp(op, cFunc, resultT)
 	quote
-		function $(esc(op)){T1, N1, T2, N2}(lhs::AFArray{T1, N1}, rhs::AFArray{T2, N2})
-			lhsBase = getBase(lhs)
-			rhsBase = getBase(rhs)
-			af = lhsBase.af
+		function $(esc(op)){D, T1, N1, T2, N2}(lhs::AFArray{D, T1, N1}, rhs::AFArray{D, T2, N2})
+			verifyAccess(lhs)
+			verifyAccess(rhs)
+			af = lhs.af
 			result = af.results.ptr
 			err = ccall(af.binary.$cFunc,
 				Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
-				result, lhsBase.ptr, rhsBase.ptr, af.batch)
+				result, lhs.ptr, rhs.ptr, af.batch)
 			assertErr(err)
 			AFArray{$resultT(T1, T2), max(N1, N2)}(af, result[])
 		end
 
-		function $(esc(op)){T, N}(lhs::AFArray{T, N}, rhsConst::Number)
-			lhsBase = getBase(lhs)
-			af = lhsBase.af
+		function $(esc(op)){D, T, N}(lhs::AFArray{D, T, N}, rhsConst::Number)
+			verifyAccess(lhs)
+			af = lhs.af
 			result = af.results.ptr
 			rhs = constant(af, rhsConst, size(lhs)...)
 			try
-				rhsBase = getBase(rhs)
+				rhs = get(rhs)
 				err = ccall(af.binary.$cFunc,
 					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
-					result, lhsBase.ptr, rhsBase.ptr, af.batch)
+					result, lhs.ptr, rhs.ptr, af.batch)
 				assertErr(err)
 				AFArray{$resultT(T, typeof(rhsConst)), N}(af, result[])
 			finally
@@ -67,16 +67,16 @@ macro binOp(op, cFunc, resultT)
 			end
 		end
 
-		function $(esc(op)){T, N}(lhsConst::Number, rhs::AFArray{T, N})
-			rhsBase = getBase(rhs)
-			af = rhsBase.af
+		function $(esc(op)){D, T, N}(lhsConst::Number, rhs::AFArray{D, T, N})
+			verifyAccess(rhs)
+			af = rhs.af
 			result = af.results.ptr
 			lhs = constant(af, lhsConst, size(rhs)...)
 			try
-				lhsBase = getBase(lhs)
+				lhs = get(lhs)
 				err = ccall(af.binary.$cFunc,
 					Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
-					result, lhsBase.ptr, rhsBase.ptr, af.batch)
+					result, lhs.ptr, rhs.ptr, af.batch)
 				assertErr(err)
 				AFArray{$resultT(typeof(lhsConst), T), N}(af, result[])
 			finally

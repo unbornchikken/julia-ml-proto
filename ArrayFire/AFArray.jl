@@ -11,26 +11,22 @@ export
 	numdims,
 	isEmpty
 
-type AFArrayBase{T<:ArrayFire}
-	af::T
+type AFArray{D, T, N}
+	af::ArrayFire{D}
 	ptr::Ptr{Void}
-end
 
-type AFArray{T, N}
-	base::AFArrayBase
-
-	function AFArray(af::ArrayFire)
+	function AFArray(af::ArrayFire{D})
 		ptr = af.results.ptr
 		dims = [0, 0, 0, 0]
 		err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, 4, dims, f32)
 		assertErr(err)
-		me = new(AFArrayBase(af, ptr[]))
+		me = new(af, ptr[])
 		register!(af, me)
 		me
 	end
 
-	function AFArray(af::ArrayFire, ptr::Ptr{Void}, wrap = true)
-		me = new(AFArrayBase(af, ptr))
+	function AFArray(af::ArrayFire{D}, ptr::Ptr{Void}, wrap = true)
+		me = new(af, ptr)
 		if wrap
 			finalizer(me, release!)
 			register!(af, me)
@@ -38,54 +34,49 @@ type AFArray{T, N}
 		me
 	end
 
-	function AFArray(af::ArrayFire, arr::Array{T, N})
+	function AFArray(af::ArrayFire{D}, arr::Array{T, N})
 		ptr = af.results.ptr
 		dims = collect(size(arr))
 		assert(N == length(dims))
 		err = ccall(af.createArray, Cint, (Ptr{Ptr{Void}}, Ptr{T}, Cuint, Ptr{DimT}, DType), ptr, pointer(arr), N, pointer(dims), asDType(T))
 		assertErr(err)
-		me = new(AFArrayBase(af, ptr[]))
+		me = new(af, ptr[])
 		finalizer(me, release!)
 		register!(af, me)
 		me
 	end
 
-	function AFArray(af::ArrayFire, dims::Int...)
+	function AFArray(af::ArrayFire{D}, dims::Int...)
 		ptr = af.results.ptr
 		dims2 = collect(dims)
 		assert(N == length(dims2))
 		err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, N, pointer(dims2), asDType(T))
 		assertErr(err)
-		me = new(AFArrayBase(af, ptr[]))
+		me = new(af, ptr[])
 		finalizer(me, release!)
 		register!(af, me)
 		me
 	end
 end
 
-empty{T}(af::ArrayFire, ::Type{T}, N::Int) = AFArray{T, N}(af)
+empty{D, T}(af::ArrayFire{D}, ::Type{T}, N::Int) = AFArray{D, T, N}(af)
 
-array{T, N}(af::ArrayFire, arr::Array{T, N}) = AFArray{T, N}(af, arr)
+array{D, T, N}(af::ArrayFire{D}, arr::Array{T, N}) = AFArray{D, T, N}(af, arr)
 
-array{T}(af::ArrayFire, ::Type{T}, dims...) = AFArray{T, length(dimsToSize(dims...))}(af, dims...)
+array{D, T}(af::ArrayFire{D}, ::Type{T}, dims...) = AFArray{D, T, length(dimsToSize(dims...))}(af, dims...)
 
-array{T}(af::ArrayFire, arr::Array{T}, dims...) = array(af, reshape(arr, dimsToSize(dims...)...))
+array{D, T}(af::ArrayFire{D}, arr::Array{T}, dims...) = array(af, reshape(arr, dimsToSize(dims...)...))
 
-array{T}(af::ArrayFire, ::Type{T}, N::Int, ptr::Ptr{Void}) = AFArray{T, N}(af, ptr)
+array{D, T}(af::ArrayFire{D}, ::Type{T}, N::Int, ptr::Ptr{Void}) = AFArray{D, T, N}(af, ptr)
 
-array{T}(af::ArrayFire, ::Type{T}, ptr::Ptr{Void}) = AFArray{T, Int(numdims(af, ptr))}(af, ptr)
+array{D, T}(af::ArrayFire{D}, ::Type{T}, ptr::Ptr{Void}) = AFArray{D, T, Int(numdims(af, ptr))}(af, ptr)
 
-array(af::ArrayFire, ptr::Ptr{Void}) = AFArray{asJType(Val{dType(af, ptr)}), Int(numdims(af, ptr))}(af, ptr)
-
-getBase(arr::AFArray) = arr.base
-
-getAF(arr::AFArray) = getBase(arr).af
+array{D}(af::ArrayFire{D}, ptr::Ptr{Void}) = AFArray{D, asJType(Val{dType(af, ptr)}), Int(numdims(af, ptr))}(af, ptr)
 
 function release!(arr::AFArray)
-	base = getBase(arr)
-	if (base.ptr != C_NULL)
-		release!(base.af, base.ptr)
-		base.ptr = C_NULL
+	if (arr.ptr != C_NULL)
+		release!(arr.af, arr.ptr)
+		arr.ptr = C_NULL
 	else
 		false
 	end
@@ -103,15 +94,9 @@ function retain!(af, ptr)
 	result[]
 end
 
-function _base(arr::AFArray)
-	b = getBase(arr)
-	b.ptr == C_NULL && error("Cannot access to a released array.")
-	b
-end
+verifyAccess(arr::AFArray) = arr.ptr == C_NULL && error("Cannot access to a released array.")
 
-isEmpty(arr::AFArray) = isEmpty(_base(arr))
-
-isEmpty{T<:ArrayFire}(base::AFArrayBase{T}) = isEmpty(base.af, base.ptr)
+isEmpty(arr::AFArray) = verifyAccess(arr); isEmpty(arr.af, arr.ptr)
 
 function isEmpty(af::ArrayFire, ptr::Ptr{Void})
 	result = af.results.bool
@@ -123,9 +108,7 @@ function isEmpty(af::ArrayFire, ptr::Ptr{Void})
 	result[]
 end
 
-dims(arr::AFArray) = dims(_base(arr))
-
-dims{T<:ArrayFire}(base::AFArrayBase{T}) = dims(base.af, base.ptr)
+dims(arr::AFArray) = verifyAccess(arr); dims(arr.af, arr.ptr)
 
 function dims(af::ArrayFire, ptr::Ptr{Void})
 	dim0 = af.results.dim0
@@ -141,8 +124,8 @@ function dims(af::ArrayFire, ptr::Ptr{Void})
 end
 
 function dims{T, N}(arr::AFArray{T, N}, n)
-	base = _base(arr)
-	af = base.af
+	verifyAccess(arr)
+	af = arr.af
 	dim0 = af.results.dim0
 	dim1 = af.results.dim1
 	dim2 = af.results.dim2
@@ -150,7 +133,7 @@ function dims{T, N}(arr::AFArray{T, N}, n)
 	err = ccall(
 		af.getDims,
 		Cint, (Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{DimT}, Ptr{Void}),
-		dim0, dim1, dim2, dim3, base.ptr)
+		dim0, dim1, dim2, dim3, arr.ptr)
 	assertErr(err)
 	if n == 0
 		dim0[]
@@ -168,10 +151,8 @@ function Base.size(arr::AFArray)
 end
 
 function dType(arr::AFArray)
-	dType(_base(arr))
+	dType(arr.af, arr.ptr)
 end
-
-dType{T<:ArrayFire}(base::AFArrayBase{T}) = dType(base.af, base.ptr)
 
 function dType(af::ArrayFire, ptr::Ptr{Void})
 	result = af.results.dType
@@ -183,13 +164,9 @@ function dType(af::ArrayFire, ptr::Ptr{Void})
 	result[]
 end
 
-jType(arr::AFArray) = asJType(Val{dType(arr)})
+jType{D, T, N}(arr::AFArray{D, T, N}) = verifyAccess(arr); T
 
-jType{T, N}(arr::AFArray{T, N}) = T
-
-numdims(arr::AFArray) = numdims(_base(arr))
-
-numdims{T<:ArrayFire}(base::AFArrayBase{T}) = numdims(base.af, base.ptr)
+numdims(arr::AFArray) = verifyAccess(arr); numdims(arr.af, arr.ptr)
 
 function numdims(af::ArrayFire, ptr::Ptr{Void})
 	result = af.results.dType
@@ -201,9 +178,7 @@ function numdims(af::ArrayFire, ptr::Ptr{Void})
 	result[]
 end
 
-elements(arr::AFArray) = elements(_base(arr))
-
-elements{T<:ArrayFire}(base::AFArrayBase{T}) = elements(base.af, base.ptr)
+elements(arr::AFArray) = verifyAccess(arr); elements(arr.af, arr.ptr)
 
 function elements(af::ArrayFire, ptr::Ptr{Void})
 	result = af.results.dim0
@@ -215,23 +190,23 @@ function elements(af::ArrayFire, ptr::Ptr{Void})
 	result[]
 end
 
-function host{T, N}(arr::AFArray{T, N})
+function host{D, T, N}(arr::AFArray{D, T, N})
 	verifyNotEmpty(arr)
 	result = Array{T}(size(arr)...)
 	_host(arr, result)
 end
 
-function host{T, N}(arr::AFArray{T, N}, to::Array{T, N})
+function host{D, T, N}(arr::AFArray{D, T, N}, to::Array{T, N})
 	verifyNotEmpty(arr)
 	_host(arr, to)
 end
 
-function _host{T, N}(arr::AFArray{T, N}, to::Array{T, N})
-	base = _base(arr)
+function _host{D, T, N}(arr::AFArray{D, T, N}, to::Array{T, N})
+	verifyAccess(arr)
 	err = ccall(
-		base.af.getDataPtr,
+		arr.af.getDataPtr,
 		Cint, (Ptr{T}, Ptr{Void}),
-		to, base.ptr)
+		to, arr.ptr)
 	assertErr(err)
 	to
 end

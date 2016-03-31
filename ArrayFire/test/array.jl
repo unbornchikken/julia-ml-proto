@@ -54,7 +54,7 @@ testOnAllBackends("AFArray") do af
 	println("\tindex get")
 	idx = AF.ArrayIndex(afArr)
 	aPtr = AF.ptr(idx)
-	@test aPtr == AF._base(afArr).ptr
+	@test aPtr == arr.ptr
 	afArr = AF.AFArray{Int32, 1}(af, aPtr, false)
 	@test [2, 1, 1, 1] == dims(afArr)
 	@test (2, ) == size(afArr)
