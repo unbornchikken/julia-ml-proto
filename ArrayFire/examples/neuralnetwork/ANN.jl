@@ -1,18 +1,18 @@
 type ANN
 	af::ArrayFire
 	numLayers::Int
-	signal::Vector{AFArray}
-	weights::Vector{AFArray}
+	signal::Vector{AFArray{Float32, 2}}
+	weights::Vector{AFArray{Float32, 2}}
 
 	function ANN(af, layers, range = 0.05f0)
 		numLayers = length(layers)
-		signal = Vector{AFArray}()
-		weights = Vector{AFArray}()
+		signal = Vector{AFArray{Float32, 2}}()
+		weights = Vector{AFArray{Float32, 2}}()
 
 		for i in 1:numLayers
-			push!(signal, NAFArray())
+			push!(signal, empty(af, Float32, 2))
 			if i != numLayers
-				w = randu(fa, Float32, layers[i] + 1, layers[i + 1])
+				w = randu(af, Float32, layers[i] + 1, layers[i + 1])
 				push!(weights, w)
 			end
 		end
@@ -32,26 +32,16 @@ function calculateError(out, pred)
 end
 
 function forwardPropagate(ann::ANN, input)
-	ann.signal[1] = input
+	ann.signal[1][] = input
 	for 1:(ann.numLayers - 1)
 		@scope ann.af begin
-
+			inVec = addBias(ann.signal[i])
+			outVec = matmul(inVec, ann.weights[i])
+			ann.signal[i + 1][] = sigmoid(outVec)
 		end
 	end
 end
 
-# proto.forwardPropagate = function (input) {
-#     this.signal[0].set(input);
-#     for (let i = 0; i < this.numLayers - 1; i++) {
-#         let self = this;
-#         this.af.scope(function() {
-#             let inVec = self.addBias(self.signal[i]);
-#             let outVec = self.af.matMul(inVec, self.weights[i]);
-#             self.signal[i + 1].set(self.af.sigmoid(outVec));
-#         });
-#     }
-# };
-#
 # proto.backPropagate = function (target, alpha) {
 #     let self = this;
 #     let af = self.af;
