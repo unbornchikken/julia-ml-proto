@@ -1,19 +1,16 @@
 af = ArrayFire{OpenCL}()
 
-arr1 = array(af, [1, 2, 3])
-arr2 = arr1[]
+afArr = array(af, [[1, 2] [3, 4]])
+result = host(moddims(afArr, 4))
 
-println(host(arr1))
-println(host(arr2))
+println(result)
 
-arr1[1] = 5
+afArr = array(af, [1, 2, 3, 4, 5, 6])
+result = host(moddims(afArr, 2, 3))
 
-println(host(arr1))
-println(host(arr2))
+println(result)
 
-arr1[] = array(af)
+afArr = array(af, [1, 2, 3, 4, 5, 6])
+result = host(moddims(afArr, 2, 2))
 
-println(dType(arr1))
-println(dims(arr1))
-println(size(arr1))
-println(host(arr2))
+println(result)

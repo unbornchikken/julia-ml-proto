@@ -1,3 +1,5 @@
+export loadSubset
+
 immutable Idx
 	numDims::Int
 	dims
@@ -99,8 +101,8 @@ loadSubset(af, expandLabels = true, frac = 0.6f0) = scope!(af) do this
 		numClasses,
 		numTrain,
 		numTest,
-		trainImages,
-		testImages,
-		trainLabelsArr,
-		testLabelsArr)
+		this.result(trainImages),
+		this.result(testImages),
+		this.result(trainLabelsArr),
+		this.result(testLabelsArr))
 end

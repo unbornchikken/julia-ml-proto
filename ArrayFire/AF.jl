@@ -42,6 +42,7 @@ type ArrayFire{T<:Backend}
 	unary::AFImpl
 	index::AFImpl
 	vectorAlgos::AFImpl
+	modify::AFImpl
 	createHandle::Ptr{Void}
 	createArray::Ptr{Void}
 	retainArray::Ptr{Void}
@@ -66,6 +67,7 @@ type ArrayFire{T<:Backend}
 			Unary(ptr),
 			Index(ptr),
 			VectorAlgos(ptr),
+			Modify(ptr),
 			Libdl.dlsym(ptr, :af_create_handle),
 			Libdl.dlsym(ptr, :af_create_array),
 			Libdl.dlsym(ptr, :af_retain_array),
@@ -104,6 +106,7 @@ include("Binary.jl")
 include("Unary.jl")
 include("Index.jl")
 include("VectorAlgos.jl")
+include("Modify.jl")
 include("FreeList.jl")
 
 immutable ScopeHandle

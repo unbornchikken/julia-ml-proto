@@ -2,7 +2,9 @@ include("../MNIST/MNIST.jl")
 
 module ANNDemo
 
-using MNIST
+using MNIST, AF
+
+export runDemo
 
 function accuracy(predicted, target)
 	pMaxIndex, pMaxArray = max(predicted, 1)
@@ -24,7 +26,7 @@ function runDemo(af)
     trainTarget = transpose(data.trainLabels);
     testTarget = transpose(data.testLabels);
 
-    network = new ANN(af, [dims(trainFeats, 1), 100, 50, data.numClasses]);
+    network = ANN(af, [dims(trainFeats, 1), 100, 50, data.numClasses]);
 
 	println("Starting.")
 

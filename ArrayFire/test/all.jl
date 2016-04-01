@@ -19,5 +19,6 @@ include("binary.jl")
 include("unary.jl")
 include("create.jl")
 include("vectorAlgos.jl")
+include("modify.jl")
 
 end
