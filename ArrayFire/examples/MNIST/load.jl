@@ -33,6 +33,8 @@ readIdx{T}(::Type{T}, path) = open(path) do f
 	return Idx(numDims, dims, data)
 end
 
+include("MNISTData.jl")
+
 loadSubset(af, expandLabels = true, frac = 0.6f0) = scope!(af) do this
 	frac = min(frac, 0.8f0)
 
@@ -93,5 +95,12 @@ loadSubset(af, expandLabels = true, frac = 0.6f0) = scope!(af) do this
 	this.result(trainLabelsArr)
 	this.result(testLabelsArr)
 
-	numClasses,	numTrain, numTest, trainImages, testImages, trainLabelsArr, testLabelsArr
+	MNISTData(
+		numClasses,
+		numTrain,
+		numTest,
+		trainImages,
+		testImages,
+		trainLabelsArr,
+		testLabelsArr)
 end

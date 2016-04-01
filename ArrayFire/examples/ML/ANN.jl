@@ -1,7 +1,7 @@
 immutable ANNTrainOptions
-	batchSize::Int
-	maxEpochs::Int
 	alpha::Float32
+	maxEpochs::Int
+	batchSize::Int
 	maxError::Float32
 end
 
@@ -84,30 +84,28 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
 	err = 0.0f0
 
 	for i in 1:options.maxEpochs
-		tic()
+		sec = @elapsed(begin
+			for j 1:(numBatches - 1)
+				@scope ann.af begin
+	                startPos = j * options.batchSize;
+	                endPos = startPos + options.batchSize - 1
 
-		for j 1:(numBatches - 1)
-			@scope ann.af begin
-                startPos = j * options.batchSize;
-                endPos = startPos + options.batchSize - 1
+	                x = input[Seq(startPos, endPos), :]
+	                y = target[Seq(startPos, endPos), :]
 
-                x = input[Seq(startPos, endPos), :]
-                y = target[Seq(startPos, endPos), :]
-
-                forwardPropagate(ann, x)
-                backPropagate(ann, y, options.alpha)
+	                forwardPropagate(ann, x)
+	                backPropagate(ann, y, options.alpha)
+				end
 			end
-		end
 
-		@scope ann.af begin
-            # Validate with last batch
-            startPos = (numBatches - 1) * options.batchSize
-            endPos = numSamples - 1
-            outVec = predict(ann, input[Seq(startPos, endPos), :])
-            err = calculateError(ann, outVec, target[Seq(startPos, endPos), :])
-		end
-
-		sec = toq()
+			@scope ann.af begin
+	            # Validate with last batch
+	            startPos = (numBatches - 1) * options.batchSize
+	            endPos = numSamples - 1
+	            outVec = predict(ann, input[Seq(startPos, endPos), :])
+	            err = calculateError(ann, outVec, target[Seq(startPos, endPos), :])
+			end
+		end)
 
 		println("Epoch: $i, Error: $(err), Duration: $(((end - start) / 1000)) seconds")
 
