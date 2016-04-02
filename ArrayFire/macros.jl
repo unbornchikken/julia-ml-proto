@@ -28,3 +28,18 @@ macro afCall_Arr_Arr_Arr_Unsigned(method, holder, func)
 		end
 	end
 end
+
+macro afCall_Arr_Arr_Bool(method, holder, func, default)
+	quote
+		function $(esc(method)){D, T, N}(arr::AFArray{D, T, N}, value::Bool = $default)
+			verifyAccess(arr)
+			af = arr.af
+			result = af.results.ptr
+			err = ccall(af.$holder.$func,
+				Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Bool),
+				result, arr.ptr, value)
+			assertErr(err)
+			array(af, result[])
+		end
+	end
+end

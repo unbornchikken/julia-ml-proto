@@ -2,17 +2,17 @@ af = ArrayFire{OpenCL}()
 
 @scope af begin
 	afArr = array(af, [[1, 2] [3, 4]])
-	result = host(moddims(afArr, 4))
+	result = host(transpose(afArr))
 
 	println(result)
 
-	afArr = array(af, [1, 2, 3, 4, 5, 6])
-	result = host(moddims(afArr, 2, 3))
+	afArr = array(af, [1, 2, 3, 4])
+	result = host(transpose(afArr))
 
 	println(result)
 
-	afArr = array(af, [1, 2, 3, 4, 5, 6])
-	result = host(moddims(afArr, 2, 2))
+	afArr = array(af, [[1, 2] [3, 4]])
+	transpose!(afArr)
 
-	println(result)
+	println(host(afArr))
 end

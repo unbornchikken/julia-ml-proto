@@ -118,11 +118,7 @@ function scope!(pred, af::ArrayFire)
 	newScope!(af.freeList)
 	try
 		h = ScopeHandle(arr -> markResult!(af.freeList, arr), arr -> register!(af.freeList, arr))
-		if applicable(pred, h)
-			pred(h)
-		else
-			pred()
-		end
+		pred(h)
 	finally
 		endScope!(af.freeList)
 	end

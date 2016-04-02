@@ -1,10 +1,12 @@
-import Base.randn
+import Base: randn,transpose,transpose!
 
 export
 	randn,
 	randu,
 	constant,
-	lookup
+	lookup,
+	transpose,
+	transpose!
 
 immutable Create <: AFImpl
 	randn::Ptr{Void}
@@ -13,6 +15,8 @@ immutable Create <: AFImpl
 	constantLong::Ptr{Void}
 	constantULong::Ptr{Void}
 	lookup::Ptr{Void}
+	transpose::Ptr{Void}
+	transposeInPlace::Ptr{Void}
 
 	function Create(ptr)
 		new(
@@ -21,7 +25,9 @@ immutable Create <: AFImpl
 			Libdl.dlsym(ptr, :af_constant),
 			Libdl.dlsym(ptr, :af_constant_long),
 			Libdl.dlsym(ptr, :af_constant_ulong),
-			Libdl.dlsym(ptr, :af_lookup)
+			Libdl.dlsym(ptr, :af_lookup),
+			Libdl.dlsym(ptr, :af_transpose),
+			Libdl.dlsym(ptr, :af_transpose_inplace)
 		)
 	end
 end
@@ -77,3 +83,15 @@ function constant{B}(af::ArrayFire{B}, value::UInt64, dims::DimT...)
 end
 
 @afCall_Arr_Arr_Arr_Unsigned(lookup, create, lookup)
+
+@afCall_Arr_Arr_Bool(transpose, create, transpose, false)
+
+function transpose!{D, T, N}(arr::AFArray{D, T, N}, conjugate::Bool = false)
+	verifyAccess(arr)
+	af = arr.af
+	err = ccall(af.create.transposeInPlace,
+		Cint, (Ptr{Void}, Bool),
+		arr.ptr, conjugate)
+	assertErr(err)
+	arr
+end
