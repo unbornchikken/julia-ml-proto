@@ -64,11 +64,11 @@ empty{D, T}(af::ArrayFire{D}, ::Type{T}, N::Int) = AFArray{D, T, N}(af)
 
 array{D, T, N}(af::ArrayFire{D}, arr::Array{T, N}) = AFArray{D, T, N}(af, arr)
 
-array{D, T}(af::ArrayFire{D}, ::Type{T}, dims...) = AFArray{D, T, length(dimsToSize(dims...))}(af, dims...)
+array{D, T}(af::ArrayFire{D}, ::Type{T}, dims::DimT...) = AFArray{D, T, length(dimsToSize(dims...))}(af, dims...)
 
-array{D, T}(af::ArrayFire{D}, arr::Array{T}, dims...) = array(af, reshape(arr, dimsToSize(dims...)...))
+array{D, T}(af::ArrayFire{D}, arr::Array{T}, dims::DimT...) = array(af, reshape(arr, dimsToSize(dims...)...))
 
-array{D, T}(af::ArrayFire{D}, ::Type{T}, ptr::Ptr{Void}, dims...) = AFArray{D, T, length(dimsToSize(dims...))}(af, ptr)
+array{D, T}(af::ArrayFire{D}, ::Type{T}, ptr::Ptr{Void}, dims::DimT...) = AFArray{D, T, length(dimsToSize(dims...))}(af, ptr)
 
 array{D, T}(af::ArrayFire{D}, ::Type{T}, N::Int, ptr::Ptr{Void}) = AFArray{D, T, N}(af, ptr)
 

@@ -10,22 +10,22 @@ type ANN{D<:Backend}
 	numLayers::Int
 	signal::Vector{AFArray{D, Float32, 2}}
 	weights::Vector{AFArray{D, Float32, 2}}
+end
 
-	function ANN(af, layers, range = 0.05f0)
-		numLayers = length(layers)
-		signal = Vector{AFArray{D, Float32, 2}}()
-		weights = Vector{AFArray{D, Float32, 2}}()
+function ANN{D}(af::ArrayFire{D}, layers::Vector{Int}, range = 0.05f0)
+	numLayers = length(layers)
+	signal = Vector{AFArray{D, Float32, 2}}()
+	weights = Vector{AFArray{D, Float32, 2}}()
 
-		for i in 1:numLayers
-			push!(signal, empty(af, Float32, 2))
-			if i != numLayers
-				w = randu(af, Float32, layers[i] + 1, layers[i + 1])
-				push!(weights, w)
-			end
+	for i in 1:numLayers
+		push!(signal, empty(af, Float32, 2))
+		if i != numLayers
+			w = randu(af, Float32, layers[i] + 1, layers[i + 1]) .* range .- range / 2
+			push!(weights, w)
 		end
-
-		new(af, numLayers, signal, weights)
 	end
+
+	ANN(af, numLayers, signal, weights)
 end
 
 deriv(out) = out .* (1.0f0 - out)
@@ -40,8 +40,8 @@ end
 
 function forwardPropagate(ann::ANN, input)
 	ann.signal[1][] = input
-	for 1:(ann.numLayers - 1)
-		@scope ann.af begin
+	for i in 1:ann.numLayers - 1
+		scope!(ann.af) do 
 			inVec = addBias(ann.signal[i])
 			outVec = matmul(inVec, ann.weights[i])
 			ann.signal[i + 1][] = sigmoid(outVec)
@@ -53,8 +53,8 @@ backPropagate(ann::ANN, target, alpha::Float32) = @scope ann.af begin
 	outVec = ann.signal[ann.numLayers]
 	err = outVec - target
 	m = dims(target, 0)
-	for i in (ann.numLayers - 1):-1:1
-		@scope ann.af begin
+	for i in ann.numLayers - 1:-1:1
+		scope!(ann.af) do
 			inVec = addBias(ann.signal[i])
 			delta = transpose(deriv(outVec) * err)
 
@@ -78,6 +78,7 @@ function predict(ann::ANN, input)
 end
 
 function train(ann::ANN, input, target, options::ANNTrainOptions)
+	af = ann.af
 	numSamples = dims(input, 0)
 	numBatches = numSamples / options.batchSize
 
@@ -85,9 +86,9 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
 
 	for i in 1:options.maxEpochs
 		sec = @elapsed(begin
-			for j 1:(numBatches - 1)
-				@scope ann.af begin
-	                startPos = j * options.batchSize;
+			for j in 1:numBatches - 1
+				scope!(af) do
+	                startPos = (j - 1) * options.batchSize
 	                endPos = startPos + options.batchSize - 1
 
 	                x = input[Seq(startPos, endPos), :]
@@ -98,7 +99,7 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
 				end
 			end
 
-			@scope ann.af begin
+			scope!(af) do
 	            # Validate with last batch
 	            startPos = (numBatches - 1) * options.batchSize
 	            endPos = numSamples - 1
@@ -107,7 +108,7 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
 			end
 		end)
 
-		println("Epoch: $i, Error: $(err), Duration: $(((end - start) / 1000)) seconds")
+		println("Epoch: $i, Error: $err, Duration: $sec seconds")
 
         # Check if convergence criteria has been met
         if err < options.maxError

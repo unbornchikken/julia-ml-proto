@@ -6,6 +6,8 @@ using MNIST, AF
 
 export runDemo
 
+include("ANN.jl")
+
 function accuracy(predicted, target)
 	pMaxIndex, pMaxArray = max(predicted, 1)
 	tMaxIndex, tMaxArray = max(target, 1)
@@ -17,15 +19,17 @@ function runDemo(af)
 
 	data = loadSubset(af)
 
-    featureSize = elements(data.trainImages) / data.numTrain;
+    featureSize = DimT(elements(data.trainImages) / data.numTrain);
 
-    # Reshape images into feature vectors
+    println("Reshaping images into feature vectors.")
     trainFeats = transpose(moddims(data.trainImages, featureSize, data.numTrain));
     testFeats = transpose(moddims(data.testImages, featureSize, data.numTest));
 
+	println("Creating targets.")
     trainTarget = transpose(data.trainLabels);
     testTarget = transpose(data.testLabels);
 
+	println("Creating Network.")
     network = ANN(af, [dims(trainFeats, 1), 100, 50, data.numClasses]);
 
 	println("Starting.")
@@ -35,12 +39,7 @@ function runDemo(af)
 			network,
 	        trainFeats,
 	        trainTarget,
-	        ANNTrainOptions(
-	            alpha: 1.0f0,
-	            maxEpochs: 300,
-	            batchSize: 100,
-	            maxError: 0.0001f0)
-	    )
+	        ANNTrainOptions(1.0f0, 300, 100,0.0001f0))
 		sync(af)
 	end)
 

@@ -10,7 +10,7 @@ immutable Modify <: AFImpl
 	end
 end
 
-function moddims{D, T, N}(arr::AFArray{D, T, N}, dims...)
+function moddims{D, T, N}(arr::AFArray{D, T, N}, dims::DimT...)
 	verifyAccess(arr)
 	af = arr.af
 	ptr = af.results.ptr

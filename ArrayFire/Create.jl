@@ -26,7 +26,7 @@ immutable Create <: AFImpl
 	end
 end
 
-function randn{B, T}(af::ArrayFire{B}, ::Type{T}, dims...)
+function randn{B, T}(af::ArrayFire{B}, ::Type{T}, dims::DimT...)
 	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.randn,
@@ -36,7 +36,7 @@ function randn{B, T}(af::ArrayFire{B}, ::Type{T}, dims...)
 	AFArray{B, T, jlLength(dims)}(af, ptr[])
 end
 
-function randu{B, T}(af::ArrayFire{B}, ::Type{T}, dims...)
+function randu{B, T}(af::ArrayFire{B}, ::Type{T}, dims::DimT...)
 	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.randu,
@@ -46,7 +46,7 @@ function randu{B, T}(af::ArrayFire{B}, ::Type{T}, dims...)
 	AFArray{B, T, jlLength(dims)}(af, ptr[])
 end
 
-function constant{B, T<:Real}(af::ArrayFire{B}, value::T, dims...)
+function constant{B, T<:Real}(af::ArrayFire{B}, value::T, dims::DimT...)
 	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.constant,
@@ -56,7 +56,7 @@ function constant{B, T<:Real}(af::ArrayFire{B}, value::T, dims...)
 	AFArray{B, T, jlLength(dims)}(af, ptr[])
 end
 
-function constant{B}(af::ArrayFire{B}, value::Int64, dims...)
+function constant{B}(af::ArrayFire{B}, value::Int64, dims::DimT...)
 	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.constantLong,
@@ -66,7 +66,7 @@ function constant{B}(af::ArrayFire{B}, value::Int64, dims...)
 	AFArray{B, Int64, jlLength(dims)}(af, ptr[])
 end
 
-function constant{B}(af::ArrayFire{B}, value::UInt64, dims...)
+function constant{B}(af::ArrayFire{B}, value::UInt64, dims::DimT...)
 	ptr = af.results.ptr
 	dims2 = collect(dims)
 	err = ccall(af.create.constantLong,
