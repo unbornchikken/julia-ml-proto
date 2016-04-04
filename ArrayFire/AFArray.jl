@@ -128,7 +128,7 @@ function dims(af::ArrayFire, ptr::Ptr{Void})
 	[dim0[], dim1[], dim2[], dim3[]]
 end
 
-function dims{T, N}(arr::AFArray{T, N}, n)
+function dims(arr::AFArray, n)
 	verifyAccess(arr)
 	af = arr.af
 	dim0 = af.results.dim0
@@ -149,6 +149,19 @@ function dims{T, N}(arr::AFArray{T, N}, n)
 	else
 		dim3[]
 	end
+end
+
+firstDim(arr::AFArray) = (verifyAccess(arr); dims(arr.af, arr.ptr))
+
+function firstDim(af::ArrayFire, ptr::Ptr{Void})
+	result = 1
+	for dim in dims(af, ptr)
+		if dim > 1
+			return result
+		end
+		result += 1
+	end
+	1
 end
 
 function Base.size(arr::AFArray)

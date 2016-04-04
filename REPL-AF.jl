@@ -1,18 +1,21 @@
 af = ArrayFire{OpenCL}()
 
-@scope af begin
-	afArr = array(af, [[1, 2] [3, 4]])
-	result = host(transpose(afArr))
+afArr = array(af, [[1.0f0, 2.0f0] [4.0f0, 3.0f0]])
 
-	println(result)
+println(host(max(afArr)))
+println(host(max(afArr, 0)))
+println(host(max(afArr, 1)))
+println(host(max(afArr, 2)))
 
-	afArr = array(af, [1, 2, 3, 4])
-	result = host(transpose(afArr))
+println(minAll(afArr))
 
-	println(result)
+result = imax(afArr, 0)
+println(string(host(result[1]), "\t", host(result[2])))
 
-	afArr = array(af, [[1, 2] [3, 4]])
-	transpose!(afArr)
+result = imaxAll(afArr)
+println(result)
 
-	println(host(afArr))
-end
+afArr = array(af, [1 2 3 4 5])
+
+println(host(min(afArr)))
+println(host(min(afArr, 1)))

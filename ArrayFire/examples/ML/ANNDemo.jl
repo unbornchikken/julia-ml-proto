@@ -9,8 +9,8 @@ export runDemo
 include("ANN.jl")
 
 function accuracy(predicted, target)
-	pMaxIndex, pMaxArray = max(predicted, 1)
-	tMaxIndex, tMaxArray = max(target, 1)
+	pMaxArray, pMaxIndex = max(predicted, 1)
+	tMaxArray, tMaxIndex = max(target, 1)
 	(100.0f0 * count(pMaxIndex .= tMaxIndex)) / elements(tMaxIndex)
 end
 

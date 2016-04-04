@@ -17,22 +17,30 @@ include("AFLib.jl")
 
 type Results
 	ptr::Ref{Ptr{Void}}
+	ptr2::Ref{Ptr{Void}}
 	dim0::Ref{DimT}
 	dim1::Ref{DimT}
 	dim2::Ref{DimT}
 	dim3::Ref{DimT}
 	dType::Ref{DType}
 	bool::Ref{Bool}
+	double::Ref{Float64}
+	double2::Ref{Float64}
+	uint::Ref{UInt32}
 end
 
 Results() = Results(
+	Ref{Ptr{Void}}(C_NULL),
 	Ref{Ptr{Void}}(C_NULL),
 	Ref{DimT}(0),
 	Ref{DimT}(0),
 	Ref{DimT}(0),
 	Ref{DimT}(0),
 	Ref{DType}(0),
-	Ref{Bool}(false))
+	Ref{Bool}(false),
+	Ref{Float64}(0.0),
+	Ref{Float64}(0.0),
+	Ref{UInt32}(0))
 
 type ArrayFire{T<:Backend}
 	ptr::Ptr{Void}
@@ -43,6 +51,7 @@ type ArrayFire{T<:Backend}
 	index::AFImpl
 	vectorAlgos::AFImpl
 	modify::AFImpl
+	reduction::AFImpl
 	createHandle::Ptr{Void}
 	createArray::Ptr{Void}
 	retainArray::Ptr{Void}
@@ -68,6 +77,7 @@ type ArrayFire{T<:Backend}
 			Index(ptr),
 			VectorAlgos(ptr),
 			Modify(ptr),
+			Reduction(ptr),
 			Libdl.dlsym(ptr, :af_create_handle),
 			Libdl.dlsym(ptr, :af_create_array),
 			Libdl.dlsym(ptr, :af_retain_array),
@@ -107,6 +117,7 @@ include("Unary.jl")
 include("Index.jl")
 include("VectorAlgos.jl")
 include("Modify.jl")
+include("Reduction.jl")
 include("FreeList.jl")
 
 immutable ScopeHandle

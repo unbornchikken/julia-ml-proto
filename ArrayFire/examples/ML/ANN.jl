@@ -41,7 +41,7 @@ end
 function forwardPropagate(ann::ANN, input)
 	ann.signal[1][] = input
 	for i in 1:ann.numLayers - 1
-		scope!(ann.af) do 
+		scope!(ann.af) do
 			inVec = addBias(ann.signal[i])
 			outVec = matmul(inVec, ann.weights[i])
 			ann.signal[i + 1][] = sigmoid(outVec)
@@ -59,12 +59,12 @@ backPropagate(ann::ANN, target, alpha::Float32) = @scope ann.af begin
 			delta = transpose(deriv(outVec) * err)
 
             # Adjust weights
-            grad = -(matMul(delta, inVec) .* alpha) ./ m
+            grad = -(matmul(delta, inVec) .* alpha) ./ m
             ann.weights[i] .+= transpose(grad)
 
             # Input to current layer is output of previous
             outVec = ann.signal[i]
-            err[] = matMulTT(delta, ann.weights[i])
+            err[] = matmulTT(delta, ann.weights[i])
 
             # Remove the error of bias and propagate backward
             err[] = err[:, Seq(1, dims(outVec, 1))]
