@@ -1,11 +1,15 @@
-export moddims
+export moddims, joinArrays
 
 immutable Modify <: AFImpl
 	moddims::Ptr{Void}
+	join::Ptr{Void}
+	join_many::Ptr{Void}
 
 	function Modify(ptr)
 		new(
-			Libdl.dlsym(ptr, :af_moddims)
+			Libdl.dlsym(ptr, :af_moddims),
+			Libdl.dlsym(ptr, :af_join),
+			Libdl.dlsym(ptr, :af_join_many)
 		)
 	end
 end
@@ -20,4 +24,36 @@ function moddims{D, T, N}(arr::AFArray{D, T, N}, dims::DimT...)
 		ptr, arr.ptr, length(dims2), pointer(dims2))
 	assertErr(err)
 	array(af, T, ptr[], dims...)
+end
+
+@generated function joinArrays{D, T}(dim::Int, arrays::AFArray{D, T}...)
+	len = length(arrays)
+	if len == 1
+		:( arrays[1] )
+	elseif len == 2
+		quote
+			arr1 = arrays[1]
+			arr2 = arrays[2]
+			verifyAccess(arr1)
+			verifyAccess(arr2)
+			af = arr1.af
+			ptr = af.results.ptr
+			err = ccall(af.modify.join,
+				Cint, (Ptr{Ptr{Void}}, Int32, Ptr{Void}, Ptr{Void}),
+				ptr, dim, arr1.ptr, arr2.ptr)
+			assertErr(err)
+			array(af, ptr[])
+		end
+	else
+		quote
+			arrPtrs = map(arr -> (verifyAccess(arr); arr.ptr), collect(arrays))
+			af = arrays[1].af
+			ptr = af.results.ptr
+			err = ccall(af.modify.join_many,
+				Cint, (Ptr{Ptr{Void}}, Int32, UInt32, Ptr{Ptr{Void}}),
+				ptr, dim, length(arrPtrs), pointer(arrPtrs))
+			assertErr(err)
+			array(af, T, ptr[])
+		end
+	end
 end

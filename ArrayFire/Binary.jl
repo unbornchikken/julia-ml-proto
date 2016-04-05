@@ -1,8 +1,8 @@
-import Base: .<,.>,.<=,.>=,.==,.!=
-export .<,.>,.<=,.>=,.==,.!=,and,or
+import Base: .<, .>, .<=, .>=, .==, .!=
+export .<, .>, .<=, .>=, .==, .!=, and, or, maxOf, minOf
 
-import Base: .+,.-,.*,./,.\
-export .+,.-,.*,./,.\
+import Base: .+, .-, .*, ./, .\
+export .+, .-, .*, ./, .\
 
 immutable Binary <: AFImpl
 	le::Ptr{Void}
@@ -17,6 +17,8 @@ immutable Binary <: AFImpl
 	sub::Ptr{Void}
 	mul::Ptr{Void}
 	div::Ptr{Void}
+	maxOf::Ptr{Void}
+	minOf::Ptr{Void}
 
 	function Binary(ptr)
 		new(
@@ -31,7 +33,9 @@ immutable Binary <: AFImpl
 			Libdl.dlsym(ptr, :af_add),
 			Libdl.dlsym(ptr, :af_sub),
 			Libdl.dlsym(ptr, :af_mul),
-			Libdl.dlsym(ptr, :af_div)
+			Libdl.dlsym(ptr, :af_div),
+			Libdl.dlsym(ptr, :af_maxof),
+			Libdl.dlsym(ptr, :af_minof)
 		)
 	end
 end
@@ -105,6 +109,8 @@ end
 @arBinOp(.-, sub)
 @arBinOp(.*, mul)
 @arBinOp(./, div)
+@arBinOp(maxOf, maxOf)
+@arBinOp(minOf, minOf)
 
 function .\{T1, N1, T2, N2}(lhs::AFArray{T1, N1}, rhs::AFArray{T2, N2})
 	rhs ./ lhs

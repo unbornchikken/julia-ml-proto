@@ -1,21 +1,11 @@
 af = ArrayFire{OpenCL}()
 
-afArr = array(af, [[1.0f0, 2.0f0] [4.0f0, 3.0f0]])
+afArr1 = array(af, [[1.0f0, 2.0f0] [4.0f0, 3.0f0]])
+afArr2 = array(af, [[5.0f0, 1.0f0] [1.0f0, 5.0f0]])
 
-println(host(max(afArr)))
-println(host(max(afArr, 0)))
-println(host(max(afArr, 1)))
-println(host(max(afArr, 2)))
+println(host(joinArrays(0, afArr1, afArr2)))
+println(host(joinArrays(1, afArr1, afArr2)))
 
-println(minAll(afArr))
+afArr3 = array(af, [[9.0f0, 9.0f0] [9.0f0, 9.0f0]])
 
-result = imax(afArr, 0)
-println(string(host(result[1]), "\t", host(result[2])))
-
-result = imaxAll(afArr)
-println(result)
-
-afArr = array(af, [1 2 3 4 5])
-
-println(host(min(afArr)))
-println(host(min(afArr, 1)))
+println(host(joinArrays(0, afArr1, afArr2, afArr3)))

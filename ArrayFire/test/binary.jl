@@ -80,4 +80,12 @@ testOnAllBackends("Binary Operators") do af
 	println("\tor")
 	result = or(afArr, array(af, [[true, false] [true, false]]))
 	@test host(result) == [[true, true] [true, false]]
+
+	println("\tmaxOf, minOf")
+	afArr1 = array(af, [[1.0f0, 2.0f0] [4.0f0, 3.0f0]])
+	afArr2 = array(af, [[5.0f0, 1.0f0] [1.0f0, 5.0f0]])
+
+	@test host(maxOf(afArr1, afArr2)) == [[5.0f0, 2.0f0] [4.0f0, 5.0f0]]
+	@test host(minOf(afArr1, 2)) == [[1.0f0, 2.0f0] [2.0f0, 2.0f0]]
+	@test host(maxOf(2.0, afArr2)) == [[5.0, 2.0] [2.0, 5.0]]
 end

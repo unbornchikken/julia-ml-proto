@@ -1,0 +1,3 @@
+immutable Math <: AFImpl
+
+end
