@@ -33,16 +33,29 @@ Base.print(info::DeviceInfo) = Base.print(toString(info))
 
 typealias DType UInt32
 
-f32 = DType(0) # 32-bit floating point values
-c32 = DType(1) # 32-bit complex floating point values
-f64 = DType(2) # 64-bit complex floating point values
-c64 = DType(3) # 64-bit complex floating point values
-b8  = DType(4) #  8-bit boolean values
-s32 = DType(5) # 32-bit signed integral values
-u32 = DType(6) # 32-bit unsigned integral values
-u8  = DType(7) #  8-bit unsigned integral values
-s64 = DType(8) # 64-bit signed integral values
-u64 = DType(9) # 64-bit unsigned integral values
+const f32 = DType(0) # 32-bit floating point values
+const c32 = DType(1) # 32-bit complex floating point values
+const f64 = DType(2) # 64-bit complex floating point values
+const c64 = DType(3) # 64-bit complex floating point values
+const b8  = DType(4) #  8-bit boolean values
+const s32 = DType(5) # 32-bit signed integral values
+const u32 = DType(6) # 32-bit unsigned integral values
+const u8  = DType(7) #  8-bit unsigned integral values
+const s64 = DType(8) # 64-bit signed integral values
+const u64 = DType(9) # 64-bit unsigned integral values
+
+const AF_MAT_NONE 		= Int32(0)	# Default.
+const AF_MAT_TRANS 		= Int32(1)	# Data needs to be transposed.
+const AF_MAT_CTRANS 	= Int32(2)	# Data needs to be conjugate tansposed.
+const AF_MAT_CONJ 		= Int32(3)	# Data needs to be conjugate.
+const AF_MAT_UPPER 		= Int32(4)	# Matrix is upper triangular.
+const AF_MAT_LOWER 		= Int32(5)	# Matrix is lower triangular.
+const AF_MAT_DIAG_UNIT 	= Int32(6)	# Matrix diagonal contains unitary values.
+const AF_MAT_SYM 		= Int32(7)	# Matrix is symmetric.
+const AF_MAT_POSDEF		= Int32(8)	# Matrix is positive definite.
+const AF_MAT_ORTHOG 	= Int32(9)	# Matrix is orthogonal.
+const AF_MAT_TRI_DIAG 	= Int32(10)	# Matrix is tri diagonal.
+const AF_MAT_BLOCK_DIAG = Int32(11)	# Matrix is block diagonal.
 
 asDType(::Type{Float32})          = f32
 asDType(::Type{Complex{Float32}}) = c32
