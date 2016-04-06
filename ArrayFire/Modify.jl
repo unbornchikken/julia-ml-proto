@@ -42,7 +42,7 @@ end
 				Cint, (Ptr{Ptr{Void}}, Int32, Ptr{Void}, Ptr{Void}),
 				ptr, dim, arr1.ptr, arr2.ptr)
 			assertErr(err)
-			array(af, ptr[])
+			array(af, T, ptr[])
 		end
 	else
 		quote

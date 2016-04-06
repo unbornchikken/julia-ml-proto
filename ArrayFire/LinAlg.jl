@@ -23,7 +23,7 @@ function matmul{D, T1, N1, T2, N2}(
 		Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Int32, Int32),
 		result, lhs.ptr, rhs.ptr, optLhs, optRhs)
 	assertErr(err)
-	AFArray{D, promote(T1, T2)}(af, result[])
+	array(af, afPromote(T1, T2), result[])
 end
 
 matmulTT(lhs, rhs) = matmul(lhs, rhs, AF_MAT_TRANS, AF_MAT_TRANS)

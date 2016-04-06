@@ -41,10 +41,10 @@ function markResult!(fl::FreeList, arr::AFArray)
 	idx = findfirst(x -> x.array == arr, curr)
 	idx == 0 && error("Array isn't registered in the current scope.")
 	curr[idx].isResult = true
-	prev = previous(fl)
-	if !isnull(prev)
-		push!(get(prev), FreeListEntry(arr))
-	end
+	# prev = previous(fl)
+	# if !isnull(prev)
+	# 	push!(get(prev), FreeListEntry(arr))
+	# end
     arr
   else
     raiseNoScope()

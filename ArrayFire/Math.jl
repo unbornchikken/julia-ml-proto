@@ -10,4 +10,4 @@ immutable Math <: AFImpl
 	end
 end
 
-afCall_Arr_Arr(sigmoid, math, sigmoid)
+@afCall_Arr_Arr(sigmoid, math, sigmoid)

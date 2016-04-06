@@ -1,4 +1,4 @@
-import Base: min, max
+import Base: min, max, sum
 
 export max, maxAll, imax, imaxAll, min, minAll, imin, iminAll, sum, sumAll
 

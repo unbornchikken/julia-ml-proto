@@ -8,7 +8,10 @@ using Base.Test
 function testOnAllBackends(f, title)
 	for b in getSupportedBackends()
 		print("DEGIN: $title - $b\n")
-		f(ArrayFire{b}())
+		af = ArrayFire{b}()
+		scope!(af) do this
+			f(af)
+		end
 		print("DONE: $title - $b\n")
 	end
 end

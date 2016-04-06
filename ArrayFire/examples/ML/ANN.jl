@@ -28,46 +28,47 @@ function ANN{D}(af::ArrayFire{D}, layers::Vector{Int}, range = 0.05f0)
 	ANN(af, numLayers, signal, weights)
 end
 
-deriv(out) = out .* (1.0f0 - out)
+deriv(out) = out .* (1.0f0 .- out)
 
-addBias(input) = join(1, constant(af(input), 1.0f0, dims(input, 0)), input)
+addBias(ann::ANN, input) = joinArrays(1, constant(ann.af, 1.0f0, dims(input, 0)), input)
 
 function calculateError(out, pred)
 	diff = out .- pred;
 	sq = diff .* diff;
-	sqrt(sum(qs)) ./ elements(sq)
+	sqrt(sumAll(sq)) / elements(sq)
 end
 
 function forwardPropagate(ann::ANN, input)
 	ann.signal[1][] = input
 	for i in 1:ann.numLayers - 1
-		scope!(ann.af) do
-			inVec = addBias(ann.signal[i])
+		scope!(ann.af) do this
+			inVec = addBias(ann, ann.signal[i])
 			outVec = matmul(inVec, ann.weights[i])
 			ann.signal[i + 1][] = sigmoid(outVec)
 		end
 	end
 end
 
-backPropagate(ann::ANN, target, alpha::Float32) = @scope ann.af begin
+backPropagate(ann::ANN, target, alpha::Float32) = scope!(ann.af) do this
 	outVec = ann.signal[ann.numLayers]
-	err = outVec - target
+	err = outVec .- target
 	m = dims(target, 0)
 	for i in ann.numLayers - 1:-1:1
-		scope!(ann.af) do
-			inVec = addBias(ann.signal[i])
-			delta = transpose(deriv(outVec) * err)
+		scope!(ann.af) do this
+			inVec = addBias(ann, ann.signal[i])
+			delta = transpose(deriv(outVec) .* err)
 
             # Adjust weights
-            grad = -(matmul(delta, inVec) .* alpha) ./ m
-            ann.weights[i] .+= transpose(grad)
+            grad = (-1.0f0 .* (matmul(delta, inVec) .* alpha)) ./ m
+            newWeights = ann.weights[i] .+ transpose(grad)
+			ann.weights[i][] = newWeights;
 
             # Input to current layer is output of previous
             outVec = ann.signal[i]
-            err[] = matmulTT(delta, ann.weights[i])
+            allErr = matmulTT(delta, ann.weights[i])
 
             # Remove the error of bias and propagate backward
-            err[] = err[:, Seq(1, dims(outVec, 1))]
+            err[] = allErr[:, Seq(1, dims(outVec, 1))]
 		end
 	end
 end
@@ -85,9 +86,9 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
 	err = 0.0f0
 
 	for i in 1:options.maxEpochs
-		sec = @elapsed(begin
+		sec = @elapsed begin
 			for j in 1:numBatches - 1
-				scope!(af) do
+				scope!(af) do this
 	                startPos = (j - 1) * options.batchSize
 	                endPos = startPos + options.batchSize - 1
 
@@ -99,14 +100,14 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
 				end
 			end
 
-			scope!(af) do
+			scope!(af) do this
 	            # Validate with last batch
 	            startPos = (numBatches - 1) * options.batchSize
 	            endPos = numSamples - 1
 	            outVec = predict(ann, input[Seq(startPos, endPos), :])
-	            err = calculateError(ann, outVec, target[Seq(startPos, endPos), :])
+	            err = calculateError(outVec, target[Seq(startPos, endPos), :])
 			end
-		end)
+		end
 
 		println("Epoch: $i, Error: $err, Duration: $sec seconds")
 

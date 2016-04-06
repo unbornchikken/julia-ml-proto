@@ -34,14 +34,14 @@ function runDemo(af)
 
 	println("Starting.")
 
-	sec = @elapsed(begin
+	sec = @elapsed begin
 	    train(
 			network,
 	        trainFeats,
 	        trainTarget,
 	        ANNTrainOptions(1.0f0, 300, 100,0.0001f0))
 		sync(af)
-	end)
+	end
 
 	# Run the trained network and test accuracy.
     trainOutput = predict(network, trainFeats);
