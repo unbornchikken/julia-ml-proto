@@ -39,7 +39,7 @@ function runDemo(af)
 			network,
 	        trainFeats,
 	        trainTarget,
-	        ANNTrainOptions(1.0f0, 300, 100,0.0001f0))
+	        ANNTrainOptions(2.0f0, 300, 100, 0.0001f0))
 		sync(af)
 	end
 

@@ -20,7 +20,7 @@ function ANN{D}(af::ArrayFire{D}, layers::Vector{Int}, range = 0.05f0)
 	for i in 1:numLayers
 		push!(signal, empty(af, Float32, 2))
 		if i != numLayers
-			w = randu(af, Float32, layers[i] + 1, layers[i + 1]) .* range .- range / 2
+			w = randu(af, Float32, layers[i] + 1, layers[i + 1]) .* range .- (range / 2.0f0)
 			push!(weights, w)
 		end
 	end
@@ -59,16 +59,15 @@ backPropagate(ann::ANN, target, alpha::Float32) = scope!(ann.af) do this
 			delta = transpose(deriv(outVec) .* err)
 
             # Adjust weights
-            grad = (-1.0f0 .* (matmul(delta, inVec) .* alpha)) ./ m
-            newWeights = ann.weights[i] .+ transpose(grad)
-			ann.weights[i][] = newWeights;
+            grad = (-alpha .* matmul(delta, inVec)) ./ m
+			ann.weights[i][] = ann.weights[i] .+ transpose(grad);
 
             # Input to current layer is output of previous
             outVec = ann.signal[i]
-            allErr = matmulTT(delta, ann.weights[i])
+            err[] = matmulTT(delta, ann.weights[i])
 
             # Remove the error of bias and propagate backward
-            err[] = allErr[:, Seq(1, dims(outVec, 1))]
+            err[] = err[:, Seq(1, dims(outVec, 1))]
 		end
 	end
 end
@@ -104,6 +103,7 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
 	            # Validate with last batch
 	            startPos = (numBatches - 1) * options.batchSize
 	            endPos = numSamples - 1
+
 	            outVec = predict(ann, input[Seq(startPos, endPos), :])
 	            err = calculateError(outVec, target[Seq(startPos, endPos), :])
 			end

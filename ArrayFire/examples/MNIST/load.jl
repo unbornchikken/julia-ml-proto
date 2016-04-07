@@ -53,8 +53,8 @@ loadSubset(af, expandLabels = true, frac = 0.6f0) = scope!(af) do this
 	trainIndices = where(cond);
 	testIndices = where(!cond);
 
-	trainImages = lookup(images, trainIndices, 2) ./ 255;
-    testImages = lookup(images, testIndices, 2) ./ 255;
+	trainImages = lookup(images, trainIndices, 2) ./ 255.0f0;
+    testImages = lookup(images, testIndices, 2) ./ 255.0f0;
 
     numClasses = 10;
     numTrain = dims(trainImages, 2);
@@ -80,7 +80,7 @@ loadSubset(af, expandLabels = true, frac = 0.6f0) = scope!(af) do this
 				idx = indices[i] + 1
 				label = labelData.data[idx]
 				assert(label >= 0 && label <= 9)
-				labels[label + 1, i] = 1;
+				labels[label + 1, i] = 1.0f0;
 			end
 
 		process(numTrain, hTrainIdx, trainLabels)

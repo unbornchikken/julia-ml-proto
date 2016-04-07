@@ -1,5 +1,6 @@
-using AF
+include("ArrayFire/examples/ML/ANNDemo.jl")
+using AF, ANNDemo
 
-af = ArrayFire{CPU}()
+af = ArrayFire{CUDA}()
 
 runDemo(af)
