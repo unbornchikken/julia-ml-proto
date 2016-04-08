@@ -4,7 +4,9 @@ export
 	setDevice,
 	getDevice,
 	deviceInfo,
-	deviceInfos
+	deviceInfos,
+	setSeed,
+	sync
 
 immutable AFDevice <: AFImpl
 	infoString::Ptr{Void}
@@ -12,6 +14,8 @@ immutable AFDevice <: AFImpl
 	setDevice::Ptr{Void}
 	getDevice::Ptr{Void}
 	deviceInfo::Ptr{Void}
+	setSeed::Ptr{Void}
+	sync::Ptr{Void}
 
 	function AFDevice(ptr)
 		new(
@@ -23,7 +27,9 @@ immutable AFDevice <: AFImpl
 			Libdl.dlsym(ptr, :af_get_device_count),
 			Libdl.dlsym(ptr, :af_set_device),
 			Libdl.dlsym(ptr, :af_get_device),
-			Libdl.dlsym(ptr, :af_device_info)
+			Libdl.dlsym(ptr, :af_device_info),
+			Libdl.dlsym(ptr, :af_set_seed),
+			Libdl.dlsym(ptr, :af_sync)
 		)
 	end
 end
@@ -90,4 +96,14 @@ function deviceInfos(af::ArrayFire)
 		setDevice(af, curr)
 	end
 	result
+end
+
+function setSeed(af::ArrayFire, seed)
+	err = ccall(af.device.setSeed, Cint, (UInt64,), seed)
+	assertErr(err)
+end
+
+function sync(af::ArrayFire)
+	err = ccall(af.device.sync, Cint, (Int32,), getDevice(af))
+	assertErr(err)
 end

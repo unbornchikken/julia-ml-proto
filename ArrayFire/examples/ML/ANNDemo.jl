@@ -9,9 +9,9 @@ export runDemo
 include("ANN.jl")
 
 function accuracy(predicted, target)
-	pMaxArray, pMaxIndex = max(predicted, 1)
-	tMaxArray, tMaxIndex = max(target, 1)
-	(100.0f0 * count(pMaxIndex .= tMaxIndex)) / elements(tMaxIndex)
+	pMaxArray, pMaxIndex = imax(predicted, 1)
+	tMaxArray, tMaxIndex = imax(target, 1)
+	(100.0f0 * count(pMaxIndex .== tMaxIndex)) / elements(tMaxIndex)
 end
 
 function runDemo(af)
@@ -39,7 +39,7 @@ function runDemo(af)
 			network,
 	        trainFeats,
 	        trainTarget,
-	        ANNTrainOptions(2.0f0, 300, 100, 0.0001f0))
+	        ANNTrainOptions(2.0f0, 250, 100, 0.0001f0))
 		sync(af)
 	end
 
@@ -48,10 +48,10 @@ function runDemo(af)
     testOutput = predict(network, testFeats);
 
     println("Training set:");
-    println("Accuracy on training data: $(accuracy(af, trainOutput, trainTarget))");
+    println("Accuracy on training data: $(accuracy(trainOutput, trainTarget))");
 
     println("Test set:");
-    println("Accuracy on testing  data: $(accuracy(af, testOutput, testTarget))");
+    println("Accuracy on testing  data: $(accuracy(testOutput, testTarget))");
 
     println("Training time: $sec seconds");
 end
