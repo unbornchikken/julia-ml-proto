@@ -9,15 +9,15 @@ export runDemo
 include("ANN.jl")
 
 function accuracy(predicted, target)
-	pMaxArray, pMaxIndex = imax(predicted, 1)
-	tMaxArray, tMaxIndex = imax(target, 1)
-	(100.0f0 * count(pMaxIndex .== tMaxIndex)) / elements(tMaxIndex)
+    pMaxArray, pMaxIndex = imax(predicted, 1)
+    tMaxArray, tMaxIndex = imax(target, 1)
+    (100.0f0 * count(pMaxIndex .== tMaxIndex)) / elements(tMaxIndex)
 end
 
 function runDemo(af)
-	println("Setting up training data.")
+    println("Setting up training data.")
 
-	data = loadSubset(af)
+    data = loadSubset(af)
 
     featureSize = DimT(elements(data.trainImages) / data.numTrain);
 
@@ -25,25 +25,25 @@ function runDemo(af)
     trainFeats = transpose(moddims(data.trainImages, featureSize, data.numTrain));
     testFeats = transpose(moddims(data.testImages, featureSize, data.numTest));
 
-	println("Creating targets.")
+    println("Creating targets.")
     trainTarget = transpose(data.trainLabels);
     testTarget = transpose(data.testLabels);
 
-	println("Creating Network.")
+    println("Creating Network.")
     network = ANN(af, [dims(trainFeats, 1), 100, 50, data.numClasses]);
 
-	println("Starting.")
+    println("Starting.")
 
-	sec = @elapsed begin
-	    train(
-			network,
-	        trainFeats,
-	        trainTarget,
-	        ANNTrainOptions(2.0f0, 250, 100, 0.0001f0))
-		sync(af)
-	end
+    sec = @elapsed begin
+        train(
+            network,
+            trainFeats,
+            trainTarget,
+            ANNTrainOptions(2.0f0, 250, 100, 0.0001f0))
+        sync(af)
+    end
 
-	# Run the trained network and test accuracy.
+    # Run the trained network and test accuracy.
     trainOutput = predict(network, trainFeats);
     testOutput = predict(network, testFeats);
 

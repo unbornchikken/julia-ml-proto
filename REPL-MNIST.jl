@@ -3,6 +3,7 @@ using AF, ANNDemo
 
 af = ArrayFire{CUDA}()
 
-setSeed(af, rand(UInt64))
+setDevice(af, 0)
+setSeed(af, 42)
 
 runDemo(af)
