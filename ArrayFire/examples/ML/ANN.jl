@@ -5,20 +5,20 @@ immutable ANNTrainOptions
     maxError::Float32
 end
 
-type ANN{D<:Backend}
-    af::ArrayFire{D}
+type ANN{B<:Backend}
+    af::ArrayFire{B}
     numLayers::Int
-    signal::Vector{AFArray{D, Float32, 2}}
-    weights::Vector{AFArray{D, Float32, 2}}
+    signal::Vector{AFArray{B}}
+    weights::Vector{AFArray{B}}
 end
 
-function ANN{D}(af::ArrayFire{D}, layers::Vector{Int}, range = 0.05f0)
+function ANN{B}(af::ArrayFire{B}, layers::Vector{Int}, range = 0.05f0)
     numLayers = length(layers)
-    signal = Vector{AFArray{D, Float32, 2}}()
-    weights = Vector{AFArray{D, Float32, 2}}()
+    signal = Vector{AFArray{B}}()
+    weights = Vector{AFArray{B}}()
 
     for i in 1:numLayers
-        push!(signal, empty(af, Float32, 2))
+        push!(signal, array(af))
         if i != numLayers
             w = randu(af, Float32, layers[i] + 1, layers[i + 1]) .* range .- (range / 2.0f0)
             push!(weights, w)
@@ -37,7 +37,7 @@ end
 function calculateError(out, pred)
     diff = out .- pred;
     sq = diff .* diff;
-    sqrt(sumAll(sq)) / elements(sq)
+    sqrt(sumAll(Float32, sq)) / elements(sq)
 end
 
 function forwardPropagate(ann::ANN, input)

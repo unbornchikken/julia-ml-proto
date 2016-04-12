@@ -1,11 +1,11 @@
 export MNISTData
 
-immutable MNISTData{D}
+immutable MNISTData{B}
 	numClasses::Int
 	numTrain::Int
 	numTest::Int
-	trainImages::AFArray{D, Float32, 3}
-	testImages::AFArray{D, Float32, 3}
-	trainLabels::AFArray{D}
-	testLabels::AFArray{D}
+	trainImages::AFArray{B}
+	testImages::AFArray{B}
+	trainLabels::AFArray{B}
+	testLabels::AFArray{B}
 end
