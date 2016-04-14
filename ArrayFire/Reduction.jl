@@ -1,6 +1,6 @@
-import Base: min, max, sum
+import Base: min, max, sum, count
 
-export max, maxAll, imax, imaxAll, min, minAll, imin, iminAll, sum, sumAll
+export max, imax, min, imin, sum, count
 
 immutable Reduction <: AFImpl
     max::Ptr{Void}
@@ -15,6 +15,8 @@ immutable Reduction <: AFImpl
     sumNan::Ptr{Void}
     sumAll::Ptr{Void}
     sumNanAll::Ptr{Void}
+    count::Ptr{Void}
+    countAll::Ptr{Void}
 
     function Reduction(ptr)
         new(
@@ -29,7 +31,9 @@ immutable Reduction <: AFImpl
             Libdl.dlsym(ptr, :af_sum),
             Libdl.dlsym(ptr, :af_sum_nan),
             Libdl.dlsym(ptr, :af_sum_all),
-            Libdl.dlsym(ptr, :af_sum_nan_all)
+            Libdl.dlsym(ptr, :af_sum_nan_all),
+            Libdl.dlsym(ptr, :af_count),
+            Libdl.dlsym(ptr, :af_count_all)
         )
     end
 end
@@ -47,7 +51,7 @@ macro minMaxRed(regular, all, indexed, indexedAll)
             array(af, result[])
         end
 
-        function $(esc(all)){T<:Real}(::Type{T}, arr::AFArray)
+        function $(esc(regular)){T<:Real}(::Type{T}, arr::AFArray)
             verifyAccess(arr)
             af = arr.af
             real = af.results.double
@@ -71,7 +75,7 @@ macro minMaxRed(regular, all, indexed, indexedAll)
             array(af, result[]), array(af, idx[])
         end
 
-        function $(esc(indexedAll)){T<:Real}(::Type{T}, arr::AFArray)
+        function $(esc(indexed)){T<:Real}(::Type{T}, arr::AFArray)
             verifyAccess(arr)
             af = arr.af
             real = af.results.double
@@ -88,7 +92,7 @@ end
 
 @minMaxRed(max, maxAll, imax, imaxAll)
 
-@minMaxRed(min, minAll, imin, iminAll)
+@minMaxRed(min, minAll, imin, imaxAll)
 
 function sum(arr::AFArray, dim::Int = -1)
     verifyAccess(arr)
@@ -112,7 +116,7 @@ function sum{T<:Union{Float32,Float64}}(arr::AFArray, dim::Int, nanVal::T)
     array(af, result[])
 end
 
-function sumAll{T<:Real}(::Type{T}, arr::AFArray)
+function sum{T<:Real}(::Type{T}, arr::AFArray)
     verifyAccess(arr)
     af = arr.af
     real = af.results.double
@@ -124,7 +128,7 @@ function sumAll{T<:Real}(::Type{T}, arr::AFArray)
     T(real[])
 end
 
-function sumAll{T<:Union{Float32,Float64}}(arr::AFArray, nanVal::T)
+function sum{T<:Union{Float32,Float64}}(arr::AFArray, nanVal::T)
     verifyAccess(arr)
     af = arr.af
     real = af.results.double
@@ -134,4 +138,27 @@ function sumAll{T<:Union{Float32,Float64}}(arr::AFArray, nanVal::T)
         real, imag, arr.ptr, nanVal)
     assertErr(err)
     real[]
+end
+
+function count(arr::AFArray, dim::Int = -1)
+    verifyAccess(arr)
+    af = arr.af
+    result = af.results.ptr
+    err = ccall(af.reduction.count,
+        Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Int32),
+        result, arr.ptr, Int32(dim < 0 ? firstDim(af, arr.ptr) - 1 : dim))
+    assertErr(err)
+    array(af, result[])
+end
+
+function count{T<:Real}(::Type{T}, arr::AFArray)
+    verifyAccess(arr)
+    af = arr.af
+    real = af.results.double
+    imag = af.results.double2
+    err = ccall(af.reduction.countAll,
+        Cint, (Ptr{Float64}, Ptr{Float64}, Ptr{Void}),
+        real, imag, arr.ptr)
+    assertErr(err)
+    T(real[])
 end

@@ -11,7 +11,7 @@ include("ANN.jl")
 function accuracy(predicted, target)
     pMaxArray, pMaxIndex = imax(predicted, 1)
     tMaxArray, tMaxIndex = imax(target, 1)
-    (100.0f0 * count(pMaxIndex .== tMaxIndex)) / elements(tMaxIndex)
+    (100.0f0 * count(Float32, pMaxIndex .== tMaxIndex)) / elements(tMaxIndex)
 end
 
 function runDemo(af)

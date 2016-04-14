@@ -23,16 +23,14 @@ type AFArray{B}
         err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, 4, dims, f32)
         assertErr(err)
         me = new(af, ptr[])
-        finalizer(me, release!)
-        register!(af, me)
+        register!(af, me) || finalizer(me, release!)
         me
     end
 
     function AFArray(af::ArrayFire{B}, ptr::Ptr{Void}, wrap = true)
         me = new(af, ptr)
         if wrap
-            finalizer(me, release!)
-            register!(af, me)
+            register!(af, me) || finalizer(me, release!)
         end
         me
     end
@@ -43,8 +41,7 @@ type AFArray{B}
         err = ccall(af.createArray, Cint, (Ptr{Ptr{Void}}, Ptr{T}, Cuint, Ptr{DimT}, DType), ptr, pointer(arr), 4, pointer(dims), asDType(T))
         assertErr(err)
         me = new(af, ptr[])
-        finalizer(me, release!)
-        register!(af, me)
+        register!(af, me) || finalizer(me, release!)
         me
     end
 
@@ -54,8 +51,7 @@ type AFArray{B}
         err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, 4, pointer(dims), asDType(T))
         assertErr(err)
         me = new(af, ptr[])
-        finalizer(me, release!)
-        register!(af, me)
+        register!(af, me) || finalizer(me, release!)
         me
     end
 end
@@ -204,6 +200,7 @@ function elements(af::ArrayFire, ptr::Ptr{Void})
 end
 
 function host(arr::AFArray)
+    verifyAccess(arr)
     verifyNotEmpty(arr)
     result = Array{jType(arr)}(size(arr)...)
     _host(arr, result)

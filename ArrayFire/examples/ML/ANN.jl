@@ -37,7 +37,7 @@ end
 function calculateError(out, pred)
     diff = out .- pred;
     sq = diff .* diff;
-    sqrt(sumAll(Float32, sq)) / elements(sq)
+    sqrt(sum(Float32, sq)) / elements(sq)
 end
 
 function forwardPropagate(ann::ANN, input)
@@ -85,6 +85,7 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
     numBatches = Int(floor(numSamples / options.batchSize))
 
     err = 0.0f0
+    allSec = 0.0f0
 
     for i in 1:options.maxEpochs
         scope!(af) do this
@@ -109,8 +110,13 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
                 outVec = predict(ann, input[Seq(startPos, endPos), :])
                 err = calculateError(outVec, target[Seq(startPos, endPos), :])
             end
+            
+            allSec += sec;
 
-            println("Epoch: $i, Error: $err, Duration: $sec seconds")
+            if i % 10 == 0
+                println("Epoch: $i, Error: $err, Duration: $(allSec / 10.0f0) seconds")
+                allSec = 0.0f0
+            end
         end
 
         # Check if convergence criteria has been met
