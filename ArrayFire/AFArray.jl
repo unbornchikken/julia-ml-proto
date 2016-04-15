@@ -37,7 +37,7 @@ type AFArray{B}
 
     function AFArray{T, N}(af::ArrayFire{B}, arr::Array{T, N})
         ptr = af.results.ptr
-        dims = fill(af.results.dims, size(arr)...)
+        dims = collectDims(af.results.dims, size(arr))
         err = ccall(af.createArray, Cint, (Ptr{Ptr{Void}}, Ptr{T}, Cuint, Ptr{DimT}, DType), ptr, pointer(arr), 4, pointer(dims), asDType(T))
         assertErr(err)
         me = new(af, ptr[])
@@ -47,7 +47,7 @@ type AFArray{B}
 
     function AFArray{T}(af::ArrayFire{B}, ::Type{T}, dims::DimT...)
         ptr = af.results.ptr
-        dims = fill(af.results.dims, dims...)
+        dims = collectDims(af.results.dims, dims)
         err = ccall(af.createHandle, Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType), ptr, 4, pointer(dims), asDType(T))
         assertErr(err)
         me = new(af, ptr[])

@@ -34,7 +34,7 @@ end
 
 function randn{B, T}(af::ArrayFire{B}, ::Type{T}, dims::DimT...)
     ptr = af.results.ptr
-    dims2 = collect(dims)
+    dims2 = collectDims(af.results.dims, dims)
     err = ccall(af.create.randn,
         Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType),
         ptr, length(dims2), pointer(dims2), asDType(T))
@@ -44,7 +44,7 @@ end
 
 function randu{B, T}(af::ArrayFire{B}, ::Type{T}, dims::DimT...)
     ptr = af.results.ptr
-    dims2 = collect(dims)
+    dims2 = collectDims(af.results.dims, dims)
     err = ccall(af.create.randu,
         Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, DType),
         ptr, length(dims2), pointer(dims2), asDType(T))
@@ -54,7 +54,7 @@ end
 
 function constant{B, T<:Real}(af::ArrayFire{B}, value::T, dims::DimT...)
     ptr = af.results.ptr
-    dims2 = collect(dims)
+    dims2 = collectDims(af.results.dims, dims)
     err = ccall(af.create.constant,
         Cint, (Ptr{Ptr{Void}}, Float64, Cuint, Ptr{DimT}, DType),
         ptr, Float64(value), length(dims2), pointer(dims2), asDType(T))
@@ -64,7 +64,7 @@ end
 
 function constant{B}(af::ArrayFire{B}, value::Int64, dims::DimT...)
     ptr = af.results.ptr
-    dims2 = collect(dims)
+    dims2 = collectDims(af.results.dims, dims)
     err = ccall(af.create.constantLong,
         Cint, (Ptr{Ptr{Void}}, Int64, Cuint, Ptr{DimT}, DType),
         ptr, value, length(dims2), pointer(dims2), asDType(Int64))
@@ -74,7 +74,7 @@ end
 
 function constant{B}(af::ArrayFire{B}, value::UInt64, dims::DimT...)
     ptr = af.results.ptr
-    dims2 = collect(dims)
+    dims2 = collectDims(af.results.dims, dims)
     err = ccall(af.create.constantLong,
         Cint, (Ptr{Ptr{Void}}, UInt64, Cuint, Ptr{DimT}, DType),
         ptr, value, length(dims2), pointer(dims2), asDType(UInt64))

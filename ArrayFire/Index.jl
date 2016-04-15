@@ -70,24 +70,22 @@ end
     end
 end
 
-function indexGen{I<:AFIndex}(arr::AFArray, indices::I...)
-    indices2 = collect(indices)
+function indexGen{I<:AFIndex}(arr::AFArray, indices::Vector{I})
     af = arr.af
     ptr = af.results.ptr
     err = ccall(af.index.indexGen,
         Cint, (Ptr{Ptr{Void}}, Ptr{Void}, DimT, Ptr{I}),
-        ptr, arr.ptr, length(indices2), pointer(indices2))
+        ptr, arr.ptr, length(indices), pointer(indices))
     assertErr(err)
     array(af, ptr[])
 end
 
-function assignGen{B, I<:AFIndex}(arr::AFArray{B}, rhs::AFArray{B}, indices::I...)
-    indices2 = collect(indices)
+function assignGen{B, I<:AFIndex}(arr::AFArray{B}, rhs::AFArray{B}, indices::Vector{I})
     af = arr.af
     ptr = af.results.ptr
     err = ccall(af.index.assignGen,
         Cint, (Ptr{Ptr{Void}}, Ptr{Void}, DimT, Ptr{I}, Ptr{Void}),
-        ptr, arr.ptr, length(indices2), pointer(indices2), rhs.ptr)
+        ptr, arr.ptr, length(indices), pointer(indices), rhs.ptr)
     assertErr(err)
     ptr[]
 end
@@ -110,7 +108,7 @@ end
 
 @generated function getindex(arr::AFArray, args...)
     exp = genIndices(arr, args...)
-    :( verifyAccess(arr); $exp; indexGen(arr, indices...) )
+    :( verifyAccess(arr); $exp; indexGen(arr, indices) )
 end
 
 @generated function setindex!{V}(arr::AFArray, rhs::V, args...)
@@ -121,7 +119,7 @@ end
             $exp
             val = constant(arr.af, rhs, genDims(arr, indices...)...)
             try
-                outPtr = assignGen(arr, val, indices...)
+                outPtr = assignGen(arr, val, indices)
                 if arr.ptr != outPtr
                     release!(arr)
                     arr.ptr = outPtr
@@ -134,7 +132,7 @@ end
         quote
             verifyAccess(arr)
             $exp
-            outPtr = assignGen(arr, rhs, indices...)
+            outPtr = assignGen(arr, rhs, indices)
             if arr.ptr != outPtr
                 release!(arr)
                 arr.ptr = outPtr
@@ -164,13 +162,14 @@ function genDims(arr::AFArray, indices::SeqIndex...)
 end
 
 function genIndices{B}(arr::Type{AFArray{B}}, args::Type...)
-    exp = :( indices = Array{AFIndex}(length(args)) )
+    if length(args) == 1 && args[1] <: AFArray{B}
+		:( Vector{ArrayIndex}([args[1]]) )
+	end
+    exp = :( indices = Vector{SeqIndex}(length(args)) )
     i = 1
     for arg in args
         if is(arg, Seq)
             exp = :( $exp; indices[$i] = SeqIndex(args[$i], arr.af.batch) )
-        elseif arg <: AFArray{B}
-            exp = :( verifyAccess(args[$i]); $exp; indices[$i] = ArrayIndex(args[$i], arr.af.batch) )
         elseif is(arg, Int)
             exp = :( $exp; indices[$i] = SeqIndex(args[$i] > 0 ? args[$i] - 1 : args[$i], arr.af.batch) )
         elseif is(arg, UnitRange{Int})

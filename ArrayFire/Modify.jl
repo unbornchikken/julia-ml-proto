@@ -18,7 +18,7 @@ function moddims(arr::AFArray, dims::DimT...)
     verifyAccess(arr)
     af = arr.af
     ptr = af.results.ptr
-    dims2 = collect(dims)
+    dims2 = collectDims(af.results.dims, dims)
     err = ccall(af.modify.moddims,
         Cint, (Ptr{Ptr{Void}}, Ptr{Void}, DimT, Ptr{DimT}),
         ptr, arr.ptr, length(dims2), pointer(dims2))

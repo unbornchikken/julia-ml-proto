@@ -44,7 +44,11 @@ Results() = Results(
     Ref{Float64}(0.0),
     Ref{UInt32}(0))
 
-function fill(dims::Vector{DimT}, values::DimT...)
+function collectDims(dims::Vector{DimT}, values::DimT...)
+    return collectDims(values)
+end
+
+function collectDims(dims::Vector{DimT}, values)
     idx = 1
     for v in values
         dims[idx] = v
