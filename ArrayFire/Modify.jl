@@ -46,12 +46,12 @@ end
         end
     else
         quote
-            arrPtrs = map(arr -> (verifyAccess(arr); arr.ptr), collect(arrays))
+            len, arrPtrs = collectArrayPointers(arrays)
             af = arrays[1].af
             ptr = af.results.ptr
             err = ccall(af.modify.join_many,
                 Cint, (Ptr{Ptr{Void}}, Int32, UInt32, Ptr{Ptr{Void}}),
-                ptr, dim, length(arrPtrs), pointer(arrPtrs))
+                ptr, dim, len, pointer(arrPtrs))
             assertErr(err)
             array(af, ptr[])
         end
