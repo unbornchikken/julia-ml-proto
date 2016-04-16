@@ -6,19 +6,19 @@ testOnAllBackends("Binary Operators") do af
 	result = afArr ./ 2
 	@test host(result) == [[0, 1] [1, 2]]
 
-	println("\t.+=")
-	result .+= 1
+	println("\taddAssign!")
+	addAssign!(result, 1)
 	@test host(result) == [[1, 2] [2, 3]]
 
 	println("\t.*=")
 	result .*= 2
 	@test host(result) == [[2, 4] [4, 6]]
 
-	println("\t.-=")
-	result .-= 1.5f0
+	println("\tsubAssign!")
+	subAssign!(result, 1.5f0)
 	@test host(result) == [[0.5f0, 2.5f0] [2.5f0, 4.5f0]]
 
-	println("\t.\=")
+	println("\t.\\=")
 	result .\= 2.0
 	@test host(result) == [[4.0, 0.8] [0.8, 0.4444444444444444]]
 
@@ -28,12 +28,12 @@ testOnAllBackends("Binary Operators") do af
 	result = afArr ./ array(af, [[2, 2] [2, 2]])
 	@test host(result) == [[0, 1] [1, 2]]
 
-	println("\t.+=")
-	result .+= array(af, [[1, 1] [1, 1]])
+	println("\taddAssign!")
+	addAssign!(result, array(af, [[1, 1] [1, 1]]))
 	@test host(result) == [[1, 2] [2, 3]]
 
-	println("\t.*=")
-	result .*= array(af, [[2, 2] [2, 2]])
+	println("\tmulAssign!")
+	mulAssign!(result, array(af, [[2, 2] [2, 2]]))
 	@test host(result) == [[2, 4] [4, 6]]
 
 	println("\t.-=")

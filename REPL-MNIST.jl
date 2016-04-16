@@ -1,7 +1,7 @@
 include("ArrayFire/examples/ML/ANNDemo.jl")
 using AF, ANNDemo
 
-af = ArrayFire{CUDA}()
+af = ArrayFire{OpenCL}()
 
 setDevice(af, 0)
 setSeed(af, 42)

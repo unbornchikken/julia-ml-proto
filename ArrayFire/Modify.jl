@@ -46,8 +46,8 @@ end
         end
     else
         quote
-            len, arrPtrs = collectArrayPointers(arrays)
             af = arrays[1].af
+			len, arrPtrs = collectArrayPointers(af.results.pointers, arrays)
             ptr = af.results.ptr
             err = ccall(af.modify.join_many,
                 Cint, (Ptr{Ptr{Void}}, Int32, UInt32, Ptr{Ptr{Void}}),

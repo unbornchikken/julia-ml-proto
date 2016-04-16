@@ -163,7 +163,7 @@ end
 
 function genIndices{B}(arr::Type{AFArray{B}}, args::Type...)
     if length(args) == 1 && args[1] <: AFArray{B}
-		:( Vector{ArrayIndex}([args[1]]) )
+		return :( indices = Vector{ArrayIndex}([ArrayIndex(args[1])]) )
 	end
     exp = :( indices = Vector{SeqIndex}(length(args)) )
     i = 1
@@ -182,7 +182,7 @@ function genIndices{B}(arr::Type{AFArray{B}}, args::Type...)
         elseif is(arg, Span)
             exp = :( $exp; indices[$i] = SeqIndex(1, 1, 0, arr.af.batch) )
         else
-            error("Unknown argument type at $i")
+            error("Unknown arguments: $args")
         end
         i = i + 1
     end

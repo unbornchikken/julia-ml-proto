@@ -4,6 +4,8 @@ export .<, .>, .<=, .>=, .==, .!=, and, or, maxOf, minOf
 import Base: .+, .-, .*, ./, .\
 export .+, .-, .*, ./, .\
 
+export addAssign!,subAssign!,divAssign!,mulAssign!
+
 immutable Binary <: AFImpl
     le::Ptr{Void}
     lt::Ptr{Void}
@@ -115,3 +117,63 @@ end
 function .\(lhs::Number, rhs::AFArray)
     rhs ./ lhs
 end
+
+macro binOpAssign(op, cFunc)
+    quote
+        function $(esc(op)){B}(lhs::AFArray{B}, rhs::AFArray{B})
+            verifyAccess(lhs)
+            verifyAccess(rhs)
+            af = lhs.af
+            result = af.results.ptr
+            err = ccall(af.binary.$cFunc,
+                Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
+                result, lhs.ptr, rhs.ptr, af.batch)
+            assertErr(err)
+			updatePtr(lhs, result[])
+        end
+
+        function $(esc(op)){B}(lhs::AFArray{B}, rhsConst::Number)
+            verifyAccess(lhs)
+            af = lhs.af
+            result = af.results.ptr
+            rhs = constant(af, rhsConst, size(lhs)...)
+            try
+                err = ccall(af.binary.$cFunc,
+                    Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
+                    result, lhs.ptr, rhs.ptr, af.batch)
+                assertErr(err)
+                updatePtr(lhs, result[])
+            finally
+                release!(rhs)
+            end
+        end
+
+        function $(esc(op)){B}(lhsConst::Number, rhs::AFArray{B})
+            verifyAccess(rhs)
+            af = rhs.af
+            result = af.results.ptr
+            lhs = constant(af, lhsConst, size(rhs)...)
+            try
+                err = ccall(af.binary.$cFunc,
+                    Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
+                    result, lhs.ptr, rhs.ptr, af.batch)
+                assertErr(err)
+                updatePtr(lhs, result[])
+            finally
+                release!(lhs)
+            end
+        end
+    end
+end
+
+function updatePtr(arr::AFArray, ptr::Ptr{Void})
+	if ptr != arr.ptr
+		release!(arr.af, arr.ptr)
+		arr.ptr = ptr
+	end
+end
+
+@binOpAssign(addAssign!, add)
+@binOpAssign(subAssign!, sub)
+@binOpAssign(mulAssign!, mul)
+@binOpAssign(divAssign!, div)
