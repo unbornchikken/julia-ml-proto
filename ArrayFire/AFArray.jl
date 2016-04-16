@@ -72,8 +72,6 @@ function release!(arr::AFArray)
     if (arr.ptr != C_NULL)
         release!(arr.af, arr.ptr)
         arr.ptr = C_NULL
-    else
-        false
     end
 end
 

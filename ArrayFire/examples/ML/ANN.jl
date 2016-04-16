@@ -28,7 +28,9 @@ function ANN{B}(af::ArrayFire{B}, layers::Vector{Int}, range = 0.05f0)
     ANN(af, numLayers, signal, weights)
 end
 
-deriv(out) = out .* (1.0f0 .- out)
+function deriv(out)
+    out .* (1.0f0 .- out)
+end
 
 function addBias(ann::ANN, input)
     joinArrays(1, constant(ann.af, 1.0f0, dims(input, 0)), input)
@@ -66,10 +68,10 @@ backPropagate(ann::ANN, target, alpha::Float32) = scope!(ann.af) do this
 
             # Input to current layer is output of previous
             outVec = ann.signal[i]
-            err[] = matmulTT(delta, ann.weights[i])
+            allErr = matmulTT(delta, ann.weights[i])
 
             # Remove the error of bias and propagate backward
-            err[] = err[:, Seq(1, dims(outVec, 1))]
+            err[] = allErr[:, Seq(1, dims(outVec, 1))]
         end
     end
 end
@@ -110,11 +112,11 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
                 outVec = predict(ann, input[Seq(startPos, endPos), :])
                 err = calculateError(outVec, target[Seq(startPos, endPos), :])
             end
-            
+
             allSec += sec;
 
             if i % 10 == 0
-                println("Epoch: $i, Error: $err, Duration: $(allSec / 10.0f0) seconds")
+                println("Epoch: $i, Error: $err, Duration: $allSec seconds")
                 allSec = 0.0f0
             end
         end
