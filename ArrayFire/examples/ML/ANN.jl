@@ -89,6 +89,8 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
     err = 0.0f0
     allSec = 0.0f0
 
+	sync(af)
+
     for i in 1:options.maxEpochs
         scope!(af) do this
             sec = @elapsed begin
