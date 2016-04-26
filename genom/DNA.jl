@@ -39,7 +39,7 @@ end
     end
 end
 
-size(dna::DNA) = size(dna.array)[1]
+size(dna::DNA) = dims(dna.array, 0)
 
 zero!(dna::DNA) = dna.array[:] = 0.0f0
 
@@ -87,7 +87,7 @@ function normalize!(dna::DNA)
     end
 end
 
-Array(dna::DNA) = host(dna.array)
+Array(dna::DNA) = Array(dna.array)
 
 copy(dna::DNA) = DNA(dna)
 
