@@ -7,27 +7,19 @@ type DNA{C, A}
     array::A
 
     function DNA(ctx, size::Int)
-        me = new(ctx, constant(ctx, 0.0f0, size))
-        finalizer(me, release!)
-        me
+        new(ctx, constant(ctx, 0.0f0, size))
     end
 
     function DNA(ctx, arr::A)
-        me = new(ctx, copy(arr))
-        finalizer(me, release!)
-        me
+        new(ctx, copy(arr))
     end
 
     function DNA(other::DNA{A})
-        me = new(other.ctx, copy(other.arr))
-        finalizer(me, release!)
-        me
+        new(other.ctx, copy(other.arr))
     end
 
     function DNA(ctx, arr::Vector{Float32})
-        me = new(ctx, array(ctx, arr))
-        finalizer(me, release!)
-        me
+        new(ctx, array(ctx, arr))
     end
 end
 
