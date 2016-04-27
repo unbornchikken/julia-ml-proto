@@ -1,4 +1,7 @@
+import Base: Array, copy
+
 export
+    Array,
     AFArray,
     array,
     getBackend,
@@ -10,7 +13,8 @@ export
     jType,
     numdims,
     isEmpty,
-    elements
+    elements,
+    copy
 
 type AFArray{B}
     af::ArrayFire{B}
@@ -218,5 +222,9 @@ function _host{T, N}(arr::AFArray, to::Array{T, N})
     assertErr(err)
     to
 end
+
+Array(arr::AFArray) = host(arr)
+
+copy(arr::AFArray) = arr[]
 
 verifyNotEmpty(arr::AFArray) = isEmpty(arr) && error("Array is empty.")

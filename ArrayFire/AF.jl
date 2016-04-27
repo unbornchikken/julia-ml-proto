@@ -28,6 +28,7 @@ type ArrayFire{T<:Backend}
     reduction::AFImpl
     math::AFImpl
     linAlg::AFImpl
+    moveAndReorder::AFImpl
     createHandle::Ptr{Void}
     createArray::Ptr{Void}
     retainArray::Ptr{Void}
@@ -56,6 +57,7 @@ type ArrayFire{T<:Backend}
             Reduction(ptr),
             Math(ptr),
             LinAlg(ptr),
+            MoveAndReorder(ptr),
             Libdl.dlsym(ptr, :af_create_handle),
             Libdl.dlsym(ptr, :af_create_array),
             Libdl.dlsym(ptr, :af_retain_array),
@@ -98,6 +100,7 @@ include("Modify.jl")
 include("Reduction.jl")
 include("Math.jl")
 include("LinAlg.jl")
+include("MoveAndReorder.jl")
 include("FreeList.jl")
 
 immutable ScopeHandle

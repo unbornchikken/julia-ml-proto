@@ -7,7 +7,7 @@ type DNA{C, A}
     array::A
 
     function DNA(ctx, size::Int)
-        new(ctx, constant(ctx, 0.0f0, size))
+        new(ctx, constant(ctx, 0f0, size))
     end
 
     function DNA(ctx, arr::A)
@@ -33,22 +33,22 @@ end
 
 size(dna::DNA) = dims(dna.array, 0)
 
-zero!(dna::DNA) = dna.array[:] = 0.0f0
+zero!(dna::DNA) = dna.array[:] = 0f0
 
-function randomizeUniform!(dna::DNA, strength = 1.0f0)
+function randomizeUniform!(dna::DNA, strength = 1f0)
     scope!(dna.ctx) do this
         dna.array[] = randu(dna.ctx, Float32, size(dna)) .* strength
     end
 end
 
-function mutate!(dna::DNA, probability = 0.0f0, strength = 0.0f0, normalize = true)
-    if probability <= 0.0f0 || strength <= 0.0f0
+function mutate!(dna::DNA, probability = 0f0, strength = 0f0, normalize = true)
+    if probability <= 0f0 || strength <= 0f0
         return
     end
 
     scope!(dna.ctx) do this
         dnaSize = size(dna)
-        values = dna.array .+ ((randu(dna.ctx, Float32, dnaSize) .* strength) - strength / 2.0f0)
+        values = dna.array .+ ((randu(dna.ctx, Float32, dnaSize) .* strength) - strength / 2f0)
         prob = randu(dna.ctx, Float32, dnaSize)
         where = prob .< probability
         dna.array[] = select(where, values, normalize ? _normalizedArray(dna.array) : dna.array)

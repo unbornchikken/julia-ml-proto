@@ -6,4 +6,6 @@ using Reexport
 
 @reexport using AF
 
+include("genome/DNA.jl")
+
 end

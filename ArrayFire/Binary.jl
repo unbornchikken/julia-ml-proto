@@ -1,10 +1,10 @@
 import Base: .<, .>, .<=, .>=, .==, .!=
 export .<, .>, .<=, .>=, .==, .!=, and, or, maxOf, minOf
 
-import Base: .+, .-, .*, ./, .\
-export .+, .-, .*, ./, .\
+import Base: .+, .-, .*, ./, .\, .%
+export .+, .-, .*, ./, .\, .%
 
-export addAssign!,subAssign!,divAssign!,mulAssign!
+export addAssign!,subAssign!,divAssign!,mulAssign!,modAssign!
 
 immutable Binary <: AFImpl
     le::Ptr{Void}
@@ -21,6 +21,7 @@ immutable Binary <: AFImpl
     div::Ptr{Void}
     maxOf::Ptr{Void}
     minOf::Ptr{Void}
+    mod::Ptr{Void}
 
     function Binary(ptr)
         new(
@@ -37,7 +38,8 @@ immutable Binary <: AFImpl
             Libdl.dlsym(ptr, :af_mul),
             Libdl.dlsym(ptr, :af_div),
             Libdl.dlsym(ptr, :af_maxof),
-            Libdl.dlsym(ptr, :af_minof)
+            Libdl.dlsym(ptr, :af_minof),
+            Libdl.dlsym(ptr, :af_mod)
         )
     end
 end
@@ -103,6 +105,7 @@ end
 @binOp(.-, sub)
 @binOp(.*, mul)
 @binOp(./, div)
+@binOp(.%, mod)
 @binOp(maxOf, maxOf)
 @binOp(minOf, minOf)
 
@@ -129,7 +132,7 @@ macro binOpAssign(op, cFunc)
                 Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Ptr{Void}, Bool),
                 result, lhs.ptr, rhs.ptr, af.batch)
             assertErr(err)
-			updatePtr(lhs, result[])
+            updatePtr(lhs, result[])
         end
 
         function $(esc(op)){B}(lhs::AFArray{B}, rhsConst::Number)
@@ -167,13 +170,14 @@ macro binOpAssign(op, cFunc)
 end
 
 function updatePtr(arr::AFArray, ptr::Ptr{Void})
-	if ptr != arr.ptr
-		release!(arr.af, arr.ptr)
-		arr.ptr = ptr
-	end
+    if ptr != arr.ptr
+        release!(arr.af, arr.ptr)
+        arr.ptr = ptr
+    end
 end
 
 @binOpAssign(addAssign!, add)
 @binOpAssign(subAssign!, sub)
 @binOpAssign(mulAssign!, mul)
 @binOpAssign(divAssign!, div)
+@binOpAssign(modAssign!, mod)

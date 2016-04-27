@@ -7,12 +7,12 @@ using Base.Test
 
 function testOnAllBackends(f, title)
     for b in getSupportedBackends()
-        print("DEGIN: $title - $b\n")
+        print("DEGIN: $title on $b\n")
         af = ArrayFire{b}()
         scope!(af) do this
             f(af)
         end
-        print("DONE: $title - $b\n")
+        print("DONE: $title on $b\n")
     end
 end
 
