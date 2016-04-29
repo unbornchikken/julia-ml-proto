@@ -50,7 +50,7 @@ function decode(rule::MultiScalarRule, pars)
     end
 end
 
-function asValue(rule::ScalarRule, values, startIndex)
+function asValue(rule::MultiScalarRule, values, startIndex)
     result = Vector(rule.resultSize)
     for i in 1:rule.resultSize
         result[i] = values[startIndex + i]

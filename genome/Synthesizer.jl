@@ -64,12 +64,12 @@ function define!(syn::Synthesizer, rule::SynthRule)
 end
 
 function dnaSize!(syn::Synthesizer)
-    isnull(syn._dnaSize) && syn._dnaSize = sum(map(rule -> dnaSize(rule), syn.rules))
+    isnull(syn._dnaSize) && (syn._dnaSize = syn.rules |> rule -> dnaSize(rule) |> sum)
     get(syn._dnaSize)
 end
 
 function resultSize!(syn::Synthesizer)
-    isnull(syn._resultSize) && syn._resultSize = sum(map(rule -> resultSize(rule), syn.rules))
+    isnull(syn._resultSize) && (syn._resultSize = syn.rules |> rule -> resultSize(rule) |> sum)
     get(syn._resultSize)
 end
 
@@ -105,7 +105,7 @@ function decodeAsContextArray{C}(syn::Synthesizer{C}, dna::DNA{C})
 end
 
 function decode{C}(syn::Synthesizer{C}, dna::DNA{C}, asContextArray::Bool)
-    isnull(asContextArray) && asContextArray = syn.options.asContextArray
+    isnull(asContextArray) && (asContextArray = syn.options.asContextArray)
 
     scope(syn.ctx) do this
         array = Array(decodeAsContextArray(syn, dna))
@@ -124,7 +124,7 @@ end
 
 function decodeAt(syn::Synthesizer, array, items::Vector{DecodeRule})
     all = Vector()
-    for item of items
+    for item in items
         local rule
         if is(item.rule, Int)
             rule = syn.rules[item.rule]
