@@ -73,7 +73,7 @@ function resultSize!(syn::Synthesizer)
     get(syn._resultSize)
 end
 
-function decodeAsContextArray(syn::Synthesizer, dna::DNA)
+function decodeAsContextArray{C}(syn::Synthesizer{C}, dna::DNA{C})
     result = constant(syn.ctx, 0f0, resultSize!(syn))
 
     dnaBeginIndex = 0
@@ -104,7 +104,7 @@ function decodeAsContextArray(syn::Synthesizer, dna::DNA)
     result
 end
 
-function decode(syn::Synthesizer, dna::DNA, asContextArray::Bool)
+function decode{C}(syn::Synthesizer{C}, dna::DNA{C}, asContextArray::Bool)
     isnull(asContextArray) && asContextArray = syn.options.asContextArray
 
     scope(syn.ctx) do this
