@@ -28,8 +28,8 @@ immutable DecodePars{C, A, S}
     state
 end
 
-#DecodePars{C, A, S}(ctx::C, dnaFragment::A, result::A, resultSeq::S, state) =
-#    DecodePars{C, A, S}(ctx, dnaFragment, result, resultSeq, state)
+DecodePars{C, A, S}(ctx::C, dnaFragment::A, result::A, resultSeq::S, state) =
+    DecodePars{C, A, S}(ctx, dnaFragment, result, resultSeq, state)
 
 immutable DecodeRule{R}
     rule::R

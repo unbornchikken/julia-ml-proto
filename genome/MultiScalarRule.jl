@@ -26,7 +26,7 @@ dnaSize(rule::MultiScalarRule) = rule.dnaSize
 resultSize(rule::MultiScalarRule) = rule.count
 
 function initialize!(rule::MultiScalarRule, ctx, state)
-    setindex!(state, range(ctx, Float32, rule.count, 0), :range)
+    state[:s] = range(ctx, Float32, rule.count, 0)
 end
 
 function decode(rule::MultiScalarRule, pars)
@@ -37,7 +37,7 @@ function decode(rule::MultiScalarRule, pars)
         rnd = randu(pars.ctx, Float32, rule.count, rule.depth)
         test = rnd ./ max(dist, 0.000001f0)
         idx, max = imax(test, 1)
-        idx2 = idx .* rule.count .+ pars.state[:range]
+        idx2 = idx .* rule.count .+ pars.state[:s]
         result = values[idx2]
 
         if rule.min == 0f0 && rule.max == 1f0

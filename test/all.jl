@@ -16,5 +16,6 @@ function testOnAllContexts(f, title)
 end
 
 include("dna.jl")
+include("synthesizer.jl")
 
 end
