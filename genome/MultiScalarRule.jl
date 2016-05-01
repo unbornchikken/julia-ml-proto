@@ -26,17 +26,18 @@ dnaSize(rule::MultiScalarRule) = rule.dnaSize
 resultSize(rule::MultiScalarRule) = rule.count
 
 function initialize!(rule::MultiScalarRule, ctx, state)
-    state[:s] = range(ctx, Float32, rule.count, 0)
+    state[:s] = range(ctx, UInt32, rule.count, 0)
 end
 
 function decode(rule::MultiScalarRule, pars)
     scope!(pars.ctx) do this
-        const blockSize = rule.count * rule.depth
-        values = moddims(pars.dnaFragment[Seq(0, blockSize - 1)], rule.count, rule.depth)
-        dist = moddims(pars.dnaFragment[Seq(blockSize, blockSize * 2 - 1)], rule.count, rule.depth)
-        rnd = randu(pars.ctx, Float32, rule.count, rule.depth)
-        test = rnd ./ max(dist, 0.000001f0)
-        idx, max = imax(test, 1)
+        const depth = rule.variationCount
+        const blockSize = rule.count * depth
+        values = moddims(pars.dnaFragment[Seq(0, blockSize - 1)], rule.count, depth)
+        dist = moddims(pars.dnaFragment[Seq(blockSize, blockSize * 2 - 1)], rule.count, depth)
+        rnd = randu(pars.ctx, Float32, rule.count, depth)
+        test = rnd ./ maxOf(dist, 0.000001f0)
+        max, idx = imax(test, 1)
         idx2 = idx .* rule.count .+ pars.state[:s]
         result = values[idx2]
 

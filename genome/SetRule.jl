@@ -27,10 +27,10 @@ function initialize!(rule::SetRule, ctx, state) end
 function decode(rule::SetRule, pars)
     scope!(pars.ctx) do this
         const depth = length(rule.items)
-        dist = moddims(pars.dnaFragment, rule.count, rule.depth)
-        rnd = randu(pars.ctx, Float32, rule.count, rule.depth)
-        test = rnd ./ max(dist, 0.000001f0)
-        idx, max = imax(test, 1)
+        dist = moddims(pars.dnaFragment, rule.count, depth)
+        rnd = randu(pars.ctx, Float32, rule.count, depth)
+        test = rnd ./ maxOf(dist, 0.000001f0)
+        max, idx = imax(test, 1)
         pars.result[pars.resultSeq] = idx
     end
 end
