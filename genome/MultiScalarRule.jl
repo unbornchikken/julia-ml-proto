@@ -14,7 +14,7 @@ immutable MultiScalarRule <: SynthRule
     variationCount::Int
     dnaSize::Int
 
-    function MultiScalarRule(count = 1, min = 0f0, max = 1f0, round = false, variationCount = 2)
+    function MultiScalarRule(;count = 1, min = 0f0, max = 1f0, round = false, variationCount = 2)
         dnaSize = variationCount * count * 2
 
         new(count, min, max, round, variationCount, dnaSize)
@@ -26,7 +26,7 @@ dnaSize(rule::MultiScalarRule) = rule.dnaSize
 resultSize(rule::MultiScalarRule) = rule.count
 
 function initialize!(rule::MultiScalarRule, ctx, state)
-    state[:s] = range(ctx, UInt32, rule.count, 0)
+    state[:s] = range(ctx, UInt32, [rule.count])
 end
 
 function decode(rule::MultiScalarRule, pars)

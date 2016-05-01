@@ -16,16 +16,18 @@ immutable ScalarRule <: SynthRule
     dnaSize::Int
     resultSize::Int
 
-    function ScalarRule(count = 1, min = 0f0, max = 1f0, round = false, variationCount = 1)
-        _multi = Nullable{MultiScalarRule}()
-        dnaSize = count
-        resultSize = count
+    function ScalarRule(;count = 1, min = 0f0, max = 1f0, round = false, variationCount = 1)
         if variationCount > 1
-            _multi = MultiScalarRule(count, min, max, round, variationCount)
-            dnaSize = dnaSize(_multi)
-            resultSize = resultSize(_multi)
+            multi = MultiScalarRule(
+                count = count,
+                min = min,
+                max = max,
+                round = round,
+                variationCount = variationCount)
+            return new(count, min, max, round, variationCount, multi, dnaSize(multi), resultSize(multi))
         end
-        new(count, min, max, round, variationCount, _multi, dnaSize, resultSize)
+
+        new(count, min, max, round, variationCount, Nullable{MultiScalarRule}(), count, count)
     end
 end
 
