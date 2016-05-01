@@ -1,4 +1,4 @@
-import Base: randn,transpose,transpose!
+import Base: randn,transpose,transpose!,range
 
 export
     randn,
@@ -6,7 +6,8 @@ export
     constant,
     lookup,
     transpose,
-    transpose!
+    transpose!,
+	range
 
 immutable Create <: AFImpl
     randn::Ptr{Void}
@@ -17,6 +18,7 @@ immutable Create <: AFImpl
     lookup::Ptr{Void}
     transpose::Ptr{Void}
     transposeInPlace::Ptr{Void}
+	range::Ptr{Void}
 
     function Create(ptr)
         new(
@@ -27,7 +29,8 @@ immutable Create <: AFImpl
             Libdl.dlsym(ptr, :af_constant_ulong),
             Libdl.dlsym(ptr, :af_lookup),
             Libdl.dlsym(ptr, :af_transpose),
-            Libdl.dlsym(ptr, :af_transpose_inplace)
+            Libdl.dlsym(ptr, :af_transpose_inplace),
+			Libdl.dlsym(ptr, :af_range)
         )
     end
 end
@@ -94,4 +97,13 @@ function transpose!{B}(arr::AFArray{B}, conjugate::Bool = false)
         arr.ptr, conjugate)
     assertErr(err)
     arr
+end
+
+function range{B, T}(af::ArrayFire{B}, ::Type{T}, dims::Dim4, seqDim = 0)
+    ptr = af.results.ptr
+    err = ccall(af.create.range,
+        Cint, (Ptr{Ptr{Void}}, Cuint, Ptr{DimT}, Cint, DType),
+        ptr, length(dims), pointer(dims), seqDim, asDType(T))
+    assertErr(err)
+    AFArray{B}(af, ptr[])
 end
