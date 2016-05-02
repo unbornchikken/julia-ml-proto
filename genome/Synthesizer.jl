@@ -14,12 +14,6 @@ abstract SynthRule
 
 typealias StateDict Dict{Symbol, Any}
 
-immutable SynthesizerOptions
-    asContextArray::Bool
-
-    SynthesizerOptions(asContextArray = false) = new(asContextArray)
-end
-
 immutable DecodePars{C, A, S}
     ctx::C
     dnaFragment::A
@@ -38,19 +32,17 @@ end
 
 type Synthesizer{C}
     ctx::C
-    options::SynthesizerOptions
     rules::Vector{SynthRule}
-    _states::Dict{SynthRule, StateDict}
+    _states::Vector{StateDict}
     _dnaSize::Nullable{Int}
     _resultSize::Nullable{Int}
 end
 
-function Synthesizer{C}(ctx::C, options = SynthesizerOptions())
+function Synthesizer{C}(ctx::C)
     Synthesizer{C}(
         ctx,
-        options,
         Vector{SynthRule}(),
-        Dict{SynthRule, StateDict}(),
+        Vector{StateDict}(),
         Nullable{Int}(),
         Nullable{Int}())
 end
@@ -58,18 +50,19 @@ end
 function define!(syn::Synthesizer, rule::SynthRule)
     push!(syn.rules, rule)
     state = StateDict()
+    push!(syn._states, state)
     initialize!(rule, syn.ctx, state)
     syn._dnaSize = Nullable{Int}()
     syn._resultSize = Nullable{Int}()
 end
 
 function dnaSize!(syn::Synthesizer)
-    isnull(syn._dnaSize) && (syn._dnaSize = syn.rules |> rule -> dnaSize(rule) |> sum)
+    isnull(syn._dnaSize) && (syn._dnaSize = sum(map(rule -> dnaSize(rule), syn.rules)))
     get(syn._dnaSize)
 end
 
 function resultSize!(syn::Synthesizer)
-    isnull(syn._resultSize) && (syn._resultSize = syn.rules |> rule -> resultSize(rule) |> sum)
+    isnull(syn._resultSize) && (syn._resultSize = sum(map(rule -> resultSize(rule), syn.rules)))
     get(syn._resultSize)
 end
 
@@ -79,35 +72,35 @@ function decodeAsContextArray{C}(syn::Synthesizer{C}, dna::DNA{C})
     dnaBeginIndex = 0
     resultBeginIndex = 0
 
+    ruleIndex = 1
     for rule in syn.rules
         scope!(syn.ctx) do this
             const ruleDnaSize = dnaSize(rule)
-            const ruleResultSize = resultSize(rule);
-            const dnaEndIndex = dnaBeginIndex + ruleDnaSize - 1;
-            const resultEndIndex = resultBeginIndex + ruleResultSize - 1;
+            const ruleResultSize = resultSize(rule)
+            const dnaEndIndex = dnaBeginIndex + ruleDnaSize - 1
+            const resultEndIndex = resultBeginIndex + ruleResultSize - 1
 
             pars = DecodePars(
                 syn.ctx,
                 dna.array[Seq(dnaBeginIndex, dnaEndIndex)],
                 result,
                 Seq(resultBeginIndex, resultEndIndex),
-                ctx._state[rule]
+                syn._states[ruleIndex]
             )
 
             decode(rule, pars)
 
             dnaBeginIndex += ruleDnaSize
             resultBeginIndex += ruleResultSize
+            ruleIndex += 1
         end
     end
 
     result
 end
 
-function decode{C}(syn::Synthesizer{C}, dna::DNA{C}, asContextArray::Bool)
-    isnull(asContextArray) && (asContextArray = syn.options.asContextArray)
-
-    scope(syn.ctx) do this
+function decode{C}(syn::Synthesizer{C}, dna::DNA{C})
+    scope!(syn.ctx) do this
         array = Array(decodeAsContextArray(syn, dna))
 
         result = Vector()

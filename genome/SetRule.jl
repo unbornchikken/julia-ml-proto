@@ -35,11 +35,11 @@ function decode(rule::SetRule, pars)
     end
 end
 
-function asValue(rule::SetRule, values, startIndex)
-    result = Vector(rule.resultSize)
-    for i in 1:rule.resultSize
-        itemIndex = values[startIndex + i]
-        result[i] = rule.items[itemIndex]
+function asValues(rule::SetRule, values, startIndex)
+    result = Vector(resultSize(rule))
+    for i in 1:resultSize(rule)
+        itemIndex = values[startIndex - 1 + i]
+        result[i] = rule.items[Int(round(itemIndex + 1))]
     end
     result
 end

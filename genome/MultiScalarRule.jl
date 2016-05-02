@@ -45,16 +45,16 @@ function decode(rule::MultiScalarRule, pars)
             pars.result[pars.resultSeq] = rule.round ? round(result) : result
         else
             const d = rule.max - rule.min
-            result = result .* d + rule.min
+            result = result .* d .+ rule.min
             pars.result[pars.resultSeq] = rule.round ? round(result) : result
         end
     end
 end
 
-function asValue(rule::MultiScalarRule, values, startIndex)
-    result = Vector(rule.resultSize)
-    for i in 1:rule.resultSize
-        result[i] = values[startIndex + i]
+function asValues(rule::MultiScalarRule, values, startIndex)
+    result = Vector(resultSize(rule))
+    for i in 1:resultSize(rule)
+        result[i] = values[startIndex - 1 + i]
     end
     result
 end

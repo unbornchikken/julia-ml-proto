@@ -39,26 +39,30 @@ initialize!(rule::ScalarRule, ctx, state) =
     !isnull(rule._multi) && initialize!(get(rule._multi), ctx, state)
 
 function decode(rule::ScalarRule, pars)
+    if !isnull(rule._multi)
+        return decode(get(rule._multi), pars)
+    end
+
     scope!(pars.ctx) do this
         result = pars.dnaFragment
         if rule.min == 0f0 && rule.max == 1f0
             pars.result[pars.resultSeq] = rule.round ? round(result) : result
         else
             const d = rule.max - rule.min
-            result = result .* d + rule.min
+            result = result .* d .+ rule.min
             pars.result[pars.resultSeq] = rule.round ? round(result) : result
         end
     end
 end
 
-function asValue(rule::ScalarRule, values, startIndex)
+function asValues(rule::ScalarRule, values, startIndex)
     if !isnull(rule._multi)
-        return asValue(rule._multi, values, startIndex)
+        return asValues(get(rule._multi), values, startIndex)
     end
 
-    result = Vector(rule.resultSize)
-    for i in 1:rule.resultSize
-        result[i] = values[startIndex + i]
+    result = Vector(resultSize(rule))
+    for i in 1:resultSize(rule)
+        result[i] = values[startIndex - 1 + i]
     end
     result
 end

@@ -18,7 +18,10 @@ testOnAllContexts("Synthesizer") do ctx
 
     syn = Synthesizer(ctx)
     genes = Vector{Float32}()
-    define!(syn, SetRule(["A", "B", "C"], 3))
+    rule = SetRule(["A", "B", "C"], 3)
+    define!(syn, rule)
+    @test resultSize(rule) == 3
+    @test dnaSize(rule) == 9
 
     push!(genes, 0.1f0)
     push!(genes, 0.1f0)
@@ -30,18 +33,27 @@ testOnAllContexts("Synthesizer") do ctx
     push!(genes, 0.9f0)
     push!(genes, 0.9f0)
 
-    define!(syn, ScalarRule(count = 3))
+    rule = ScalarRule(count = 3)
+    define!(syn, rule)
+    @test resultSize(rule) == 3
+    @test dnaSize(rule) == 3
 
     push!(genes, 0.5f0)
     push!(genes, 0.6f0)
     push!(genes, 0.7f0)
 
-    define!(syn, ScalarRule(count = 3, round = true, min = 1f0, max = 100f0))
+    rule = ScalarRule(count = 2, round = true, min = 1f0, max = 100f0)
+    define!(syn, rule)
+    @test resultSize(rule) == 2
+    @test dnaSize(rule) == 2
 
     push!(genes, 0.5f0)
     push!(genes, 0.6f0)
 
-    define!(syn, ScalarRule(count = 2, round = true, min = 1, max = 100, variationCount = 2))
+    rule = ScalarRule(count = 2, round = true, min = 1, max = 100, variationCount = 2)
+    define!(syn, rule)
+    @test resultSize(rule) == 2
+    @test dnaSize(rule) == 2 * 2 * 2
 
     push!(genes, 0.001f0)
     push!(genes, 0.01f0)
@@ -53,25 +65,29 @@ testOnAllContexts("Synthesizer") do ctx
     push!(genes, 0.12f0)
     push!(genes, 0.2f0)
 
-    # let dna = genevo.genome.createDNA(genes);
-    # let result = yield synth.decodeAsync(dna);
-    #
-    # assert(_.isArray(result));
-    # assert.equal(synth.dnaSize, dna.size);
-    # assert.equal(synth.resultSize, result.length);
-    #
-    # let i = 0;
-    # assert(_.contains(["A", "B", "C"], result[i++]));
-    # assert(_.contains(["A", "B", "C"], result[i++]));
-    # assert(_.contains(["A", "B", "C"], result[i++]));
-    #
-    # assert.equal(_.round(result[i++], 2), 0.5);
-    # assert.equal(_.round(result[i++], 2), 0.6);
-    # assert.equal(_.round(result[i++], 2), 0.7);
-    #
-    # assert.equal(result[i++], 51);
-    # assert.equal(result[i++], 60);
-    #
-    # assert(_.contains([1, 2, 59, 99], result[i++]));
-    # assert(_.contains([1, 2, 59, 99], result[i++]));
+    dna = DNA(ctx, genes)
+    result = decode(syn, dna)
+
+    @test typeof(result) == Vector{Any}
+
+    @test dnaSize!(syn) == length(dna)
+    @test resultSize!(syn) == length(result)
+
+    i = 0
+
+    @test result[i += 1] in ["A", "B", "C"]
+    @test result[i += 1] in ["A", "B", "C"]
+    @test result[i += 1] in ["A", "B", "C"]
+
+    @test result[i += 1] == 0.5f0
+    @test result[i += 1] == 0.6f0
+    @test result[i += 1] == 0.7f0
+
+    @test result[i += 1] == 51f0
+    @test result[i += 1] == 60f0
+
+    @test result[i += 1] in [1, 2, 59, 99]
+    @test result[i += 1] in [1, 2, 59, 99]
+
+    println("TODO: test decodeAt")
 end
