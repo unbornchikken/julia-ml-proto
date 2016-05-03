@@ -18,7 +18,7 @@ testOnAllContexts("Synthesizer") do ctx
 
     syn = Synthesizer(ctx)
     genes = Vector{Float32}()
-    rule = SetRule(["A", "B", "C"], 3)
+    firstRule = rule = SetRule(["A", "B", "C"], 3)
     define!(syn, rule)
     @test resultSize(rule) == 3
     @test dnaSize(rule) == 9
@@ -89,5 +89,41 @@ testOnAllContexts("Synthesizer") do ctx
     @test result[i += 1] in [1, 2, 59, 99]
     @test result[i += 1] in [1, 2, 59, 99]
 
-    println("TODO: test decodeAt")
+    println("\tdecode at")
+    caResult = decodeAsContextArray(syn, dna)
+
+    @test typeof(caResult) != Vector{Any}
+
+    @test resultSize!(syn) == dims(caResult, 0)
+    @test length(size(caResult)) == 1
+    @test resultSize!(syn) ==  size(caResult)[1]
+
+    decoded = decodeAt(syn, caResult, [DecodeRule(firstRule), DecodeRule(2, true), DecodeRule(syn.rules[3], false)])
+    @test typeof(decoded) == Vector{Any}
+
+    result1 = decoded[1]
+    result2 = decoded[2]
+    result3 = decoded[3]
+
+    @test isa(result1, Vector{Any})
+    @test length(result1) == 3
+    for item in result1
+        @test item in ["A", "B", "C"]
+    end
+
+    result2H = host(result2)
+    @test length(result2H) == 3
+    @test isa(result2H, Vector{Float32})
+    @test result2H[1] == 0.5f0
+    @test result2H[2] == 0.6f0
+    @test result2H[3] == 0.7f0
+
+    @test isa(result3, Vector{Any})
+    @test length(result3) == 2
+    @test result3[1] == 51f0
+    @test result3[2] == 60f0
+
+    @test_throws BoundsError decodeAt(syn, caResult, [DecodeRule(42)])
+
+    @test_throws ErrorException decodeAt(syn, caResult, [DecodeRule(ScalarRule(count = 3))])
 end

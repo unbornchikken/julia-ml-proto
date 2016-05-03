@@ -30,6 +30,10 @@ immutable DecodeRule{R}
     asContextArray::Bool
 end
 
+DecodeRule{R}(rule::R) = DecodeRule{R}(rule, false)
+
+DecodeRule{R}(rule::R, asContextArray::Bool) = DecodeRule{R}(rule, asContextArray)
+
 type Synthesizer{C}
     ctx::C
     rules::Vector{SynthRule}
@@ -115,13 +119,13 @@ function decode{C}(syn::Synthesizer{C}, dna::DNA{C})
     end
 end
 
-function decodeAt(syn::Synthesizer, array, items::Vector{DecodeRule})
+function decodeAt(syn::Synthesizer, array, items)
     all = Vector()
     for item in items
         local rule
-        if is(item.rule, Int)
+        if isa(item.rule, Int)
             rule = syn.rules[item.rule]
-        elseif is(item.rule, SynthRule)
+        elseif isa(item.rule, SynthRule)
             rule = item.rule
         else
             error("Unknown rule: $(item.rule)")
@@ -148,7 +152,7 @@ function decodeAt(syn::Synthesizer, array, items::Vector{DecodeRule})
                 found = true
                 break
             end
-            outputIndex += resultSize(rule)
+            outputIndex += resultSize(curr)
         end
         found || error("Rule hasn't found: $(item.rule)")
     end
