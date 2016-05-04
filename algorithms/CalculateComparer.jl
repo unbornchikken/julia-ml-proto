@@ -4,13 +4,13 @@ type CalculateComparer{S, T} <: AbstractComparer{T}
     _results::Dict{S, Nullable{T}}
 
     CalculateComparer(factory, c) = new(factory, c, Dict{S, Nullable{T}}())
+
+    CalculateComparer(factory::Function) = new(factory, Comparer{T}())
+
+    CalculateComparer(factory::Function, fn::Function) = new(factory, Comparer{T}(fn))
+
+    CalculateComparer(factory::Function, cc::AbstractComparer{T}) = new(factory, Comparer{T}(cc))
 end
-
-CalculateComparer{T}(factory::Function) = CalculateComparer{T}(factory, Comparer{T}())
-
-CalculateComparer{T}(factory::Function, fn::Function) = CalculateComparer{T}(factory, Comparer{T}(fn))
-
-CalculateComparer{T}(factory::Function, cc::AbstractComparer{T}) = CalculateComparer{T}(factory, Comparer{T}(cc))
 
 fn{T}(cc::CalculateComparer{T}) = (a, b) ->
 begin
