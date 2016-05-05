@@ -1,3 +1,5 @@
+export FastComparer, fn, reset!
+
 type FastComparer{T} <: AbstractComparer{T}
     c::Comparer{T}
     _results::Dict{Tuple{T, T}, Nullable{Int}}

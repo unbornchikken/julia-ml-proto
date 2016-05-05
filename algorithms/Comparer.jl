@@ -1,3 +1,5 @@
+export AbstractComparer, Comparer, fn, reset!
+
 abstract AbstractComparer{T}
 
 immutable Comparer{T} <: AbstractComparer{T}

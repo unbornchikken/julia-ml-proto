@@ -1,3 +1,5 @@
+export ArrayComparer, fn, reset!
+
 type ArrayComparer{T::Vector} <: AbstractComparer{T}
     c::Comparer{T}
 end

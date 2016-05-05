@@ -1,3 +1,5 @@
+export CalculateComparer, fn, reset!
+
 type CalculateComparer{S, T} <: AbstractComparer{T}
     factory::Function
     c::Comparer{T}
