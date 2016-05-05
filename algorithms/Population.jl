@@ -30,17 +30,18 @@ push!(pop::Population, dna::DNA) = push!(pop._entities, Entity(dna, pop -> decod
 
 function randomize!(pop::Population, populationSize::Int, dnaSize::Int)
     empty!(pop)
-
     for i in 1:populationSize
         dna = DNA(pop.ctx, dnaSize)
         randomizeUniform!(dna)
         push!(pop, dna)
     end
+    sort!(pop)
 end
 
 function sort!(pop::Population)
     reset!(pop.comparer)
     sort!(pop._entities, by = e -> e.body, lt = fn(pop.comparer))
+    first(pop._entities)
 end
 
 function release!(pop::Population)
