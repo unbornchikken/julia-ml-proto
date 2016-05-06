@@ -1,8 +1,10 @@
 export
     PopulationManager,
-    createEmpty,
+    createCandidate,
     randomize!,
-    chooseParentIndex
+    chooseParentIndex,
+    keepElites!,
+    set!
 
 immutable PopulationManager
     population::Population
@@ -14,44 +16,44 @@ end
 PopulationManager(ctx, populationSize::Int, dnaSize::Int, comparer::Comparer, decode::Function) =
     PopulationManager(Population(ctx, comparer, decode), populationSize, dnaSize)
 
-createEmpty(popMan::PopulationManager) =
+createCandidate(popMan::PopulationManager) =
     Population(popMan.population.ctx, popMan.population.comparer, popMan.population.decode)
 
 function randomize!(popMan::PopulationManager)
-    first = randomize!(popMan.population, popMan.populationSize, popMan.dnaSize)
-    set!(popMan.best, first)
+    set!(popMan.best, randomize!(popMan.population, popMan.populationSize, popMan.dnaSize))
 end
 
 chooseParentIndex(popMan::PopulationManager, stdDev::Float64) =
     chooseParentIndex(popMan, stdDev, length(popMan.population))
 
-function chooseParentIndex(stdDev::Float64, size::Int)
+function chooseParentIndices(popMan::PopulationManager, stdDev::Float64)
+    idx1 = chooseParentIndex(popMan, stdDev)
+    idx2 = chooseParentIndex(popMan, stdDev)
+    while idx1 == idx2
+        idx2 = chooseParentIndex(popMan, stdDev)
+    end
+    idx1, idx2
+end
+
+function chooseParentIndex(stdDev::Float32, size::Int)
     v = abs(randn() * stdDev)
     v = v - floor(v)
     Int(round(v * size))
 end
 
-# keepElites(newPop) {
-#     let keep = this.options.keepElitesRate < 1 ? Math.round(this.population.length * this.options.keepElitesRate) : this.options.keepElitesRate;
-#     debug("Keeping %d elites from the previous population.", keep);
-#     for (let i = 0; i < keep; i++) {
-#         newPop.pushEntity(this.population.at(i).clone());
-#     }
-# }
-#
-# *registerNewPopulationAsync(newPop, noSort) {
-#     if (!noSort) {
-#         yield this.updateBestAsync(yield newPop.sortAsync());
-#     }
-#     else {
-#         let best = null;
-#         for (let entity of newPop.entities) {
-#             if (best === null || (yield this.comparer.compareAsync(entity.body, best.body)) < 0) {
-#                 best = entity;
-#             }
-#         }
-#         yield this.updateBestAsync(best);
-#     }
-#     this.population.free();
-#     this.population = newPop;
-# }
+function keepElites!(popMan::PopulationManager, candidatePop::Population, rate::Float32)
+    keep = Int(rate < 1.0 ? round(length(popMan.populationSize) * rate) : round(rate))
+    for i in 1:keep
+        push!(candidatePop, copy(popMan.population[i]))
+    end
+end
+
+function set!(popMan::PopulationManager, candidatePop::Population, candidateSorted = false)
+    if !candidateSorted
+        set!(popMan.best, sort!(candidatePop, popMan.populationSize, popMan.dnaSize))
+    else
+        set!(popMan.best, candidatePop[0])
+    end
+    release!(popMan.population)
+    popMan.population = candidatePop
+end

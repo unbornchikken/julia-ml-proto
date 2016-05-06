@@ -66,6 +66,8 @@ function mutate!(dna::DNA, probability = 0f0, strength = 0f0, normalize = true)
         where = prob .< probability
         dna.array[] = select(where, values, normalize ? _normalizedArray(dna.array) : dna.array)
     end
+
+    dna
 end
 
 function crossover{C, A}(dna1::DNA{C, A}, dna2::DNA{C, A})
