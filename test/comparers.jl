@@ -47,31 +47,32 @@ testOnAllContexts("Comparers") do ctx
     @test comparisons == 6
 
     println("\tArrayComparer")
+    ac = ArrayComparer()
 
     println("\t- throws when attempt to compare non arrays")
-    @test_throws TypeError fn(ArrayComparer())(1, 2)
+    @test_throws TypeError ac(1, 2)
 
     println("\t- compares arrays of same size")
     a1 = [1, 2, 3]
     a2 = [2, 3, 4]
-    @test fn(ArrayComparer())(a1, a2) == true
-    @test fn(ArrayComparer())(a2, a1) == false
-    @test fn(ArrayComparer())(a1, a1) == false
-    @test fn(ArrayComparer())(a2, a2) == false
+    @test ac(a1, a2) == true
+    @test ac(a2, a1) == false
+    @test ac(a1, a1) == false
+    @test ac(a2, a2) == false
 
     println("\t- compares arrays of different sizes")
     a1 = [1, 2, 3, 4]
     a2 = [4, 5]
-    @test fn(ArrayComparer())(a1, a2) == true
-    @test fn(ArrayComparer())(a2, a1) == false
-    @test fn(ArrayComparer())(a1, a1) == false
-    @test fn(ArrayComparer())(a2, a2) == false
+    @test ac(a1, a2) == true
+    @test ac(a2, a1) == false
+    @test ac(a1, a1) == false
+    @test ac(a2, a2) == false
 
     println("\t- compares same arrays")
     a1 = [1, 2, 3]
     a2 = [1, 2, 3]
-    @test fn(ArrayComparer())(a1, a2) == false
-    @test fn(ArrayComparer())(a2, a1) == false
-    @test fn(ArrayComparer())(a1, a1) == false
-    @test fn(ArrayComparer())(a2, a2) == false
+    @test ac(a1, a2) == false
+    @test ac(a2, a1) == false
+    @test ac(a1, a1) == false
+    @test ac(a2, a2) == false
 end
