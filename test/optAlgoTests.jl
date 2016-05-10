@@ -18,11 +18,11 @@ function testSimpleProblem(algoFactory)
         bestFitness = fitnessFunction(bestEntity.dna)
         @test typeof(bestFitness) == Float32
         @test bestFitness <= lastFitness
+        lastFitness = bestFitness
         if bestFitness < treshold
             found = true
             break
         end
-        lastFitness = bestFitness
     end
 
     @test found
