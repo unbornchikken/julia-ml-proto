@@ -40,7 +40,7 @@ end
 
 function sort!(pop::Population)
     reset!(pop.comparer)
-    sort!(pop._entities, by = e -> e.body, lt = fn(pop.comparer))
+    sort!(pop._entities, by = e -> e.body, lt = pop.comparer)
     first(pop._entities)
 end
 

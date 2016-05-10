@@ -27,7 +27,7 @@ function set!(best::BestEntity, value::Nullable{Entity})
 end
 
 function update!(best::BestEntity, other)
-    if isnull(best) || fn(best.comparer)(other, get(best))
+    if isnull(best) || best.comparer(other, get(best))
         set!(best, other)
         return true
     end
