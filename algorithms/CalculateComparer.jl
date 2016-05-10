@@ -1,17 +1,15 @@
 export CalculateComparer, fn, reset!
 
-type CalculateComparer{S} <: AbstractComparer
+type CalculateComparer <: AbstractComparer
     factory::Function
-    c::Comparer
-    _results::Dict{S, Nullable{Any}}
+    c::AbstractComparer
+    _results::Dict{Any, Nullable{Any}}
 
-    CalculateComparer(factory, c) = new(factory, c, Dict{S, Nullable{Any}}())
+    CalculateComparer(factory::Function) = new(factory, Comparer(), Dict{Any, Nullable{Any}}())
 
-    CalculateComparer(factory::Function) = new(factory, Comparer())
+    CalculateComparer(factory::Function, fn::Function) = new(factory, Comparer(fn), Dict{Any, Nullable{Any}}())
 
-    CalculateComparer(factory::Function, fn::Function) = new(factory, Comparer(fn))
-
-    CalculateComparer(factory::Function, cc::AbstractComparer) = new(factory, Comparer(cc))
+    CalculateComparer(factory::Function, c::AbstractComparer) = new(factory, c, Dict{Any, Nullable{Any}}())
 end
 
 fn(cc::CalculateComparer) = (a, b) ->
@@ -22,12 +20,12 @@ begin
     baseFn(aResult, bResult)
 end
 
-function create!{S}(cc::CalculateComparer, source::S)
+function create!(cc::CalculateComparer, source)
     result = get(cc._results, source, Nullable{Any}())
-    if !isnulle(result)
+    if !isnull(result)
         return get(result)
     end
-    cc._result[source] = cc.factory(source)
+    cc._results[source] = cc.factory(source)
 end
 
 function reset!(cc::CalculateComparer)

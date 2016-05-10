@@ -1,7 +1,7 @@
 export FastComparer, fn, reset!
 
 type FastComparer <: AbstractComparer
-    c::Comparer
+    c::AbstractComparer
     _results::Dict{Tuple, Nullable{Int}}
 
     FastComparer(c) = new(c, Dict{Tuple, Nullable{Int}}())
@@ -11,10 +11,9 @@ FastComparer() = FastComparer(Comparer())
 
 FastComparer(fn::Function) = FastComparer(Comparer(fn))
 
-FastComparer(ac::AbstractComparer) = FastComparer(Comparer(ac))
+fn(fc::FastComparer) = (a, b) -> compare(fc, a, b) < 0
 
-fn(fc::FastComparer) = (a, b) ->
-begin
+function compare(fc::FastComparer, a, b)
     key1 = (a, b)
     result = get(fc._results, key1, Nullable{Int}())
     if !isnull(result)

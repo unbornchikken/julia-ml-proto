@@ -1,21 +1,18 @@
 export ArrayComparer, fn, reset!
 
 type ArrayComparer <: AbstractComparer
-    c::Comparer
+    c::AbstractComparer
 end
 
 ArrayComparer() = ArrayComparer(Comparer())
 
 ArrayComparer(fn::Function) = ArrayComparer(Comparer(fn))
 
-ArrayComparer(ac::AbstractComparer) = ArrayComparer(Comparer(ac))
-
-fn(ac::ArrayComparer) = (a, b) ->
+fn(ac::ArrayComparer) = (a::Vector, b::Vector) ->
 begin
     baseFn = fn(ac.c)
 
-    all = map(i -> (i, 1), a)
-    merge!(all, map(i -> (i, 2), b))
+    all = [map(i -> (i, 1), a); map(i -> (i, 2), b)]
 
     sort!(all, by = i -> i[1], lt = baseFn)
 
@@ -24,11 +21,10 @@ begin
     arr2Points = 0
 
     for idx in 1:length(all)
-        result = 0
-        if idx > 1
-            result = baseFn(all[idx - 1][1], all[idx][1])
+        if idx > 1 && baseFn(all[idx - 1][1], all[idx][1])
+            score += 1
         end
-        if result < 0
+        if all[idx][2] == 1
             arr1Points += score
         else
             arr2Points += score
