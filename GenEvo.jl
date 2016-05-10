@@ -11,4 +11,17 @@ include("genome/MultiScalarRule.jl")
 include("genome/ScalarRule.jl")
 include("genome/SetRule.jl")
 
+include("algorithms/algoTypes.jl")
+include("algorithms/Comparer.jl")
+include("algorithms/ArrayComparer.jl")
+include("algorithms/CalculateComparer.jl")
+include("algorithms/FitnessComparer.jl")
+include("algorithms/FastComparer.jl")
+include("algorithms/Entity.jl")
+include("algorithms/BestEntity.jl")
+include("algorithms/Population.jl")
+include("algorithms/PopulationManager.jl")
+include("algorithms/Epoch.jl")
+include("algorithms/GA.jl")
+
 end

@@ -20,7 +20,7 @@ GA{C}(
     mutationChance = 0.02f0,
     mutationStrength = 0.05f0,
     selectionStdDev = 0.25f0,
-    keepElitesRate = 0.05f0)
+    keepElitesRate = 0.05f0) =
 new(
     ctx,
     dnaSize,
@@ -47,7 +47,7 @@ function step!(ga::GA)
     set!(ga.popMan, candidate)
 end
 
-best(ga::GA = best(ga.popMan.best)
+best(ga::GA) = get(ga.popMan.best)
 
 function createChildDNA(ga::GA)
     parent1Index, parent2Index = chooseParentIndices(ga.popMan, ga.selectionStdDev)

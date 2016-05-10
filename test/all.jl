@@ -7,7 +7,7 @@ using Base.Test
 
 function testOnAllContexts(f, title)
     for ctx in [("AF/CPU", ArrayFire{CPU}())]
-        println("DEGIN: $title on $(ctx[1])")
+        println("BEGIN: $title on $(ctx[1])")
         scope!(ctx[2]) do this
             f(ctx[2])
         end
@@ -17,5 +17,6 @@ end
 
 include("dna.jl")
 include("synthesizer.jl")
+include("comparers.jl")
 
 end

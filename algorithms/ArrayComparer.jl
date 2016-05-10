@@ -1,16 +1,16 @@
 export ArrayComparer, fn, reset!
 
-type ArrayComparer{T::Vector} <: AbstractComparer{T}
-    c::Comparer{T}
+type ArrayComparer <: AbstractComparer
+    c::Comparer
 end
 
-ArrayComparer{T}() = ArrayComparer{T}(Comparer{T}())
+ArrayComparer() = ArrayComparer(Comparer())
 
-ArrayComparer{T}(fn::Function) = ArrayComparer{T}(Comparer{T}(fn))
+ArrayComparer(fn::Function) = ArrayComparer(Comparer(fn))
 
-ArrayComparer{T}(ac::AbstractComparer{T}) = ArrayComparer{T}(Comparer{T}(ac))
+ArrayComparer(ac::AbstractComparer) = ArrayComparer(Comparer(ac))
 
-fn{T}(ac::ArrayComparer{T}) = (a, b) ->
+fn(ac::ArrayComparer) = (a, b) ->
 begin
     baseFn = fn(ac.c)
 
@@ -38,6 +38,6 @@ begin
     arr1Points < arr2Points
 end
 
-function reset!{T}(ac::ArrayComparer{T})
+function reset!(ac::ArrayComparer)
     reset!(ac.c)
 end

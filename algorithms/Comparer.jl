@@ -1,18 +1,18 @@
 export AbstractComparer, Comparer, fn, reset!
 
-abstract AbstractComparer{T}
+abstract AbstractComparer
 
-immutable Comparer{T} <: AbstractComparer{T}
+immutable Comparer <: AbstractComparer
     fn::Function
     reset::Nullable{Function}
 end
 
-Comparer{T}() = Comparer{T}((x::T, y::T) -> <(x, y), Nullable{Function}())
+Comparer() = Comparer((x, y) -> <(x, y), Nullable{Function}())
 
-Comparer{T}(fn::Function) = Comparer{T}(fn, Nullable{Function}())
+Comparer(fn::Function) = Comparer(fn, Nullable{Function}())
 
-Comparer{T}(ac::AbstractComparer{T}) = Comparer{T}(fn(ac), () -> reset!(ac))
+Comparer(ac::AbstractComparer) = Comparer(fn(ac), () -> reset!(ac))
 
-fn{T}(c::Comparer{T}) = c.fn
+fn(c::Comparer) = c.fn
 
-reset!{T}(c::Comparer{T}) = !isnull(c.reset) && c.reset()
+reset!(c::Comparer) = !isnull(c.reset) && c.reset()

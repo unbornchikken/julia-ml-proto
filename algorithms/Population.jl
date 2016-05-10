@@ -10,14 +10,14 @@ export
     sort!,
     release!
 
-immutable Population{C, T}
+immutable Population{C}
     ctx::C
-    comparer::Comparer{T}
+    comparer::Comparer
     decode::Function
     _entities::Vector{Entity}
 end
 
-Population{C, T}(ctx::C, comparer::Comparer{T}, decode::Function) =
+Population{C}(ctx::C, comparer::Comparer, decode::Function) =
     Population(ctx, comparer, decoder, Vector{Entity}())
 
 length(pop::Population) = length(pop._entities)

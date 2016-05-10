@@ -20,7 +20,7 @@ end
 @generated function copy{C, A, T}(entity::Entity{C, A, T})
     if length(methods(copy, (T, ))) > 0
         :( Entity(copy(entity.dna), copy(entity.body)) )
-    if length(methods(deepcopy, (T, ))) > 0
+    elseif length(methods(deepcopy, (T, ))) > 0
         :( Entity(deepcopy(entity.body)) )
     else
         :( Entity(copy(entity.dna), entity.body) )
