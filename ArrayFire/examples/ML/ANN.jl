@@ -64,7 +64,7 @@ backPropagate(ann::ANN, target, alpha::Float32) = scope!(ann.af) do this
 
             # Adjust weights
             grad = (-alpha .* matmul(delta, inVec)) ./ m
-			addAssign!(ann.weights[i], transpose(grad))
+            addAssign!(ann.weights[i], transpose(grad))
 
             # Input to current layer is output of previous
             outVec = ann.signal[i]
