@@ -12,13 +12,13 @@ export
 
 immutable Population{C}
     ctx::C
-    comparer::Comparer
+    comparer::AbstractComparer
     decode::Function
     _entities::Vector{Entity}
 end
 
-Population{C}(ctx::C, comparer::Comparer, decode::Function) =
-    Population(ctx, comparer, decoder, Vector{Entity}())
+Population{C}(ctx::C, comparer::AbstractComparer, decode::Function) =
+    Population(ctx, comparer, decode, Vector{Entity}())
 
 length(pop::Population) = length(pop._entities)
 
@@ -26,7 +26,7 @@ getindex(pop::Population, idx) = pop._entities[idx]
 
 push!(pop::Population, entity::Entity) = push!(pop._entities, entity)
 
-push!(pop::Population, dna::DNA) = push!(pop._entities, Entity(dna, pop -> decode(dna)))
+push!(pop::Population, dna::DNA) = push!(pop._entities, Entity(dna, pop.decode(dna)))
 
 function randomize!(pop::Population, populationSize::Int, dnaSize::Int)
     empty!(pop)
@@ -39,7 +39,6 @@ function randomize!(pop::Population, populationSize::Int, dnaSize::Int)
 end
 
 function sort!(pop::Population)
-    reset!(pop.comparer)
     sort!(pop._entities, by = e -> e.body, lt = pop.comparer)
     first(pop._entities)
 end

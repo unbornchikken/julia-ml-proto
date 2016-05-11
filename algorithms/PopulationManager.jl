@@ -6,15 +6,15 @@ export
     keepElites!,
     set!
 
-immutable PopulationManager
+type PopulationManager
     population::Population
     populationSize::Int
     dnaSize::Int
     best::BestEntity
 end
 
-PopulationManager(ctx, populationSize::Int, dnaSize::Int, comparer::Comparer, decode::Function) =
-    PopulationManager(Population(ctx, comparer, decode), populationSize, dnaSize)
+PopulationManager(ctx, populationSize::Int, dnaSize::Int, comparer::AbstractComparer, decode::Function) =
+    PopulationManager(Population(ctx, comparer, decode), populationSize, dnaSize, BestEntity(comparer))
 
 createCandidate(popMan::PopulationManager) =
     Population(popMan.population.ctx, popMan.population.comparer, popMan.population.decode)
@@ -23,10 +23,7 @@ function randomize!(popMan::PopulationManager)
     set!(popMan.best, randomize!(popMan.population, popMan.populationSize, popMan.dnaSize))
 end
 
-chooseParentIndex(popMan::PopulationManager, stdDev::Float64) =
-    chooseParentIndex(popMan, stdDev, length(popMan.population))
-
-function chooseParentIndices(popMan::PopulationManager, stdDev::Float64)
+function chooseParentIndices(popMan::PopulationManager, stdDev::Float32)
     idx1 = chooseParentIndex(popMan, stdDev)
     idx2 = chooseParentIndex(popMan, stdDev)
     while idx1 == idx2
@@ -35,10 +32,13 @@ function chooseParentIndices(popMan::PopulationManager, stdDev::Float64)
     idx1, idx2
 end
 
+chooseParentIndex(popMan::PopulationManager, stdDev::Float32) =
+    chooseParentIndex(stdDev, length(popMan.population))
+
 function chooseParentIndex(stdDev::Float32, size::Int)
     v = abs(randn() * stdDev)
     v = v - floor(v)
-    Int(round(v * size))
+    Int(round(v * size + 1.0f0))
 end
 
 function keepElites!(popMan::PopulationManager, candidatePop::Population, rate::Float32)
@@ -50,9 +50,9 @@ end
 
 function set!(popMan::PopulationManager, candidatePop::Population, candidateSorted = false)
     if !candidateSorted
-        set!(popMan.best, sort!(candidatePop, popMan.populationSize, popMan.dnaSize))
+        update!(popMan.best, sort!(candidatePop))
     else
-        set!(popMan.best, candidatePop[0])
+        update!(popMan.best, candidatePop[1])
     end
     release!(popMan.population)
     popMan.population = candidatePop

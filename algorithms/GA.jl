@@ -8,27 +8,29 @@ immutable GA{C} <: PopulationBasedOptAlgo{C}
     mutationStrength::Float32
     selectionStdDev::Float32
     keepElitesRate::Float32
+    comparer::AbstractComparer
     popMan::PopulationManager
 end
 
 GA{C}(
     ctx::C,
     dnaSize,
-    comparer::Comparer,
+    comparer::AbstractComparer,
     decode::Function;
-    populationSize = 100f0,
+    populationSize = 100,
     mutationChance = 0.02f0,
     mutationStrength = 0.05f0,
     selectionStdDev = 0.25f0,
     keepElitesRate = 0.05f0) =
-new(
+GA(
     ctx,
-    dnaSize,
     populationSize,
+    dnaSize,
     mutationChance,
     mutationStrength,
     selectionStdDev,
     keepElitesRate,
+    comparer,
     PopulationManager(
         ctx,
         populationSize,
@@ -36,18 +38,19 @@ new(
         comparer,
         decode))
 
-start!(ga::GA) = randomize!(ga.popMan)
+start!(ga::GA) = (reset!(ga.comparer); randomize!(ga.popMan))
 
 function step!(ga::GA)
+    reset!(ga.comparer)
     candidate = createCandidate(ga.popMan)
-    keepElites!(ga.popMan, candidates, ga.keepElitesRate)
+    keepElites!(ga.popMan, candidate, ga.keepElitesRate)
     while length(candidate) < ga.popMan.populationSize
         push!(candidate, createChildDNA(ga))
     end
     set!(ga.popMan, candidate)
 end
 
-best(ga::GA) = get(ga.popMan.best)
+best(ga::GA) = ga.popMan.best
 
 function createChildDNA(ga::GA)
     parent1Index, parent2Index = chooseParentIndices(ga.popMan, ga.selectionStdDev)
