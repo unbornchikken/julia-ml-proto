@@ -7,11 +7,25 @@ immutable Entity{T}
     body::T
 end
 
+function Entity{T}(dna::DNA, body::T)
+    eval!(dna)
+    evalBody!(body)
+    Entity{T}(dna, body)
+end
+
 @generated function release!{T}(entity::Entity{T})
     if length(methods(release!, (T, ))) > 0
         :( release!(entity.body); release!(entity.dna) )
     else
         :( release!(entity.dna) )
+    end
+end
+
+@generated function evalBody!{T}(body::T)
+    if length(methods(eval!, (T, ))) > 0
+        :( eval!(body) )
+    else
+        :( )
     end
 end
 

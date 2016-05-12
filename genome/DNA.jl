@@ -11,7 +11,8 @@ export
     crossover,
     normalize!,
     normalized,
-    randomizeUniform!
+    randomizeUniform!,
+    eval!
 
 type DNA{C, A}
     ctx::C
@@ -39,6 +40,14 @@ end
 @generated function release!{C, A}(dna::DNA{C, A})
     if length(methods(release!, (A, ))) > 0
         :( release!(dna.array) )
+    else
+        :( )
+    end
+end
+
+@generated function eval!{C, A}(dna::DNA{C, A})
+    if length(methods(eval!, (A, ))) > 0
+        :( eval!(dna.array) )
     else
         :( )
     end

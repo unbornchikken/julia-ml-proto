@@ -39,6 +39,7 @@ type ArrayFire{T<:Backend}
     getNumDims::Ptr{Void}
     getElements::Ptr{Void}
     isEmpty::Ptr{Void}
+    eval::Ptr{Void}
     freeList::AFImpl
     batch::Bool
     results::Results
@@ -68,6 +69,7 @@ type ArrayFire{T<:Backend}
             Libdl.dlsym(ptr, :af_get_numdims),
             Libdl.dlsym(ptr, :af_get_elements),
             Libdl.dlsym(ptr, :af_is_empty),
+            Libdl.dlsym(ptr, :af_eval),
             FreeList(),
             false,
             Results())

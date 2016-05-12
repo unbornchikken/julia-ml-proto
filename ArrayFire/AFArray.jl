@@ -14,7 +14,8 @@ export
     numdims,
     isEmpty,
     elements,
-    copy
+    copy,
+    eval!
 
 type AFArray{B}
     af::ArrayFire{B}
@@ -221,6 +222,13 @@ function _host{T, N}(arr::AFArray, to::Array{T, N})
         to, arr.ptr)
     assertErr(err)
     to
+end
+
+eval!(arr::AFArray) = (verifyAccess(arr); eval!(arr.af, arr.ptr))
+
+function eval!(af::ArrayFire, ptr::Ptr{Void})
+    err = ccall(af.eval, Cint, (Ptr{Void}, ), ptr)
+    assertErr(err)
 end
 
 Array(arr::AFArray) = host(arr)

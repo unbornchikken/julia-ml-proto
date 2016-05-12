@@ -1,7 +1,7 @@
 function testSimpleProblem(algoFactory)
     const maxIteration = 50
     const target = 42.0f0
-    const treshold = 0.001f0
+    const treshold = 0.1f0
     const fitnessFunction = dna -> abs(target - sum(Float32, dna.array))
 
     epoch = Epoch(algoFactory(CalculateComparer(fitnessFunction)))
@@ -22,13 +22,14 @@ function testSimpleProblem(algoFactory)
         @test typeof(bestFitness) == Float32
         @test bestFitness <= lastFitness
         lastFitness = bestFitness
-        println("\t- fitness: $lastFitness")
         if bestFitness < treshold
             found = true
-            #break
+            break
         end
     end
 
     @test found
     @test epoch.itertaionNo > 0
+
+    println("\t- fitness: $lastFitness")
 end

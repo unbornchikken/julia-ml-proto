@@ -1,6 +1,6 @@
 testOnAllContexts("GA") do ctx
     println("\tsolves a simple problem")
-    testSimpleProblem(
+    @time testSimpleProblem(
         comparer ->
         begin
             ga = GA(ctx, 60, comparer, dna -> dna)

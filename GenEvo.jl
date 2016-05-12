@@ -5,6 +5,8 @@ module GenEvo
 using Reexport
 @reexport using AF
 
+import AF: release!, copy, eval!
+
 include("genome/DNA.jl")
 include("genome/Synthesizer.jl")
 include("genome/MultiScalarRule.jl")
