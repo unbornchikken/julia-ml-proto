@@ -38,7 +38,7 @@ chooseParentIndex(popMan::PopulationManager, stdDev::Float32) =
 function chooseParentIndex(stdDev::Float32, size::Int)
     v = abs(randn() * stdDev)
     v = v - floor(v)
-    Int(round(v * size + 1.0f0))
+    Int(floor(v * size)) + 1
 end
 
 function keepElites!(popMan::PopulationManager, candidatePop::Population, rate::Float32)

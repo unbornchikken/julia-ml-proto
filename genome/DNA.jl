@@ -45,12 +45,8 @@ end
     end
 end
 
-@generated function eval!{C, A}(dna::DNA{C, A})
-    if length(methods(eval!, (A, ))) > 0
-        :( eval!(dna.array) )
-    else
-        :( )
-    end
+function eval!(dna::DNA)
+    eval!(dna.array)
 end
 
 length(dna::DNA) = dims(dna.array, 0)

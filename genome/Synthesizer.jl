@@ -100,6 +100,7 @@ function decodeAsContextArray{C}(syn::Synthesizer{C}, dna::DNA{C})
         end
     end
 
+    eval!(result)
     result
 end
 
