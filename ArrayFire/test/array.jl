@@ -93,6 +93,19 @@ testOnAllBackends("AFArray") do af
     indexed = afArr[afIdx]
     @test host(indexed) == [2,1,3,6,11,3]
 
+    # Col, Row
+    afArr = array(af, [[0,1,2] [3,4,5] [6,7,8]])
+
+    @test host(afArr[Row(0)]) == [0 3 6]
+    @test host(afArr[Row(2)]) == [2 5 8]
+
+    @test host(afArr[Rows(0, 1)]) == [[0,1] [3,4] [6,7]]
+
+    @test host(afArr[Col(0)]) == [0,1,2]
+    @test host(afArr[Col(2)]) == [6,7,8]
+
+    @test host(afArr[Cols(1,2)]) == [[3,4,5] [6,7,8]]
+
     println("\tindex assign")
     afArr = array(af, [1,2,3,4])
     afArr[:] = 5

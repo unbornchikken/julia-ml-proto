@@ -24,5 +24,6 @@ include("algorithms/Population.jl")
 include("algorithms/PopulationManager.jl")
 include("algorithms/Epoch.jl")
 include("algorithms/GA.jl")
+include("algorithms/CrossEntropy.jl")
 
 end

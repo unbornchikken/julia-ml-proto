@@ -1,6 +1,6 @@
 import Base: getindex, setindex!
 export getindex, setindex!
-export Seq, Span
+export Seq, Span, Row, Rows, Col, Cols
 
 immutable Index <: AFImpl
     indexGen::Ptr{Void}
@@ -22,6 +22,24 @@ end
 
 Seq(i::Real) = Seq(i, i, 1)
 Seq(b::Real, e::Real) = Seq(b, e, 1)
+
+immutable Col
+    index::Int
+end
+
+immutable Cols
+    firstIndex::Int
+    lastIndex::Int
+end
+
+immutable Row
+    index::Int
+end
+
+immutable Rows
+    firstIndex::Int
+    lastIndex::Int
+end
 
 immutable DummySeq
     i1::UInt32
@@ -163,8 +181,8 @@ end
 
 function genIndices{B}(arr::Type{AFArray{B}}, args::Type...)
     if length(args) == 1 && args[1] <: AFArray{B}
-		return :( indices = Vector{ArrayIndex}([ArrayIndex(args[1])]) )
-	end
+        return :( indices = Vector{ArrayIndex}([ArrayIndex(args[1])]) )
+    end
     exp = :( indices = Vector{SeqIndex}(length(args)) )
     i = 1
     for arg in args
@@ -181,6 +199,34 @@ function genIndices{B}(arr::Type{AFArray{B}}, args::Type...)
             exp = :( $exp; indices[$i] = SeqIndex(1, 1, 0, arr.af.batch) )
         elseif is(arg, Span)
             exp = :( $exp; indices[$i] = SeqIndex(1, 1, 0, arr.af.batch) )
+        elseif is(arg, Row)
+            exp = quote
+                $exp
+                indices[$i] = SeqIndex(args[$i].index, arr.af.batch)
+                push!(indices, SeqIndex(1, 1, 0, arr.af.batch))
+            end
+            break
+        elseif is(arg, Rows)
+            exp = quote
+                $exp
+                indices[$i] = SeqIndex(args[$i].firstIndex, args[$i].lastIndex, arr.af.batch)
+                push!(indices, SeqIndex(1, 1, 0, arr.af.batch))
+            end
+            break
+        elseif is(arg, Col)
+            exp = quote
+                $exp
+                indices[$i] = SeqIndex(1, 1, 0, arr.af.batch)
+                push!(indices, SeqIndex(args[$i].index, arr.af.batch))
+            end
+            break
+        elseif is(arg, Cols)
+            exp = quote
+                $exp
+                indices[$i] = SeqIndex(1, 1, 0, arr.af.batch)
+                push!(indices, SeqIndex(args[$i].firstIndex, args[$i].lastIndex, arr.af.batch))
+            end
+            break
         else
             error("Unknown arguments: $args")
         end

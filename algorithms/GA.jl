@@ -50,8 +50,6 @@ function step!(ga::GA)
     set!(ga.popMan, candidate)
 end
 
-best(ga::GA) = ga.popMan.best
-
 function createChildDNA(ga::GA)
     parent1Index, parent2Index = chooseParentIndices(ga.popMan, ga.selectionStdDev)
     parent1 = ga.popMan.population[parent1Index]
