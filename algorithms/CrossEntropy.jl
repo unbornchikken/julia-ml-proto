@@ -55,25 +55,25 @@ function step!(ce::CrossEntropy)
         ce.offsprings[Col(i - 1)] = parent.dna.array;
     end
 
-    candidate = createCandidate(ga.popMan)
-    keepElites!(ga.popMan, candidate, ce.keepElitesRate)
+    candidate = createCandidate(ce.popMan)
+    keepElites!(ce.popMan, candidate, ce.keepElitesRate)
 
-    mean = mean(ce.offsprings, 1)
+    _mean = mean(ce.offsprings, 1)
     stdDev = stdev(ce.offsprings, 1)
     try
         while length(candidate) < ce.populationSize
             push!(candidate, scope!(ce.ctx) do this
                 rnd = randn(ce.ctx, Float32, ce.dnaSize)
-                dnaArray = rnd .* stdDev .+ mean
+                dnaArray = rnd .* stdDev .+ _mean
                 childDNA = DNA(ce.ctx, dnaArray)
                 this.result(childDNA.array)
                 mutate!(childDNA, ce.mutationChance, ce.mutationStrength)
             end)
         end
     finally
-        release!(mean)
+        release!(_mean)
         release!(stdDev)
     end
 
-    set!(ga.popMan, candidate)
+    set!(ce.popMan, candidate)
 end

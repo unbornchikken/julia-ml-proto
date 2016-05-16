@@ -28,7 +28,7 @@ testOnAllContexts("CrossEntropy") do ctx
             @test ce.dnaSize == dnaSize!(synth)
             @test ce.populationSize == 100
             @test ce.mutationChance == 0.05f0
-            @test ce.mutationStrength == 0.05f0
+            @test ce.mutationStrength == 0.02f0
             @test ce.selectionStdDev == 0.3f0
             @test ce.keepElitesRate == 0.05f0
             ce

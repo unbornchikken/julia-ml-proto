@@ -31,12 +31,30 @@ end
 
 macro afCall_Arr_Arr_Bool(method, holder, func, default)
     quote
-        function $(esc(method)){B}(arr::AFArray{B}, value::Bool = $default)
+        function $(esc(method))(arr::AFArray, value::Bool = $default)
             verifyAccess(arr)
             af = arr.af
             result = af.results.ptr
             err = ccall(af.$holder.$func,
                 Cint, (Ptr{Ptr{Void}}, Ptr{Void}, Bool),
+                result, arr.ptr, value)
+            assertErr(err)
+            array(af, result[])
+        end
+    end
+end
+
+macro afCall_Arr_Arr_DimT(method, holder, func, default)
+    quote
+        function $(esc(method))(arr::AFArray, value::DimT = $default)
+            verifyAccess(arr)
+            af = arr.af
+            result = af.results.ptr
+            if value == -1
+                value = firstDim(af, arr.ptr)
+            end
+            err = ccall(af.$holder.$func,
+                Cint, (Ptr{Ptr{Void}}, Ptr{Void}, DimT),
                 result, arr.ptr, value)
             assertErr(err)
             array(af, result[])
