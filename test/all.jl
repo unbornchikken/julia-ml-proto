@@ -20,6 +20,7 @@ end
 #include("comparers.jl")
 include("optAlgoTests.jl")
 #include("ga.jl")
-include("ce.jl")
+#include("ce.jl")
+include("pso.jl")
 
 end

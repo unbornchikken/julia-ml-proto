@@ -48,11 +48,17 @@ function keepElites!(popMan::PopulationManager, candidatePop::Population, rate::
     end
 end
 
-function set!(popMan::PopulationManager, candidatePop::Population, candidateSorted = false)
-    if !candidateSorted
+function set!(popMan::PopulationManager, candidatePop::Population, noSort = false)
+    if noSort == false # sort
         update!(popMan.best, sort!(candidatePop))
     else
-        update!(popMan.best, candidatePop[1])
+        bestOf = candidatePop[1]
+        for entity in candidatePop.entities # TODO: support iteration in Population
+            if entity != bestOf && popMan.population.comparer(entity.body, bestOf.body)
+                bestOf = entity
+            end
+        end
+        update!(popMan.best, bestOf)
     end
     release!(popMan.population)
     popMan.population = candidatePop

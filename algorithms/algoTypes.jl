@@ -1,3 +1,5 @@
+export OptAlgo, PopulationBasedOptAlgo, best
+
 abstract OptAlgo{C}
 
 abstract PopulationBasedOptAlgo{C} <: OptAlgo{C}

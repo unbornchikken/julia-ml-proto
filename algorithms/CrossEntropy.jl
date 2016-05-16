@@ -1,4 +1,4 @@
-export CrossEntropy, start!, step!, best
+export CrossEntropy, start!, step!
 
 immutable CrossEntropy{C, A} <: PopulationBasedOptAlgo{C}
     ctx::C
@@ -13,8 +13,8 @@ immutable CrossEntropy{C, A} <: PopulationBasedOptAlgo{C}
     offsprings::A
 end
 
-CrossEntropy{C}(
-    ctx::C,
+CrossEntropy(
+    ctx,
     dnaSize,
     comparer::AbstractComparer,
     decode::Function;

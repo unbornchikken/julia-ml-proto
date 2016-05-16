@@ -17,8 +17,8 @@ function testSimpleProblem(algoFactory)
         @test !isnull(bestEntity)
         @test isa(get(bestEntity).dna, DNA)
         @test isa(get(bestEntity).body, DNA)
-        @test host(get(bestEntity).dna.array) == host(get(bestEntity).body.array)
-        bestFitness = fitnessFunction(get(bestEntity).dna)
+        @test host(normalized(get(bestEntity).dna).array) == host(get(bestEntity).body.array)
+        bestFitness = fitnessFunction(get(bestEntity).body)
         @test typeof(bestFitness) == Float32
         @test bestFitness <= lastFitness
         lastFitness = bestFitness

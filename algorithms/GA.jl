@@ -1,4 +1,4 @@
-export GA, start!, step!, best
+export GA, start!, step!
 
 immutable GA{C} <: PopulationBasedOptAlgo{C}
     ctx::C
@@ -12,8 +12,8 @@ immutable GA{C} <: PopulationBasedOptAlgo{C}
     popMan::PopulationManager
 end
 
-GA{C}(
-    ctx::C,
+GA(
+    ctx,
     dnaSize,
     comparer::AbstractComparer,
     decode::Function;

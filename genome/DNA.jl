@@ -88,9 +88,10 @@ end
 
 function normalized(dna::DNA)
     scope!(dna.ctx) do this
-        dna = DNA(dna.ctx, _normalizedArray(dna.array))
-        this.result(dna.array)
-        dna
+        dna2 = DNA(dna.ctx, _normalizedArray(dna.array))
+        eval!(dna2.array)
+        this.result(dna2.array)
+        dna2
     end
 end
 

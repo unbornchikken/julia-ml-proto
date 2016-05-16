@@ -14,19 +14,19 @@ immutable Population{C}
     ctx::C
     comparer::AbstractComparer
     decode::Function
-    _entities::Vector{Entity}
+    entities::Vector{Entity}
 end
 
 Population{C}(ctx::C, comparer::AbstractComparer, decode::Function) =
     Population(ctx, comparer, decode, Vector{Entity}())
 
-length(pop::Population) = length(pop._entities)
+length(pop::Population) = length(pop.entities)
 
-getindex(pop::Population, idx) = pop._entities[idx]
+getindex(pop::Population, idx) = pop.entities[idx]
 
-push!(pop::Population, entity::Entity) = push!(pop._entities, entity)
+push!(pop::Population, entity::Entity) = (push!(pop.entities, entity); entity)
 
-push!(pop::Population, dna::DNA) = push!(pop._entities, Entity(dna, pop.decode(dna)))
+push!(pop::Population, dna::DNA) = push!(pop, Entity(dna, pop.decode(dna)))
 
 function randomize!(pop::Population, populationSize::Int, dnaSize::Int)
     empty!(pop)
@@ -39,16 +39,16 @@ function randomize!(pop::Population, populationSize::Int, dnaSize::Int)
 end
 
 function sort!(pop::Population)
-    sort!(pop._entities, by = e -> e.body, lt = pop.comparer)
-    first(pop._entities)
+    sort!(pop.entities, by = e -> e.body, lt = pop.comparer)
+    first(pop.entities)
 end
 
 function release!(pop::Population)
-    for entity in pop._entities
+    for entity in pop.entities
         release!(entity)
     end
 end
 
 function empty!(pop::Population)
-    empty!(pop._entities)
+    empty!(pop.entities)
 end
