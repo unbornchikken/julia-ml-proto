@@ -5,7 +5,6 @@ function testSimpleProblem(algoFactory)
     const fitnessFunction = dna -> abs(target - sum(Float32, dna.array))
 
     epoch = Epoch(algoFactory(CalculateComparer(fitnessFunction)))
-    @test length(epoch.algo.popMan.population) == 0
     @test isnull(best(epoch.algo))
     start!(epoch)
     @test !isnull(best(epoch.algo))
@@ -17,7 +16,16 @@ function testSimpleProblem(algoFactory)
         @test !isnull(bestEntity)
         @test isa(get(bestEntity).dna, DNA)
         @test isa(get(bestEntity).body, DNA)
-        @test host(normalized(get(bestEntity).dna).array) == host(get(bestEntity).body.array)
+        arr1 = host(get(bestEntity).dna.array)
+        arr1N = host(normalized(get(bestEntity).dna).array)
+        arr2 = host(get(bestEntity).body.array)
+        if abs(sum(arr1N .- arr1)) < 0.01f0
+            # pop style
+            @test abs(sum(arr1 .- arr2)) < 0.01f0
+        else
+            # pso style
+            @test abs(sum(arr1N .- arr2)) < 0.01f0
+        end
         bestFitness = fitnessFunction(get(bestEntity).body)
         @test typeof(bestFitness) == Float32
         @test bestFitness <= lastFitness
@@ -47,7 +55,6 @@ function testSimpleProblem(ctx, algoFactory)
     synth = Synthesizer(ctx)
     define!(synth, SetRule(collect('A':'Z'), 4))
     epoch = Epoch(algoFactory(CalculateComparer(fitnessOfCOOL), synth))
-    @test length(epoch.algo.popMan.population) == 0
     @test isnull(best(epoch.algo))
     start!(epoch)
     @test !isnull(best(epoch.algo))

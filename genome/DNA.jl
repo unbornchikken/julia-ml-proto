@@ -69,7 +69,8 @@ function mutate!(dna::DNA, probability = 0f0, strength = 0f0, normalize = true)
         values = dna.array .+ ((randu(dna.ctx, Float32, dnaLength) .* strength) .- strength / 2f0)
         prob = randu(dna.ctx, Float32, dnaLength)
         where = prob .< probability
-        dna.array[] = select(where, values, normalize ? _normalizedArray(dna.array) : dna.array)
+        values = select(where, values, dna.array)
+        dna.array[] = normalize ? _normalizedArray(values) : values
     end
 
     dna

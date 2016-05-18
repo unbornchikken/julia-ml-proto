@@ -15,12 +15,12 @@ function testOnAllContexts(f, title)
     end
 end
 
-#include("dna.jl")
-#include("synthesizer.jl")
-#include("comparers.jl")
+include("dna.jl")
+include("synthesizer.jl")
+include("comparers.jl")
 include("optAlgoTests.jl")
-#include("ga.jl")
-#include("ce.jl")
+include("ga.jl")
+include("ce.jl")
 include("pso.jl")
 
 end
