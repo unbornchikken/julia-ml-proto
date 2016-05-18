@@ -59,7 +59,7 @@ function randomizeUniform!(dna::DNA, strength = 1f0)
     end
 end
 
-function mutate!(dna::DNA, probability = 0f0, strength = 0f0, normalize = true)
+function mutate!(dna::DNA, probability, strength, normalize = true)
     if probability <= 0f0 || strength <= 0f0
         return
     end

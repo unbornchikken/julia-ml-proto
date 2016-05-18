@@ -92,7 +92,7 @@ function step!(pso::PSO)
             loc = loc .+ vel
             childDNA = DNA(pso.ctx, loc)
             this.result(childDNA.array)
-            mutate!(childDNA, pso.mutationChance, pso.mutationStrength)
+            mutate!(childDNA, pso.mutationChance, pso.mutationStrength, false)
         end
         entity = push!(candidate, dna)
         if pso.comparer(entity.body, pBest.body)
