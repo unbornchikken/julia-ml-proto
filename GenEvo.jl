@@ -7,6 +7,8 @@ using Reexport
 
 import AF: release!, copy, eval!
 
+include("utils.jl")
+
 include("genome/DNA.jl")
 include("genome/Synthesizer.jl")
 include("genome/MultiScalarRule.jl")

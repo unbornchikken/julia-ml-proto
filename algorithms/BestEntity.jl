@@ -1,6 +1,6 @@
 import Base: isnull, get
 
-export BestEntity, isnull, get, reset!, set!, update!
+export BestEntity, isnull, get, reset!, set!, update!, release!
 
 type BestEntity
     comparer::AbstractComparer
@@ -8,6 +8,8 @@ type BestEntity
 
     BestEntity(comparer) = new(comparer, Nullable{Entity}())
 end
+
+release!(best::BestEntity) = reset!(best)
 
 isnull(best::BestEntity) = isnull(best.value)
 

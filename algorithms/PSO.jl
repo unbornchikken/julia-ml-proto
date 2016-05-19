@@ -1,4 +1,4 @@
-export PSO, start!, step!
+export PSO, start!, step!, release!
 
 immutable PSO{C, A} <: PopulationBasedOptAlgo{C}
     ctx::C
@@ -58,6 +58,18 @@ PSO(
         end),
     Vector{Entity}(),
     [(x -> array(ctx))(x) for x in 1:populationSize])
+
+function release!(pso::PSO)
+    release!(pso.popMan)
+    for best in pso.pBests
+        release!(best)
+    end
+    empty!(pso.pBests)
+    for vel in pso.velocities
+        release!(vel)
+    end
+    empty!(pso.velocities)
+end
 
 function start!(pso::PSO)
     reset!(pso.comparer)

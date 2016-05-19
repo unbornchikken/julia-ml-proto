@@ -26,17 +26,17 @@ testOnAllContexts("PSO") do ctx
                 comparer,
                 dna -> decode(synth, dna),
                 vMax = 0.9f0,
-                w = 0.2f0,
-                mutationChance = 0.05f0,
-                mutationStrength = 0.01f0)
+                w = 0.4f0,
+                mutationChance = 0.01f0,
+                mutationStrength = 0.02f0)
             @test pso.dnaSize == dnaSize!(synth)
             @test pso.populationSize == 100
             @test pso.vMax == 0.9f0
-            @test pso.w == 0.2f0
+            @test pso.w == 0.4f0
             @test pso.c1 == 2f0
             @test pso.c2 == 2f0
-            @test pso.mutationChance == 0.05f0
-            @test pso.mutationStrength == 0.01f0
+            @test pso.mutationChance == 0.01f0
+            @test pso.mutationStrength == 0.02f0
             pso
         end)
 end

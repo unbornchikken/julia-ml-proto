@@ -1,4 +1,4 @@
-export GA, start!, step!
+export GA, start!, step!, release!
 
 immutable GA{C} <: PopulationBasedOptAlgo{C}
     ctx::C
@@ -37,6 +37,8 @@ GA(
         dnaSize,
         comparer,
         decode))
+
+release!(ga::GA) = release!(ga.popMan)
 
 start!(ga::GA) = (reset!(ga.comparer); randomize!(ga.popMan))
 

@@ -47,6 +47,7 @@ function release!(pop::Population)
     for entity in pop.entities
         release!(entity)
     end
+    empty!(pop)
 end
 
 function empty!(pop::Population)

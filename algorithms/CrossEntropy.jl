@@ -1,4 +1,4 @@
-export CrossEntropy, start!, step!
+export CrossEntropy, start!, step!, release!
 
 immutable CrossEntropy{C, A} <: PopulationBasedOptAlgo{C}
     ctx::C
@@ -39,6 +39,8 @@ CrossEntropy(
         comparer,
         decode),
     array(ctx, Float32, dnaSize, populationSize))
+
+release!(ce::CrossEntropy) = (release!(ce.popMan); release!(ce.offsprings))
 
 function start!(ce::CrossEntropy)
     reset!(ce.comparer)

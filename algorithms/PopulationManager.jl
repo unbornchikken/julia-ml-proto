@@ -1,5 +1,6 @@
 export
     PopulationManager,
+    release!,
     createCandidate,
     randomize!,
     chooseParentIndex,
@@ -15,6 +16,8 @@ end
 
 PopulationManager(ctx, populationSize::Int, dnaSize::Int, comparer::AbstractComparer, decode::Function) =
     PopulationManager(Population(ctx, comparer, decode), populationSize, dnaSize, BestEntity(comparer))
+
+release!(popMan::PopulationManager) = (release!(popMan.population); release!(popMan.best))
 
 createCandidate(popMan::PopulationManager) =
     Population(popMan.population.ctx, popMan.population.comparer, popMan.population.decode)
