@@ -35,7 +35,7 @@ function MLP{C}(ctx::C, weightDims::Vector{WeightDim})
         if i != numLayers
             dims = weightDims[i]
             # TODO: make Seq and co context dependent ASAP!
-            push!(weights, WeightPos(Seq(wIdx, wIdx + dims.size - 1), dims.rows, dims.cols)
+            push!(weights, WeightPos(seq(ctx, wIdx, wIdx + dims.size - 1), dims.rows, dims.cols)
             wIdx += dims.size
         end
     end

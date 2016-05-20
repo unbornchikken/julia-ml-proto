@@ -63,7 +63,7 @@ testOnAllBackends("AFArray") do af
     @test numdims(afArr) == length(size(afArr))
 
     afArr = array(af, [1, 2, 3, 4, 5])
-    indexed = afArr[Seq(1)]
+    indexed = afArr[seq(af, 1)]
     @test host(indexed) == [2]
     indexed = afArr[3]
     @test host(indexed) == [3]
@@ -78,7 +78,7 @@ testOnAllBackends("AFArray") do af
     indexed = afArr[-1, 3:4]
     @test host(indexed) == [12 16]
     # span
-    indexed = afArr[Span()]
+    indexed = afArr[span(af)]
     @test host(indexed) == [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
     indexed = afArr[2,:]
     @test host(indexed) == [2 6 10 14]
@@ -96,15 +96,15 @@ testOnAllBackends("AFArray") do af
     # Col, Row
     afArr = array(af, [[0,1,2] [3,4,5] [6,7,8]])
 
-    @test host(afArr[Row(0)]) == [0 3 6]
-    @test host(afArr[Row(2)]) == [2 5 8]
+    @test host(afArr[row(af, 0)]) == [0 3 6]
+    @test host(afArr[row(af, 2)]) == [2 5 8]
 
-    @test host(afArr[Rows(0, 1)]) == [[0,1] [3,4] [6,7]]
+    @test host(afArr[rows(af, 0, 1)]) == [[0,1] [3,4] [6,7]]
 
-    @test host(afArr[Col(0)]) == [0,1,2]
-    @test host(afArr[Col(2)]) == [6,7,8]
+    @test host(afArr[col(af, 0)]) == [0,1,2]
+    @test host(afArr[col(af, 2)]) == [6,7,8]
 
-    @test host(afArr[Cols(1,2)]) == [[3,4,5] [6,7,8]]
+    @test host(afArr[cols(af, 1,2)]) == [[3,4,5] [6,7,8]]
 
     println("\tindex assign")
     afArr = array(af, [1,2,3,4])

@@ -1,6 +1,6 @@
 import Base: getindex, setindex!
 export getindex, setindex!
-export Seq, Span, Row, Rows, Col, Cols
+export seq, span, row, rows, col, cols
 
 immutable Index <: AFImpl
     indexGen::Ptr{Void}
@@ -23,23 +23,35 @@ end
 Seq(i::Real) = Seq(i, i, 1)
 Seq(b::Real, e::Real) = Seq(b, e, 1)
 
+seq(af::ArrayFire, v) = Seq(v)
+seq(af::ArrayFire, v1, v2) = Seq(v1, v2)
+seq(af::ArrayFire, v1, v2, v3) = Seq(v1, v2, v3)
+
 immutable Col
     index::Int
 end
+
+col(af::ArrayFire, index) = Col(index)
 
 immutable Cols
     firstIndex::Int
     lastIndex::Int
 end
 
+cols(af::ArrayFire, firstIndex, lastIndex) = Cols(firstIndex, lastIndex)
+
 immutable Row
     index::Int
 end
+
+row(af::ArrayFire, index) = Row(index)
 
 immutable Rows
     firstIndex::Int
     lastIndex::Int
 end
+
+rows(af::ArrayFire, firstIndex, lastIndex) = Rows(firstIndex, lastIndex)
 
 immutable DummySeq
     i1::UInt32
@@ -109,6 +121,8 @@ function assignGen{B, I<:AFIndex}(arr::AFArray{B}, rhs::AFArray{B}, indices::Vec
 end
 
 immutable Span end
+
+span(af::ArrayFire) = Span()
 
 function getindex(arr::AFArray)
     verifyAccess(arr)

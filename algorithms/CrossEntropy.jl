@@ -54,7 +54,7 @@ function step!(ce::CrossEntropy)
     for i in 1:ce.populationSize
         parentIndex = chooseParentIndex(ce.popMan, ce.selectionStdDev);
         parent = ce.popMan.population[parentIndex]
-        ce.offsprings[Col(i - 1)] = parent.dna.array;
+        ce.offsprings[col(ce.ctx, i - 1)] = parent.dna.array;
     end
 
     candidate = createCandidate(ce.popMan)

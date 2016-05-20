@@ -86,9 +86,9 @@ function decodeAsContextArray{C}(syn::Synthesizer{C}, dna::DNA{C})
 
             pars = DecodePars(
                 syn.ctx,
-                dna.array[Seq(dnaBeginIndex, dnaEndIndex)],
+                dna.array[seq(syn.ctx, dnaBeginIndex, dnaEndIndex)],
                 result,
-                Seq(resultBeginIndex, resultEndIndex),
+                seq(syn.ctx, resultBeginIndex, resultEndIndex),
                 syn._states[ruleIndex]
             )
 
@@ -137,7 +137,7 @@ function decodeAt(syn::Synthesizer, array, items)
         for curr in syn.rules
             if curr == rule
                 scope!(syn.ctx) do this
-                    sub = array[Seq(outputIndex, outputIndex + resultSize(rule) - 1)]
+                    sub = array[seq(syn.ctx, outputIndex, outputIndex + resultSize(rule) - 1)]
                     if item.asContextArray
                         this.result(sub)
                         push!(all, sub)

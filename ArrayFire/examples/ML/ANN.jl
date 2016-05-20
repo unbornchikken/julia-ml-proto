@@ -71,7 +71,7 @@ backPropagate(ann::ANN, target, alpha::Float32) = scope!(ann.af) do this
             allErr = matmulTT(delta, ann.weights[i])
 
             # Remove the error of bias and propagate backward
-            err[] = allErr[:, Seq(1, dims(outVec, 1))]
+            err[] = allErr[:, seq(ann.af, 1, dims(outVec, 1))]
         end
     end
 end
@@ -99,8 +99,8 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
                         startPos = j * options.batchSize
                         endPos = startPos + options.batchSize - 1
 
-                        x = input[Seq(startPos, endPos), :]
-                        y = target[Seq(startPos, endPos), :]
+                        x = input[seq(af, startPos, endPos), :]
+                        y = target[seq(af, startPos, endPos), :]
 
                         forwardPropagate(ann, x)
                         backPropagate(ann, y, options.alpha)
@@ -111,8 +111,8 @@ function train(ann::ANN, input, target, options::ANNTrainOptions)
                 startPos = (numBatches - 1) * options.batchSize
                 endPos = numSamples - 1
 
-                outVec = predict(ann, input[Seq(startPos, endPos), :])
-                err = calculateError(outVec, target[Seq(startPos, endPos), :])
+                outVec = predict(ann, input[seq(af, startPos, endPos), :])
+                err = calculateError(outVec, target[seq(af, startPos, endPos), :])
             end
 
             allSec += sec;

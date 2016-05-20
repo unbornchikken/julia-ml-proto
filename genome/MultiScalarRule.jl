@@ -33,8 +33,8 @@ function decode(rule::MultiScalarRule, pars)
     scope!(pars.ctx) do this
         const depth = rule.variationCount
         const blockSize = rule.count * depth
-        values = moddims(pars.dnaFragment[Seq(0, blockSize - 1)], rule.count, depth)
-        dist = moddims(pars.dnaFragment[Seq(blockSize, blockSize * 2 - 1)], rule.count, depth)
+        values = moddims(pars.dnaFragment[seq(pars.ctx, 0, blockSize - 1)], rule.count, depth)
+        dist = moddims(pars.dnaFragment[seq(pars.ctx, blockSize, blockSize * 2 - 1)], rule.count, depth)
         rnd = randu(pars.ctx, Float32, rule.count, depth)
         test = rnd ./ maxOf(dist, 0.000001f0)
         max, idx = imax(test, 1)
