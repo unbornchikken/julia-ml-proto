@@ -29,4 +29,9 @@ include("algorithms/GA.jl")
 include("algorithms/CrossEntropy.jl")
 include("algorithms/PSO.jl")
 
+include("networks/networkTypes.jl")
+include("networks/ANN.jl")
+include("networks/FFMLP.jl")
+include("networks/RecMLP.jl")
+
 end
