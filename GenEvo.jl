@@ -8,30 +8,9 @@ using Reexport
 import AF: release!, copy, eval!
 
 include("utils.jl")
-
-include("genome/DNA.jl")
-include("genome/Synthesizer.jl")
-include("genome/MultiScalarRule.jl")
-include("genome/ScalarRule.jl")
-include("genome/SetRule.jl")
-
-include("algorithms/algoTypes.jl")
-include("algorithms/Comparer.jl")
-include("algorithms/ArrayComparer.jl")
-include("algorithms/CalculateComparer.jl")
-include("algorithms/FastComparer.jl")
-include("algorithms/Entity.jl")
-include("algorithms/BestEntity.jl")
-include("algorithms/Population.jl")
-include("algorithms/PopulationManager.jl")
-include("algorithms/Epoch.jl")
-include("algorithms/GA.jl")
-include("algorithms/CrossEntropy.jl")
-include("algorithms/PSO.jl")
-
-include("networks/networkTypes.jl")
-include("networks/ANN.jl")
-include("networks/FFMLP.jl")
-include("networks/RecMLP.jl")
+include("genome/index.jl")
+include("algorithms/index.jl")
+include("networks/index.jl")
+include("data/index.jl");
 
 end

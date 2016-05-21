@@ -2,7 +2,7 @@ export RecMLP, release!, predict!, setWeights!, reset!
 
 immutable RecMLP{C} <: MLP
     layers::Vector{Int}
-    net::ANN{C}
+    net::MLPData{C}
 end
 
 function RecMLP{C}(ctx::C, layers::Vector{Int})
@@ -16,7 +16,7 @@ function RecMLP{C}(ctx::C, layers::Vector{Int})
         cols = layers[i + 1]
         push!(dims, WeightDim(rows, cols))
     end
-    RecMLP{C}(layers, ANN(RecMLP{C}, ctx, dims))
+    RecMLP{C}(layers, MLPData(RecMLP{C}, ctx, dims))
 end
 
 function makeInputVector(mlp::RecMLP, index)

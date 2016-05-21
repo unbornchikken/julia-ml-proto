@@ -1,0 +1,5 @@
+include("DNA.jl")
+include("Synthesizer.jl")
+include("MultiScalarRule.jl")
+include("ScalarRule.jl")
+include("SetRule.jl")

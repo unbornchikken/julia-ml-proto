@@ -2,7 +2,7 @@ export FFMLP, release!, predict!, setWeights!, reset!
 
 immutable FFMLP{C} <: MLP
     layers::Vector{Int}
-    net::ANN{C}
+    net::MLPData{C}
 end
 
 function FFMLP{C}(ctx::C, layers::Vector{Int})
@@ -13,7 +13,7 @@ function FFMLP{C}(ctx::C, layers::Vector{Int})
         cols = layers[i + 1]
         push!(dims, WeightDim(rows, cols))
     end
-    FFMLP{C}(layers, ANN(FFMLP{C}, ctx, dims))
+    FFMLP{C}(layers, MLPData(FFMLP{C}, ctx, dims))
 end
 
 makeInputVector(mlp::FFMLP, index) = addBias!(mlp.net, mlp.signal[index])

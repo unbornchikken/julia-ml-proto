@@ -13,7 +13,7 @@ end
 
 WeightPos{S}(seq::S, dims1, dim2) = WeightPos{S}(deq, (dim1, dim2))
 
-immutable ANN{C, A}
+immutable MLPData{C, A}
     ctx::C
     numLayers::Int
     weightCount::Int
@@ -23,7 +23,7 @@ immutable ANN{C, A}
     weights::Vector{WeightPos}
 end
 
-function ANN{C}(ctx::C, weightDims::Vector{WeightDim})
+function MLPData{C}(ctx::C, weightDims::Vector{WeightDim})
     numLayers = length(dims) + 1
     empty = array(ctx)
     A = typeof(empty)
@@ -40,21 +40,21 @@ function ANN{C}(ctx::C, weightDims::Vector{WeightDim})
             wIdx += dims.size
         end
     end
-    ANN{C, A}(ctx, numLayers, weightCount, empty, weightsArray, signal, weights)
+    MLPData{C, A}(ctx, numLayers, weightCount, empty, weightsArray, signal, weights)
 end
 
-function release!(mlp::ANN)
+function release!(mlp::MLPData)
     release!(mlp.weightsArray)
     for s in mlp.signal
         release!(s)
     end
 end
 
-function addBias!(mlp::ANN, input)
+function addBias!(mlp::MLPData, input)
     joinArrays(1, constant(mlp.ctx, 1.0f0, dims(input, 0)), input)
 end
 
-function predict!(impl, mlp::ANN, input)
+function predict!(impl, mlp::MLPData, input)
     ann.signal[1][] = input
     for i in 1:mlp.numLayers - 1
         scope!(mlp.ctx) do this
@@ -68,13 +68,13 @@ function predict!(impl, mlp::ANN, input)
     ann.signal[mlp.numLayers]
 end
 
-function setWeights!(mlp::ANN, weights)
+function setWeights!(mlp::MLPData, weights)
     @assert dims(weights) == dims(mlp.weightsArray)
     mlp.weightsArray[] = weights
 end
 
-reset!(mlp::ANN) = for s in mlp.signal
+reset!(mlp::MLPData) = for s in mlp.signal
     s[] = mlp.empty
 end
 
-arrayType{C, A}(mlp::ANN{C, A}) = A
+arrayType{C, A}(mlp::MLPData{C, A}) = A
