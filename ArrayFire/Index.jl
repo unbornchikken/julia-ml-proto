@@ -1,6 +1,6 @@
 import Base: getindex, setindex!
 export getindex, setindex!
-export seq, span, row, rows, col, cols
+export seq, span, row, rows, col, cols, seqBegin, seqEnd
 
 immutable Index <: AFImpl
     indexGen::Ptr{Void}
@@ -26,6 +26,9 @@ Seq(b::Real, e::Real) = Seq(b, e, 1)
 seq(af::ArrayFire, v) = Seq(v)
 seq(af::ArrayFire, v1, v2) = Seq(v1, v2)
 seq(af::ArrayFire, v1, v2, v3) = Seq(v1, v2, v3)
+
+seqBegin(seq::Seq) = Int(floor(seq.afBegin))
+seqEnd(seq::Seq) = Int(floor(seq.afEnd))
 
 immutable Col
     index::Int

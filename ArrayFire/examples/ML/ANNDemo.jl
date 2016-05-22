@@ -29,17 +29,16 @@ function runDemo(af)
     trainTarget = transpose(data.trainLabels)
     testTarget = transpose(data.testLabels)
 
-    println("Warming up.")
+    println("Creating Network.")
     network = ANN(af, [dims(trainFeats, 1), 100, 50, data.numClasses])
+
+    println("Warming up.")
     train(
         network,
         trainFeats,
         trainTarget,
         ANNTrainOptions(2.0f0, 1, 100, 0.0001f0))
     sync(af)
-
-    println("Creating Network.")
-    network = ANN(af, [dims(trainFeats, 1), 100, 50, data.numClasses])
 
     println("Starting.")
     sec = @elapsed begin

@@ -1,4 +1,4 @@
-export MNISTData, featureSize, numTrain, numTest
+export MNISTData, featureSize, numTrain, numTest, numClasses
 
 immutable MNISTData{A}
     trainImages::A
@@ -7,8 +7,10 @@ immutable MNISTData{A}
     testLabels::A
 end
 
-featureSize(data::MNISTData) = dims(data.trainImages, 0)
+featureSize(data::MNISTData) = dims(data.trainImages, 1)
 
-numTrain(data::MNISTData) = dims(data.trainImages, 1)
+numClasses(data::MNISTData) = dims(data.trainLabels, 1)
 
-numTest(data::MNISTData) = dims(data.testImages, 1)
+numTrain(data::MNISTData) = dims(data.trainImages, 0)
+
+numTest(data::MNISTData) = dims(data.testImages, 0)

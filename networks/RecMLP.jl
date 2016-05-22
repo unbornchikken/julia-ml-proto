@@ -2,7 +2,7 @@ export RecMLP, release!, predict!, setWeights!, reset!
 
 immutable RecMLP{C} <: MLP
     layers::Vector{Int}
-    net::MLPData{C}
+    data::MLPData{C}
 end
 
 function RecMLP{C}(ctx::C, layers::Vector{Int})
@@ -20,14 +20,14 @@ function RecMLP{C}(ctx::C, layers::Vector{Int})
 end
 
 function makeInputVector(mlp::RecMLP, index)
-    input = addBias!(mlp.net, mlp.signal[index])
+    input = addBias!(mlp.data, mlp.signal[index])
     batchSize = dims(input, 0)
-    outputs = Nullable{arrayType(mlp.net)}()
-    for next in index + 1:mlp.net.numLayers
-        output = mlp.net.signal[next]
+    outputs = Nullable{arrayType(mlp.data)}()
+    for next in index + 1:mlp.data.numLayers
+        output = mlp.data.signal[next]
         outputSize = mlp.layers[next]
         if isEmpty(output)
-            output = constant(mlp.net.ctx, 0f0, batchSize, outputSize)
+            output = constant(mlp.data.ctx, 0f0, batchSize, outputSize)
         elseif dims(output, 0) != batchSize
             error("Size of batches must be the same. Last batch size was $(dims(output, 0)) and current is $batchSize.")
         end
@@ -36,10 +36,10 @@ function makeInputVector(mlp::RecMLP, index)
     joinArrays(1, input, get(outputs))
 end
 
-release!(mlp::RecMLP) = release!(mlp.net)
+release!(mlp::RecMLP) = release!(mlp.data)
 
-predict!(mlp::RecMLP, input) = predict!(mlp, mlp.net, input)
+predict!(mlp::RecMLP, input) = predict!(mlp, mlp.data, input)
 
-setWeights!(mlp::RecMLP, weights) = setWeights!(mlp.net, weights)
+setWeights!(mlp::RecMLP, weights) = setWeights!(mlp.data, weights)
 
-reset!(mlp::RecMLP) = reset!(mlp.net)
+reset!(mlp::RecMLP) = reset!(mlp.data)

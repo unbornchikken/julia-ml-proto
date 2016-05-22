@@ -11,7 +11,9 @@ immutable WeightPos{S}
     dims::Tuple{DimT, DimT}
 end
 
-WeightPos{S}(seq::S, dims1, dim2) = WeightPos{S}(deq, (dim1, dim2))
+WeightPos{S}(seq::S, dim1, dim2) = WeightPos{S}(seq, (dim1, dim2))
+
+Base.show(io::IO, pos::WeightPos) = print(io, "< Size: $(pos.dims), Seq: $((seqBegin(pos.seq),seqEnd(pos.seq))) >")
 
 immutable MLPData{C, A}
     ctx::C
@@ -24,11 +26,11 @@ immutable MLPData{C, A}
 end
 
 function MLPData{C}(ctx::C, weightDims::Vector{WeightDim})
-    numLayers = length(dims) + 1
+    numLayers = length(weightDims) + 1
     empty = array(ctx)
     A = typeof(empty)
-    weights = Vector{A}()
-    signal = Vector{WeightPos}()
+    weights = Vector{WeightPos}()
+    signal = Vector{A}()
     weightCount = map(d -> d.size, weightDims) |> sum
     weightsArray = array(ctx, Float32, weightCount)
     wIdx = 0
@@ -42,6 +44,8 @@ function MLPData{C}(ctx::C, weightDims::Vector{WeightDim})
     end
     MLPData{C, A}(ctx, numLayers, weightCount, empty, weightsArray, signal, weights)
 end
+
+Base.show(io::IO, mlp::MLPData) = print(io, "Weight Count: $(mlp.weightCount)\nWeight Layout: $(mlp.weights)")
 
 function release!(mlp::MLPData)
     release!(mlp.weightsArray)

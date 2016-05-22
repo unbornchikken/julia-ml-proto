@@ -2,7 +2,7 @@ export FFMLP, release!, predict!, setWeights!, reset!
 
 immutable FFMLP{C} <: MLP
     layers::Vector{Int}
-    net::MLPData{C}
+    data::MLPData{C}
 end
 
 function FFMLP{C}(ctx::C, layers::Vector{Int})
@@ -13,15 +13,17 @@ function FFMLP{C}(ctx::C, layers::Vector{Int})
         cols = layers[i + 1]
         push!(dims, WeightDim(rows, cols))
     end
-    FFMLP{C}(layers, MLPData(FFMLP{C}, ctx, dims))
+    FFMLP{C}(layers, MLPData(ctx, dims))
 end
 
-makeInputVector(mlp::FFMLP, index) = addBias!(mlp.net, mlp.signal[index])
+makeInputVector(mlp::FFMLP, index) = addBias!(mlp.data, mlp.signal[index])
 
-release!(mlp::FFMLP) = release!(mlp.net)
+release!(mlp::FFMLP) = release!(mlp.data)
 
-predict!(mlp::FFMLP, input) = predict!(mlp, mlp.net, input)
+predict!(mlp::FFMLP, input) = predict!(mlp, mlp.data, input)
 
-setWeights!(mlp::FFMLP, weights) = setWeights!(mlp.net, weights)
+setWeights!(mlp::FFMLP, weights) = setWeights!(mlp.data, weights)
 
-reset!(mlp::FFMLP) = reset!(mlp.net)
+reset!(mlp::FFMLP) = reset!(mlp.data)
+
+Base.show(io::IO, mlp::FFMLP) = print(io, "Feed Forward Multiplayer Perceptron\nLayers: $(mlp.layers)\nData: $(mlp.data)")

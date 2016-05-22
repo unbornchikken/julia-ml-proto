@@ -60,9 +60,6 @@ loadSubset(ctx, expandLabels = true, frac = 0.6f0) = scope!(ctx) do this
     numTrain = dims(trainImages, 2)
     numTest = dims(testImages, 2)
 
-    println("Training sample count: $numTrain")
-    println("Test sample count: $numTest")
-
     local trainLabelsArr, testLabelsArr
 
     if expandLabels
@@ -94,11 +91,11 @@ loadSubset(ctx, expandLabels = true, frac = 0.6f0) = scope!(ctx) do this
         testLabelsArr = labels[testIndices]
     end
 
-    featureSize = DimT(elements(data.trainImages) / data.numTrain)
-    trainFeats = transpose(moddims(data.trainImages, featureSize, data.numTrain))
-    testFeats = transpose(moddims(data.testImages, featureSize, data.numTest))
-    trainTarget = transpose(data.trainLabels)
-    testTarget = transpose(data.testLabels)
+    featureSize = DimT(elements(trainImages) / numTrain)
+    trainFeats = transpose(moddims(trainImages, featureSize, numTrain))
+    testFeats = transpose(moddims(testImages, featureSize, numTest))
+    trainTarget = transpose(trainLabelsArr)
+    testTarget = transpose(testLabelsArr)
 
     MNISTData(
         this.result(trainFeats),
