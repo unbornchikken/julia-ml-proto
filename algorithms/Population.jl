@@ -10,14 +10,14 @@ export
     sort!,
     release!
 
-immutable Population{C}
+immutable Population{C, T<:AbstractComparer}
     ctx::C
-    comparer::AbstractComparer
+    comparer::T
     decode::Function
     entities::Vector{Entity}
 end
 
-Population{C}(ctx::C, comparer::AbstractComparer, decode::Function) =
+Population(ctx, comparer, decode) =
     Population(ctx, comparer, decode, Vector{Entity}())
 
 length(pop::Population) = length(pop.entities)
@@ -39,7 +39,7 @@ function randomize!(pop::Population, populationSize::Int, dnaSize::Int)
 end
 
 function sort!(pop::Population)
-    sort!(pop.entities, by = e -> e.body, lt = pop.comparer)
+    sort!(pop.entities, by = e -> e.body, lt = (a, b) -> fn(pop.comparer)(a, b))
     first(pop.entities)
 end
 

@@ -2,8 +2,6 @@ export AbstractComparer, Comparer, fn, reset!
 
 abstract AbstractComparer
 
-call(c::AbstractComparer, x, y) = fn(c)(x, y)
-
 immutable Comparer <: AbstractComparer
     fn::Function
     reset::Nullable{Function}

@@ -1,7 +1,7 @@
 export ArrayComparer, fn, reset!
 
 type ArrayComparer <: AbstractComparer
-    c::AbstractComparer
+    c::Comparer
 end
 
 ArrayComparer() = ArrayComparer(Comparer())

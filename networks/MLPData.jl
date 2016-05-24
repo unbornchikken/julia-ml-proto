@@ -59,17 +59,22 @@ function addBias!(mlp::MLPData, input)
 end
 
 function predict!(impl, mlp::MLPData, input)
-    ann.signal[1][] = input
-    for i in 1:mlp.numLayers - 1
+    mlp.signal[1][] = input
+    const eof = mlp.numLayers - 1
+    for i in 1:eof
         scope!(mlp.ctx) do this
             inVec = makeInputVector(impl, i)
             weights = mlp.weights[i]
-            currWeights = moddims(mlp.weightsArray[weights.seq], weights.dims...);
+            currWeights = moddims(mlp.weightsArray[weights.seq], weights.dims...)
             outVec = matmul(inVec, currWeights)
-            mlp.signal[i + 1][] = sigmoid(outVec)
+            if i == eof
+                mlp.signal[i + 1][] = sigmoid(outVec)
+            else
+                mlp.signal[i + 1][] = sin(outVec ./ 4f0)
+            end
         end
     end
-    ann.signal[mlp.numLayers]
+    mlp.signal[mlp.numLayers]
 end
 
 function setWeights!(mlp::MLPData, weights)

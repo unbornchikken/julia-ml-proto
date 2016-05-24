@@ -1,16 +1,16 @@
 export CalculateComparer, fn, reset!
 
-type CalculateComparer <: AbstractComparer
+type CalculateComparer{C<:AbstractComparer} <: AbstractComparer
     factory::Function
-    c::AbstractComparer
+    c::C
     _results::Dict{Any, Nullable{Any}}
-
-    CalculateComparer(factory::Function) = new(factory, Comparer(), Dict{Any, Nullable{Any}}())
-
-    CalculateComparer(factory::Function, fn::Function) = new(factory, Comparer(fn), Dict{Any, Nullable{Any}}())
-
-    CalculateComparer(factory::Function, c::AbstractComparer) = new(factory, c, Dict{Any, Nullable{Any}}())
 end
+
+CalculateComparer(factory::Function) = CalculateComparer{Comparer}(factory, Comparer(), Dict{Any, Nullable{Any}}())
+
+CalculateComparer(factory::Function, fn::Function) = CalculateComparer{Comparer}(factory, Comparer(fn), Dict{Any, Nullable{Any}}())
+
+CalculateComparer{C}(factory::Function, c::C) = CalculateComparer{C}(factory, c, Dict{Any, Nullable{Any}}())
 
 fn(cc::CalculateComparer) = (a, b) ->
 begin

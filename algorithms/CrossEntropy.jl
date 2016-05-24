@@ -70,6 +70,7 @@ function step!(ce::CrossEntropy)
                 childDNA = DNA(ce.ctx, dnaArray)
                 this.result(childDNA.array)
                 mutate!(childDNA, ce.mutationChance, ce.mutationStrength)
+                eval!(childDNA)
             end)
         end
     finally

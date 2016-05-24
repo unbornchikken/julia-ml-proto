@@ -1,4 +1,4 @@
-export RecMLP, release!, predict!, setWeights!, reset!
+export RecMLP, reset!
 
 immutable RecMLP{C} <: MLP
     layers::Vector{Int}
@@ -20,7 +20,7 @@ function RecMLP{C}(ctx::C, layers::Vector{Int})
 end
 
 function makeInputVector(mlp::RecMLP, index)
-    input = addBias!(mlp.data, mlp.signal[index])
+    input = addBias!(mlp.data, mlp.data.signal[index])
     batchSize = dims(input, 0)
     outputs = Nullable{arrayType(mlp.data)}()
     for next in index + 1:mlp.data.numLayers
@@ -35,11 +35,5 @@ function makeInputVector(mlp::RecMLP, index)
     end
     joinArrays(1, input, get(outputs))
 end
-
-release!(mlp::RecMLP) = release!(mlp.data)
-
-predict!(mlp::RecMLP, input) = predict!(mlp, mlp.data, input)
-
-setWeights!(mlp::RecMLP, weights) = setWeights!(mlp.data, weights)
 
 reset!(mlp::RecMLP) = reset!(mlp.data)

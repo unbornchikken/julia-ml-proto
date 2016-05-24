@@ -2,12 +2,12 @@ import Base: isnull, get
 
 export BestEntity, isnull, get, reset!, set!, update!, release!
 
-type BestEntity
-    comparer::AbstractComparer
+type BestEntity{T<:AbstractComparer}
+    comparer::T
     value::Nullable{Entity}
-
-    BestEntity(comparer) = new(comparer, Nullable{Entity}())
 end
+
+BestEntity(comparer) = BestEntity(comparer, Nullable{Entity}())
 
 release!(best::BestEntity) = reset!(best)
 
@@ -33,7 +33,7 @@ end
 update!(best::BestEntity, value::Entity) = update!(best, Nullable{Entity}(value))
 
 function update!(best::BestEntity, other::Entity)
-    if isnull(best) || best.comparer(other.body, get(best).body)
+    if isnull(best) || fn(best.comparer)(other.body, get(best).body)
         set!(best, other)
         return true
     end

@@ -47,6 +47,7 @@ end
 
 function eval!(dna::DNA)
     eval!(dna.array)
+    dna
 end
 
 length(dna::DNA) = dims(dna.array, 0)

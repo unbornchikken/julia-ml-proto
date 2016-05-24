@@ -58,4 +58,5 @@ function createChildDNA(ga::GA)
     parent2 = ga.popMan.population[parent2Index]
     childDNA = crossover(parent1.dna, parent2.dna)
     mutate!(childDNA, ga.mutationChance, ga.mutationStrength)
+    eval!(childDNA)
 end

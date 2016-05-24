@@ -1,15 +1,15 @@
 export FastComparer, fn, reset!
 
-type FastComparer <: AbstractComparer
+type FastComparer{C<:AbstractComparer} <: AbstractComparer
     c::AbstractComparer
     _results::Dict{Tuple, Nullable{Int}}
-
-    FastComparer(c) = new(c, Dict{Tuple, Nullable{Int}}())
 end
 
-FastComparer() = FastComparer(Comparer())
+FastComparer() = FastComparer{Comparer}(Comparer())
 
-FastComparer(fn::Function) = FastComparer(Comparer(fn))
+FastComparer{C}(c::C) = FastComparer{C}(c, Dict{Tuple, Nullable{Int}}())
+
+FastComparer(fn::Function) = FastComparer{Comparer}(Comparer(fn))
 
 fn(fc::FastComparer) = (a, b) -> compare(fc, a, b) < 0
 

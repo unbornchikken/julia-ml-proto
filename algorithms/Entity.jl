@@ -8,8 +8,6 @@ immutable Entity{T}
 end
 
 function Entity{T}(dna::DNA, body::T)
-    eval!(dna)
-    evalBody!(body)
     Entity{T}(dna, body)
 end
 
@@ -18,14 +16,6 @@ end
         :( release!(entity.body); release!(entity.dna) )
     else
         :( release!(entity.dna) )
-    end
-end
-
-@generated function evalBody!{T}(body::T)
-    if length(methods(eval!, (T, ))) > 0
-        :( eval!(body) )
-    else
-        :( )
     end
 end
 
